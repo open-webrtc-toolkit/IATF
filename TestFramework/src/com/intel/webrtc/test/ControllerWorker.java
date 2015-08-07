@@ -19,7 +19,7 @@ class ControllerWorker extends Thread {
 
     private String deviceId;
     private ControllerWorkerObserver observer = null;
-    private boolean alive = true;
+    private volatile boolean alive = true;
 
     private BufferedReader bufferedReader = null;
 
@@ -118,7 +118,6 @@ class ControllerWorker extends Thread {
             }
             if (message == null)
                 continue;
-            Logger.d(TAG, "message received: " + message);
             dispatchMessage(message);
         }
         tearDown();

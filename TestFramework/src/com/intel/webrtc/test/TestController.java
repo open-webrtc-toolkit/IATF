@@ -111,6 +111,8 @@ public class TestController implements ControllerWorkerObserver {
             }
         }
         Logger.d(TAG, "The result was:" + testStatus.name());
+        heartBeatThread.setTEST_END(true);
+        close();
         return testStatus;
     }
 
@@ -329,6 +331,11 @@ public class TestController implements ControllerWorkerObserver {
     }
 
     private class HeartBeatThread extends Thread {
+        private volatile boolean TEST_END=false;
+        public void setTEST_END(boolean tEST_END) {
+			TEST_END = tEST_END;
+			Logger.d(TAG, "set TEST_END:"+TEST_END);
+		}
         @Override
         public void run() {
             try {
@@ -339,7 +346,7 @@ public class TestController implements ControllerWorkerObserver {
                 e.printStackTrace();
             }
             // TODO Replace this condition with "Test hasn't finished"
-            while (true) {
+            while (!TEST_END) {
                 try {
                     Thread.sleep(5000);
                     long earlestTime = heartBeatRecorder.getEarliest()
