@@ -19,7 +19,7 @@ public class Main {
         device1.setName("device1");
         DemoTestDevice2 device2 = new DemoTestDevice2();
         device2.setName("device2");
-        //testSuite.addTestDevice(device1);
+        testSuite.addTestDevice(device1);
         testSuite.addTestDevice(device2);
         System.out.println(testSuite.toString());
         testRunner.runTest(testSuite);

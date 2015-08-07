@@ -3,6 +3,7 @@ package com.intel.webrtc.test.android;
 import android.app.Activity;
 import android.util.Log;
 
+import com.intel.webrtc.test.Logger;
 import com.intel.webrtc.test.TestDevice;
 import org.junit.Assert;
 
@@ -38,7 +39,7 @@ public class AndroidTestDevice extends Assert implements TestDevice {
      */
     public AndroidTestDevice() {
         super();
-        Log.d(TAG, "Created successfully.");
+        Logger.d(TAG, "Created successfully.");
         controller = null;
         testEntry = null;
     }

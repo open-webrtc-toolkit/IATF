@@ -10,7 +10,7 @@ public class DemoTestDevice2 extends AndroidTestDevice {
     String lock = "lock", TAG = "DemoTestDevice2";
 
     public void testWaitNotify() {
-        SystemClock.sleep(10000);
+        SystemClock.sleep(5000);
         getActivity();
         waitForObject(lock);
         Log.d(TAG, "Test Finished");
