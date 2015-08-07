@@ -283,14 +283,20 @@ public class TestController implements ControllerWorkerObserver {
 
     @Override
     public void onWait(String deviceId, String lockId) {
-        wnManager.waitForObject(deviceId, lockId);
+        Logger.d(TAG, "onWait(): deviceId:\t" + deviceId + "\tlockId:\t"
+                + lockId);
+        boolean CallNotify=wnManager.waitForObject(deviceId, lockId);
+        if(CallNotify){
+            Logger.d(TAG, "Use Stored notify !");
+            notifyDevice(deviceId, lockId);
+        }
     }
 
     @Override
     public void onNotify(String deviceId, String lockId) {
         Logger.d(TAG, "onNotify(): deviceId:\t" + deviceId + "\tlockId:\t"
                 + lockId);
-        String notifiedDevice = wnManager.notifyObject(lockId);
+        String notifiedDevice = wnManager.notifyObject(deviceId,lockId);
         if (notifiedDevice != null) {
             notifyDevice(notifiedDevice, lockId);
         }
