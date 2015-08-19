@@ -164,9 +164,11 @@ public class AndroidTestEntry extends InstrumentationTestCase implements
                 activityClass = (Class<Activity>) Class
                         .forName(testActivityName);
                 assertNotNull(activityClass);
-                super.launchActivity(testPackage, activityClass, new Bundle());
+                testActivity=super.launchActivity(testPackage, activityClass, new Bundle());
+                Log.d(TAG, "testActivity:"+testActivity);
             } catch (ClassNotFoundException | ClassCastException e) {
                 // TODO Auto-generated catch block
+                Log.e(TAG, testActivityName);
                 e.printStackTrace();
             }
         }

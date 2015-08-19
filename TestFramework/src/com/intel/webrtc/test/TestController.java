@@ -17,6 +17,8 @@ import org.json.JSONObject;
 
 import com.intel.webrtc.test.ControllerWorker.ControllerWorkerObserver;
 
+import android.R.integer;
+
 /**
  * This class takes charge of the executing process of a test case.
  * It communicates with test devices via Socket, and do the following things:
@@ -50,7 +52,8 @@ public class TestController implements ControllerWorkerObserver {
 
     private HeartBeatRecorder heartBeatRecorder;
     private HeartBeatThread heartBeatThread;
-    private int port = 10086;
+//    private int port = 10086;
+    private String ip="127.0.0.1";
 
     private TestStatus testStatus;
 
@@ -111,7 +114,7 @@ public class TestController implements ControllerWorkerObserver {
             }
         }
         Logger.d(TAG, "The result was:" + testStatus.name());
-        heartBeatThread.setTEST_END(true);
+        heartBeatThread.setTestEnd(true);
         close();
         return testStatus;
     }
@@ -138,7 +141,8 @@ public class TestController implements ControllerWorkerObserver {
         Iterator<Entry<String, String>> iterator = addressTable.entrySet()
                 .iterator();
         Entry<String, String> element;
-        String deviceId, ipAddr;
+        String deviceId;
+        String localPort;
         String[] deviceIds = new String[addressTable.size()];
         int index = 0;
         while (iterator.hasNext()) {
@@ -148,12 +152,12 @@ public class TestController implements ControllerWorkerObserver {
             ControllerWorker controllerWorker = null;
             element = iterator.next();
             deviceId = element.getKey();
-            ipAddr = element.getValue();
+            localPort = element.getValue();
             deviceIds[index++] = deviceId;
             try {
-                Logger.d(TAG, "Create connection to ip " + ipAddr + " port "
-                        + port);
-                socket = new Socket(ipAddr, port);
+                Logger.d(TAG, "Create connection to ip " + deviceId + " port "
+                        + localPort);
+                socket = new Socket(ip, Integer.parseInt(localPort));
                 bufferedReader = new BufferedReader(new InputStreamReader(
                         socket.getInputStream()));
                 printWriter = new PrintWriter(new BufferedWriter(
@@ -182,7 +186,6 @@ public class TestController implements ControllerWorkerObserver {
             }
         }
         heartBeatRecorder = new HeartBeatRecorder(deviceIds);
-
     }
 
     /**
@@ -273,6 +276,7 @@ public class TestController implements ControllerWorkerObserver {
                         + deviceId);
             }
         }
+        Logger.d(TAG, "TestController closed.");
     }
 
     @Override
@@ -337,11 +341,11 @@ public class TestController implements ControllerWorkerObserver {
     }
 
     private class HeartBeatThread extends Thread {
-        private volatile boolean TEST_END=false;
-        public void setTEST_END(boolean tEST_END) {
-			TEST_END = tEST_END;
-			Logger.d(TAG, "set TEST_END:"+TEST_END);
-		}
+        private volatile boolean testEnd=false;
+        public void setTestEnd(boolean end) {
+            this.testEnd = end;
+            Logger.d(TAG, "set testEnd flag:"+testEnd);
+        }
         @Override
         public void run() {
             try {
@@ -352,7 +356,7 @@ public class TestController implements ControllerWorkerObserver {
                 e.printStackTrace();
             }
             // TODO Replace this condition with "Test hasn't finished"
-            while (!TEST_END) {
+            while (!testEnd) {
                 try {
                     Thread.sleep(5000);
                     long earlestTime = heartBeatRecorder.getEarliest()

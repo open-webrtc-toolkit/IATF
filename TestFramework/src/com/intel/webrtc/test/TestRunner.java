@@ -18,11 +18,13 @@ import com.intel.webrtc.test.android.AndroidDeviceInfo;
 import com.intel.webrtc.test.android.AndroidTestDevice;
 import com.intel.webrtc.test.android.AndroidDeviceInfo.AndroidDeviceType;
 
+import android.R.integer;
+
 /**
- * This class is the core of the test framework.
- * Its main job is collaborating all modules together.
- * It is also responsible for interacting with Linux System and ADB, in order to
- * get device info and start test on each device.
+ * This class is the core of the test framework. Its main job is collaborating
+ * all modules together. It is also responsible for interacting with Linux
+ * System and ADB, in order to get device info and start test on each device.
+ *
  * @author xianglai
  *
  */
@@ -38,8 +40,7 @@ public class TestRunner {
     private LinkedList<TestResult> testResults;
 
     // androidHome and antHome should be read from configure files.
-    private String adbPath, antPath, shellPath, apkName, androidTestPackage,
-            androidTestClass;
+    private String adbPath, antPath, shellPath, apkName, androidTestPackage, androidTestClass;
     // Get the port from the configuration, and pass it to the TestController
     int port;
     private TestCase currentTestCase;
@@ -72,14 +73,14 @@ public class TestRunner {
 
     /**
      * run TestCases in the TestSuite one by one.
+     *
      * @param tests
-     *     the test suite.
+     *            the test suite.
      */
     public void runTest(TestSuite tests) {
         deployTests();
         Hashtable<String, TestCase> testCases = tests.getTestCases();
-        Iterator<Entry<String, TestCase>> iterator = testCases.entrySet()
-                .iterator();
+        Iterator<Entry<String, TestCase>> iterator = testCases.entrySet().iterator();
         while (iterator.hasNext()) {
             Entry<String, TestCase> entry = iterator.next();
             runTestCase(entry.getValue());
@@ -90,8 +91,9 @@ public class TestRunner {
 
     /**
      * Run single test case.
+     *
      * @param testCase
-     *     the test case which is going to run.
+     *            the test case which is going to run.
      */
     private void runTestCase(TestCase testCase) {
         if (testController != null) {
@@ -105,8 +107,7 @@ public class TestRunner {
         // TODO reset the test environment
         getTestDeviceInfo();
         // TODO initialize the test devices
-        CountDownLatch startTestCountDownLatch = new CountDownLatch(testCase
-                .getDevices().size());
+        CountDownLatch startTestCountDownLatch = new CountDownLatch(testCase.getDevices().size());
         Iterator<TestDevice> iterator = testCase.getDevices().iterator();
         while (iterator.hasNext()) {
             TestDevice device = iterator.next();
@@ -130,13 +131,32 @@ public class TestRunner {
         }
         testController = new TestController(addressTable, startMessageTable);
         TestStatus testCaseReslut = testController.start();// TODO result?
+        removeForwardRules();
         testResults.add(new TestResult(testCase.getName(), testCaseReslut));
     }
 
     /**
-     *  Get device info.
-     *  Now, this method will get serial Id, device type and IP address
-     *  of all Android device that attached to the computer.
+     * Remove the forward rules on all the devices after a testCase is finished.
+     */
+    private void removeForwardRules() {
+        // Clean forward rules
+        String cmd = adbPath + " forward --remove-all";
+        try {
+            Process process = executeByShell(cmd);
+            process.waitFor();
+        } catch (IOException e) {
+            Logger.e(TAG, "Forward setting error!");
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            Logger.e(TAG, "Wait for cmdline process error!");
+            e.printStackTrace();
+        }
+        Logger.d(TAG, "Remove all the forward rules.");
+    }
+
+    /**
+     * Get device info. Now, this method will get serial Id, device type and IP
+     * address of all Android device that attached to the computer.
      */
     private void getTestDeviceInfo() {
         Process process = null;
@@ -145,8 +165,7 @@ public class TestRunner {
         AndroidDeviceType type;
         try {
             process = executeByShell(adbPath + " devices");
-            sio0 = new BufferedReader(new InputStreamReader(
-                    process.getInputStream()));
+            sio0 = new BufferedReader(new InputStreamReader(process.getInputStream()));
             process.waitFor();
             while (true) {
                 serialId = null;
@@ -171,17 +190,14 @@ public class TestRunner {
                     type = AndroidDeviceType.UNAUTHORIZED;
                     Logger.e(TAG, "Device " + serialId + " is unauthorized!");
                 } else {
-                    Logger.e(TAG, "The type of Device " + serialId
-                            + " is unknown!");
+                    Logger.e(TAG, "The type of Device " + serialId + " is unknown!");
                 }
                 /**
                  * GET CLIENT IP
                  */
                 try {
-                    process = executeByShell(adbPath + " -s " + serialId
-                            + " shell netcfg");
-                    sio1 = new BufferedReader(new InputStreamReader(
-                            process.getInputStream()));
+                    process = executeByShell(adbPath + " -s " + serialId + " shell netcfg");
+                    sio1 = new BufferedReader(new InputStreamReader(process.getInputStream()));
                     process.waitFor();
                     while (true) {
                         // TODO add some fault tolerance related code.
@@ -198,27 +214,19 @@ public class TestRunner {
                             }
                             if (i != 0) {
                                 ipAddr = resultLine.substring(i, offset);
-                                Logger.d(TAG, "Serial Id: " + serialId
-                                        + ", Type:" + type.name() + ", Ip: "
-                                        + ipAddr);
-                                androidDeviceInfos.push(new AndroidDeviceInfo(
-                                        serialId, type, ipAddr));
-                                Logger.d(TAG, "Push back into Infos, size = "
-                                        + androidDeviceInfos.size());
+                                Logger.d(TAG, "Serial Id: " + serialId + ", Type:" + type.name() + ", Ip: " + ipAddr);
+                                androidDeviceInfos.push(new AndroidDeviceInfo(serialId, type, ipAddr));
+                                Logger.d(TAG, "Push back into Infos, size = " + androidDeviceInfos.size());
                             } else {
-                                Logger.d(TAG, "Serial Id: " + serialId
-                                        + ", Type:" + type.name()
-                                        + ", Ip:-----------");
+                                Logger.d(TAG, "Serial Id: " + serialId + ", Type:" + type.name() + ", Ip:-----------");
                             }
                         }
                     }
                 } catch (IOException e) {
-                    Logger.e(TAG, "Error occured when get ip address of "
-                            + serialId);
+                    Logger.e(TAG, "Error occured when get ip address of " + serialId);
                     e.printStackTrace();
                 } catch (InterruptedException e) {
-                    Logger.e(TAG, "Error occured when get ip address of "
-                            + serialId);
+                    Logger.e(TAG, "Error occured when get ip address of " + serialId);
                     e.printStackTrace();
                 }
             }
@@ -233,11 +241,12 @@ public class TestRunner {
 
     /**
      * This method is a common entry of starting test device
+     *
      * @param device
-     *      device name
+     *            device name
      * @param latch
-     *      to guarantee all TestDevices have been started before the next step.
-     *      if the action finishes, it will call latch.countDown().
+     *            to guarantee all TestDevices have been started before the next
+     *            step. if the action finishes, it will call latch.countDown().
      */
     private void startTestDevice(TestDevice device, CountDownLatch latch) {
         if (device instanceof AndroidTestDevice) {
@@ -251,25 +260,40 @@ public class TestRunner {
     }
 
     /**
-     *  This method will initialize an Android device for testing.
-     *  It will start an instrumentation test case and run the test named testEntry.
-     *  Then, it will pause and wait for commands from the test controller, in setUp();  
+     * This method will initialize an Android device for testing. It will start
+     * an instrumentation test case and run the test named testEntry. Then, it
+     * will pause and wait for commands from the test controller, in setUp();
+     *
      * @param device
-     *      device name
+     *            device name
      * @param latch
-     *      to guarantee all TestDevices have been started before the next step.
-     *      if the action finishes, it will call latch.countDown().
+     *            to guarantee all TestDevices have been started before the next
+     *            step. if the action finishes, it will call latch.countDown().
      */
 
-    private void startAndroidTestDevice(AndroidTestDevice device,
-            CountDownLatch latch) {
+    private void startAndroidTestDevice(AndroidTestDevice device, CountDownLatch latch) {
         // TODO this solution of device assigning is the simplest one.
         AndroidDeviceInfo info;
         if (!androidDeviceInfos.isEmpty()) {
             info = androidDeviceInfos.removeFirst();
-            addressTable.put(info.id, info.ip);
+            addressTable.put(info.id, ""+info.localPort);
+            // set forward rule
+            Process process;
+            String cmd = adbPath + " -s " + info.id + " forward tcp:" + info.localPort + " tcp:10086";
+            try {
+                process = executeByShell(cmd);
+                process.waitFor();
+            } catch (IOException e) {
+                Logger.e(TAG, "Forward setting error!");
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                Logger.e(TAG, "Wait for cmdline process error!");
+                e.printStackTrace();
+            }
+
             generateStartMessage(device, info);
         } else {
+            // TODO: logic error
             Logger.e(TAG, "There is no Android device available!");
             countDown(latch);
             return;
@@ -277,17 +301,12 @@ public class TestRunner {
         try { // run Android Instrumentation Test via ADB
             Process process;
             BufferedReader sio, seo;
-            String cmd = adbPath + " -s " + info.id
-                    + " shell am instrument -r -e class " + androidTestClass
-                    + "#testEntry -w " + androidTestPackage
-                    + "/android.test.InstrumentationTestRunner";
+            String cmd = adbPath + " -s " + info.id + " shell am instrument -r -e class " + androidTestClass
+                    + "#testEntry -w " + androidTestPackage + "/android.test.InstrumentationTestRunner";
             process = executeByShell(cmd);
-            sio = new BufferedReader(new InputStreamReader(
-                    process.getInputStream()));
-            seo = new BufferedReader(new InputStreamReader(
-                    process.getErrorStream()));
-            waitForAndroidTestResult(process, sio, seo, latch,
-                    device.getName(), info.id);
+            sio = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            seo = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            waitForAndroidTestResult(process, sio, seo, latch, device.getName(), info.id);
         } catch (IOException e) {
             Logger.e(TAG, "Error occured when get device list via ADB ");
             countDown(latch);
@@ -297,22 +316,22 @@ public class TestRunner {
     }
 
     /**
-     * This method is used internally to build a new thread to wait for a process
-     * and read its result when it finishes.
+     * This method is used internally to build a new thread to wait for a
+     * process and read its result when it finishes.
+     *
      * @param process
-     *      The process that the new thread is going to wait.
+     *            The process that the new thread is going to wait.
      * @param standardIOReader
-     *      the BufferedReader of the standard I/O stream of the process.
+     *            the BufferedReader of the standard I/O stream of the process.
      * @param standardErrorStreamReader
-     *      the BufferedReader of the standard error stream of the process.
+     *            the BufferedReader of the standard error stream of the
+     *            process.
      * @param latch
-     *      if the latch is not null, its countDown() method will be called when
-     *      the thread finished.
+     *            if the latch is not null, its countDown() method will be
+     *            called when the thread finished.
      */
-    private void waitForResultAndLog(final Process process,
-            final BufferedReader standardIOReader,
-            final BufferedReader standardErrorStreamReader,
-            final CountDownLatch latch) {
+    private void waitForResultAndLog(final Process process, final BufferedReader standardIOReader,
+            final BufferedReader standardErrorStreamReader, final CountDownLatch latch) {
         new Thread() {
             public void run() {
                 String resultLine;
@@ -340,10 +359,8 @@ public class TestRunner {
         }.start();
     }
 
-    private void waitForAndroidTestResult(final Process process,
-            final BufferedReader standardIOReader,
-            final BufferedReader standardErrorStreamReader,
-            final CountDownLatch latch, final String deviceName,
+    private void waitForAndroidTestResult(final Process process, final BufferedReader standardIOReader,
+            final BufferedReader standardErrorStreamReader, final CountDownLatch latch, final String deviceName,
             final String deviceId) {
         new Thread() {
             public void run() {
@@ -362,12 +379,10 @@ public class TestRunner {
                         resultLine = standardErrorStreamReader.readLine();
                         if (resultLine == null)
                             break;
-                        Logger.d(TAG, "Test Device:\t" + deviceId
-                                + "\tReal Device:\t" + deviceId + "\n"
-                                + resultLine);
+                        Logger.e(TAG,
+                                "Test Device:\t" + deviceName + "\tReal Device:\t" + deviceId + "\n" + resultLine);
                     }
-                    Logger.d(TAG, "Test Device:\t" + deviceId
-                            + "\tReal Device:\t" + deviceId);
+                    Logger.d(TAG, "Test Device:\t" + deviceName + "\tReal Device:\t" + deviceId);
                     for (int i = 0; i < resultLines.size(); i++) {
                         Logger.d(TAG, resultLines.get(i));
                     }
@@ -382,15 +397,15 @@ public class TestRunner {
     }
 
     /**
-     * This method will start a new process, and execute the inputed command
-     * in it, with shell (the default path is /bin/sh)
+     * This method will start a new process, and execute the inputed command in
+     * it, with shell (the default path is /bin/sh)
      *
      * @param cmd
-     * The inputed command.
-     * @return
-     * The created process.
+     *            The inputed command.
+     * @return The created process.
      * @throws IOException
-     * When error occurs during the execution, it may throw an IOException.
+     *             When error occurs during the execution, it may throw an
+     *             IOException.
      */
     private Process executeByShell(String cmd) throws IOException {
         return Runtime.getRuntime().exec(new String[] { shellPath, "-c", cmd });
@@ -398,30 +413,24 @@ public class TestRunner {
 
     /**
      * This method is used to generate a start message for android device.
+     *
      * @param device
-     *      the AndroidTestDevice going to run.
+     *            the AndroidTestDevice going to run.
      * @param info
-     *      the AndroidDeviceInfo of the device.
+     *            the AndroidDeviceInfo of the device.
      */
-    private void generateStartMessage(AndroidTestDevice device,
-            AndroidDeviceInfo info) {
+    private void generateStartMessage(AndroidTestDevice device, AndroidDeviceInfo info) {
         JSONObject message = new JSONObject();
         try {
-            message.put(MessageProtocol.MESSAGE_TYPE,
-                    MessageProtocol.TEST_START);
+            message.put(MessageProtocol.MESSAGE_TYPE, MessageProtocol.TEST_START);
             message.put(MessageProtocol.CLASS_NAME, device.getClass().getName());
             message.put(MessageProtocol.METHOD_NAME, currentTestCase.getName());
-            message.put(MessageProtocol.TEST_ACTIVITY,
-                    config.getAndroidTestActivity());
-            message.put(MessageProtocol.TEST_PACKAGE,
-                    config.getAndroidTestPackage());
-            Logger.d(TAG, "Start message of device " + device.getName()
-                    + " is " + message.toString());
+            message.put(MessageProtocol.TEST_ACTIVITY, config.getAndroidTestActivity());
+            message.put(MessageProtocol.TEST_PACKAGE, config.getAndroidTestPackage());
+            Logger.d(TAG, "Start message of device " + device.getName() + " is " + message.toString());
             startMessageTable.put(info.id, message.toString());
         } catch (JSONException e) {
-            Logger.e(TAG,
-                    "Error occured when generate start message for device "
-                            + device.getName());
+            Logger.e(TAG, "Error occured when generate start message for device " + device.getName());
         }
     }
 
@@ -434,10 +443,8 @@ public class TestRunner {
         try {
             String cmd = antPath + " clean debug";
             process = executeByShell(cmd);
-            sio = new BufferedReader(new InputStreamReader(
-                    process.getInputStream()));
-            seo = new BufferedReader(new InputStreamReader(
-                    process.getErrorStream()));
+            sio = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            seo = new BufferedReader(new InputStreamReader(process.getErrorStream()));
             String resultLine;
             boolean buildFailed = false;
             while (true) {
@@ -479,10 +486,11 @@ public class TestRunner {
 
     /**
      * This method is used to deploy the test APK to a single device.
+     *
      * @param info
-     *     the AndroidTestInfo of a device.
+     *            the AndroidTestInfo of a device.
      * @param latch
-     *     the CountDownLatch to control the deploy process.
+     *            the CountDownLatch to control the deploy process.
      */
     private void deployApk(AndroidDeviceInfo info, CountDownLatch latch) {
         // TODO if info == null?
@@ -494,10 +502,8 @@ public class TestRunner {
         String cmd = adbPath + " -s " + info.id + " install -r " + apkName;
         try {
             process = executeByShell(cmd);
-            sio = new BufferedReader(new InputStreamReader(
-                    process.getInputStream()));
-            seo = new BufferedReader(new InputStreamReader(
-                    process.getErrorStream()));
+            sio = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            seo = new BufferedReader(new InputStreamReader(process.getErrorStream()));
         } catch (IOException e) {
             e.printStackTrace();
             Logger.e(TAG, "Error occured when building test Apk.");
@@ -508,8 +514,8 @@ public class TestRunner {
     }
 
     /**
-     *  This method is used to deploy all test programs to real test devices.
-     *  It can be extended to support more types of device
+     * This method is used to deploy all test programs to real test devices. It
+     * can be extended to support more types of device
      */
     private void deployTests() {
         // deploy Android Test
@@ -545,13 +551,13 @@ public class TestRunner {
     /**
      * parse the test result of a single Android device, and report it to the
      * TestController
+     *
      * @param resultLines
-     *      the test result lines
+     *            the test result lines
      * @param deviceId
-     *      the device id of the device.
+     *            the device id of the device.
      */
-    private void parseAndroidResult(LinkedList<String> resultLines,
-            String deviceId) {
+    private void parseAndroidResult(LinkedList<String> resultLines, String deviceId) {
         if (testController == null) {
             Logger.e(TAG, "parseAndroidResult: testController is null!");
         }
@@ -566,14 +572,12 @@ public class TestRunner {
                 testController.devicePassed(deviceId);
                 return;
             }
-            if (resultLine
-                    .startsWith("Test results for InstrumentationTestRunner=.E")) {
+            if (resultLine.startsWith("Test results for InstrumentationTestRunner=.E")) {
                 // Test erred
                 testController.deviceErred(deviceId);
                 return;
             }
-            if (resultLine
-                    .startsWith("Test results for InstrumentationTestRunner=.F")) {
+            if (resultLine.startsWith("Test results for InstrumentationTestRunner=.F")) {
                 // Test failed
                 testController.deviceFailed(deviceId);
                 return;
@@ -589,8 +593,7 @@ public class TestRunner {
         int passed = 0, crashed = 0, erred = 0, failed = 0, timeout = 0;
         for (int i = 0; i < testResults.size(); i++) {
             TestResult element = testResults.get(i);
-            String testCaseName = element.testCaseName, result = element.status
-                    .name();
+            String testCaseName = element.testCaseName, result = element.status.name();
             switch (element.status) {
             case Passed:
                 passed++;

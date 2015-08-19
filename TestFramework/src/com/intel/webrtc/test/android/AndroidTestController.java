@@ -58,6 +58,7 @@ public class AndroidTestController {
     private void startServer() {
         new Thread() {
             public void run() {
+                Log.d(TAG, "creating socket start:");
                 ServerSocket server = null;
                 try {
                     server = new ServerSocket(port);
@@ -99,6 +100,7 @@ public class AndroidTestController {
                     heartBeatThread = new HeartBeatThread();
                     heartBeatThread.start();
                     listenToServer();
+                    Log.d(TAG, "creating socket end.");
                 }
             }
         }.start();
