@@ -18,8 +18,8 @@ public class Config {
     final static private String TAG = "Configure";
 
     private int port = 10086;
-    private String adbPath = "/home/xianglai/develop/ADT/sdk/platform-tools/adb";
-    private String antPath = "/home/xianglai/tools/apache-ant-1.9.4/bin/ant";
+    private String adbPath = "/home/bean/Lib/android-sdk-linux/platform-tools/adb";
+    private String antPath = "/home/bean/Lib/apache-ant-1.9.5/bin/ant";
     private String shellPath = "/bin/sh";
     private String apkName = "test.apk";
     private String androidTestPackage = "com.intel.webrtc.test";

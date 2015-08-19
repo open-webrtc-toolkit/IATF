@@ -3,8 +3,11 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/TestFramework-Android"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/TestFramework"/>
+	<classpathentry kind="lib" path="basesdk.jar"/>
+	<classpathentry kind="lib" path="p2psdk.jar"/>
+	<classpathentry kind="lib" path="android.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
