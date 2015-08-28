@@ -155,9 +155,10 @@ public class AndroidTestEntry extends InstrumentationTestCase implements
      * Bundle.
      *
      */
+    @SuppressWarnings("unchecked")
     public Activity getActivity() {
         if (testActivity == null) {
-            Class<Activity> activityClass;
+            Class<Activity> activityClass=null;
             try {
                 // TODO find a better way to solve this conversion.
                 // Do not suppress the warning.
@@ -168,6 +169,7 @@ public class AndroidTestEntry extends InstrumentationTestCase implements
                 Log.d(TAG, "testActivity:"+testActivity);
             } catch (ClassNotFoundException | ClassCastException e) {
                 // TODO Auto-generated catch block
+                Log.e(TAG, activityClass.toString());
                 Log.e(TAG, testActivityName);
                 e.printStackTrace();
             }
