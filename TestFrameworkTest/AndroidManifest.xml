@@ -33,7 +33,8 @@
 
         <activity
             android:name="com.intel.webrtc.test.helper.TestActivity"
-            android:label="@string/title_activity_test" >
+            android:label="@string/title_activity_test"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -1,11 +1,15 @@
 package com.intel.webrtc.test.helper;
 
+import java.lang.reflect.Method;
+import java.util.List;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
 
 import com.intel.webrtc.base.LocalCameraStream;
 import com.intel.webrtc.base.LocalCameraStreamParameters;
+import com.intel.webrtc.base.RemoteStream;
 import com.intel.webrtc.base.WoogeenException;
 import com.intel.webrtc.p2p.PeerClient;
 
@@ -19,9 +23,12 @@ import android.util.Log;
  * @author bean
  */
 public class P2PActions extends Assert {
-    public static long waitingTime = 4000;
-    public static final String TAG = "P2PActions";
+    private static long waitingTime = 4000;
+    private static final String TAG = "P2PActions";
     private Activity testAct = null;
+    private static long waitingTimeInterval = 1000;
+    private static int waitingIntervalNum = 10;
+    private static boolean intervalWaitingMode = true;
 
     private static String generateLoginToken(String serverIp, String userName) {
         JSONObject loginObject = new JSONObject();
@@ -132,6 +139,11 @@ public class P2PActions extends Assert {
         return localCameraStream;
     }
 
+    public static void closeLocalCameraStream(String actorUserName, LocalCameraStream lcs) {
+        lcs.close();
+        //assertNull("Local stream should be null, after close it.", lcs);
+    }
+
     /**
      * ActorUser publish local camera stream to targetUser.
      * @param actorUser The peer client user to take a test action.
@@ -203,7 +215,11 @@ public class P2PActions extends Assert {
      */
     public static void afterWaitInvite(String actorUserName, PeerClientObserverForTest pcObserver,
             int expectInviteTimes) {
-        SystemClock.sleep(waitingTime);
+        if (intervalWaitingMode) {
+            sleepWait("onInvitedCalledTimes", pcObserver, expectInviteTimes);
+        } else {
+            SystemClock.sleep(waitingTime);
+        }
         assertEquals(" should be invited once!", expectInviteTimes, pcObserver.onInvitedCalledTimes);
     }
 
@@ -216,7 +232,11 @@ public class P2PActions extends Assert {
      */
     public static void afterWaitAccept(String actorUserName, PeerClientObserverForTest pcObserver,
             int expectAcceptTimes, int expectCharStartTimes) {
-        SystemClock.sleep(waitingTime);
+        if (intervalWaitingMode) {
+            sleepWait("onAcceptedCalledTimes", pcObserver, expectAcceptTimes);
+        } else {
+            SystemClock.sleep(waitingTime);
+        }
         assertEquals(actorUserName + " didn't receive the accepted message!", expectAcceptTimes,
                 pcObserver.onAcceptedCalledTimes);
         assertEquals(actorUserName + " didn't receive the chatStarted message!", expectCharStartTimes,
@@ -230,7 +250,11 @@ public class P2PActions extends Assert {
      * @param expectDenyTimes Expect number in peer client observer.
      */
     public static void afterWaitDeny(String actorUserName, PeerClientObserverForTest pcObserver, int expectDenyTimes) {
-        SystemClock.sleep(waitingTime);
+        if (intervalWaitingMode) {
+            sleepWait("onDeniedCalledTimes", pcObserver, expectDenyTimes);
+        } else {
+            SystemClock.sleep(waitingTime);
+        }
         assertEquals(actorUserName + " didn't receive the onDeny message!", expectDenyTimes,
                 pcObserver.onDeniedCalledTimes);
     }
@@ -243,7 +267,11 @@ public class P2PActions extends Assert {
      */
     public static void afterWaitStop(String actorUserName, PeerClientObserverForTest pcObserver,
             int expectiChatStopTimes) {
-        SystemClock.sleep(waitingTime);
+        if (intervalWaitingMode) {
+            sleepWait("onChatStoppedCalledTimes", pcObserver, expectiChatStopTimes);
+        } else {
+            SystemClock.sleep(waitingTime);
+        }
         assertEquals(actorUserName + " didn't receive the onStop message!", expectiChatStopTimes,
                 pcObserver.onChatStoppedCalledTimes);
     }
@@ -256,6 +284,13 @@ public class P2PActions extends Assert {
     }
 
     /**
+     * Call after wait for a closeLocalCameraStream action.
+     */
+    public static void afterWaitCloseLocalCameraStream() {
+        // do nothing
+    }
+
+    /**
      * Call after wait for a publish action.
      * @param actorUserName The name of the peer client user to take an action.
      * @param pcObserver Peer client callback observer.
@@ -263,10 +298,17 @@ public class P2PActions extends Assert {
      */
     public static void afterWaitPublish(String actorUserName, PeerClientObserverForTest pcObserver,
             int expectStreamAddedTimes) {
-        SystemClock.sleep(waitingTime);
+        if (intervalWaitingMode) {
+            sleepWait("onStreamAddedCalledTimes", pcObserver, expectStreamAddedTimes);
+        } else {
+            SystemClock.sleep(waitingTime);
+        }
         assertEquals(actorUserName + " should receive the streamAdded message once!", expectStreamAddedTimes,
                 pcObserver.onStreamAddedCalledTimes);
-        assertNotNull(actorUserName + " received a null stream!", pcObserver.addedStream);
+        List<RemoteStream> rslist = pcObserver.addedStream;
+        for (int checkTimes = expectStreamAddedTimes; checkTimes > 0; checkTimes--) {
+            assertNotNull(actorUserName + " received a null stream!", rslist.get(rslist.size() - checkTimes));
+        }
     }
 
     /**
@@ -277,10 +319,17 @@ public class P2PActions extends Assert {
      */
     public static void afterWaitUnpublish(String actorUserName, PeerClientObserverForTest pcObserver,
             int expectStreamRemovedTimes) {
-        SystemClock.sleep(waitingTime);
+        if (intervalWaitingMode) {
+            sleepWait("onStreamRemovedCalledTimes", pcObserver, expectStreamRemovedTimes);
+        } else {
+            SystemClock.sleep(waitingTime);
+        }
         assertEquals(actorUserName + " should receive the streamAdded message once!", expectStreamRemovedTimes,
                 pcObserver.onStreamRemovedCalledTimes);
-        assertNotNull(actorUserName + " the stream removed was null!", pcObserver.removedStream);
+        List<RemoteStream> rslist = pcObserver.removedStream;
+        for (int checkSize = expectStreamRemovedTimes; checkSize > 0; checkSize--) {
+            assertNotNull(actorUserName + " the stream removed was null!", rslist.get(rslist.size() - checkSize));
+        }
     }
 
     /**
@@ -292,7 +341,13 @@ public class P2PActions extends Assert {
      */
     public static void afterWaitSend(String actorUserName, PeerClientObserverForTest pcObserver, int numOfMsg,
             int numOfSender) {
-        SystemClock.sleep(waitingTime);
+        if (intervalWaitingMode) {
+            sleepWait("onDataReceivedCalledTimes", pcObserver, numOfMsg);
+        } else {
+            SystemClock.sleep(waitingTime);
+        }
+        assertEquals(actorUserName + " should receive datarevied message for" + numOfMsg + "times.", numOfMsg,
+                pcObserver.onDataReceivedCalledTimes);
         assertEquals(actorUserName + " should receive " + numOfMsg + " messages from ", numOfMsg,
                 pcObserver.dataReceived.size());
         Log.d(TAG, "senders:");
@@ -327,7 +382,11 @@ public class P2PActions extends Assert {
      */
     public static void afterAccept(String actorUserName, PeerClientObserverForTest pcObserver,
             int expectChatStartedTimes) {
-        SystemClock.sleep(waitingTime);
+        if (intervalWaitingMode) {
+            sleepWait("onChatStartedCalledTimes", pcObserver, expectChatStartedTimes);
+        } else {
+            SystemClock.sleep(waitingTime);
+        }
         assertEquals(actorUserName + " didn't receive the chatStarted message!", expectChatStartedTimes,
                 pcObserver.onChatStartedCalledTimes);
     }
@@ -335,6 +394,7 @@ public class P2PActions extends Assert {
     public static void afterDeny() {
         // do nothing
     }
+
     /**
      * Call after taking a stop action
      * @param actorUserName The name of the peer client user to take an action.
@@ -342,17 +402,21 @@ public class P2PActions extends Assert {
      * @param expectChatStopTimes Expect number in peer client observer.
      */
     public static void afterStop(String actorUserName, PeerClientObserverForTest pcObserver, int expectChatStopTimes) {
-        SystemClock.sleep(waitingTime);
+        if (intervalWaitingMode) {
+            sleepWait("onChatStoppedCalledTimes", pcObserver, expectChatStopTimes);
+        } else {
+            SystemClock.sleep(waitingTime);
+        }
         assertEquals(actorUserName + " didn't receive the chatStopped message!", expectChatStopTimes,
                 pcObserver.onChatStoppedCalledTimes);
     }
-    /**
-     * Call after taking a CreateLocalStream action
-     * @param actorUserName The name of the peer client user to take an action.
-     * @param lcs Created local stream.
-     */
-    public static void afterCreateLocalStream(String actorUserName, LocalCameraStream lcs) {
-        assertNotNull(actorUserName + " shouldn't create a null stream!", lcs);
+
+    public static void afterCreateLocalStream() {
+        // do nothing
+    }
+
+    public static void afterCloseLocalStream() {
+        // do nothing
     }
 
     public static void afterPublish() {
@@ -375,7 +439,11 @@ public class P2PActions extends Assert {
      */
     public static void afterDisconnect(String actorUserName, PeerClientObserverForTest pcObserver,
             int expectDisconnetTimes) {
-        SystemClock.sleep(waitingTime);
+        if (intervalWaitingMode) {
+            sleepWait("onServerDisconnectedCalledTimes", pcObserver, expectDisconnetTimes);
+        } else {
+            SystemClock.sleep(waitingTime);
+        }
         assertEquals(actorUserName + " should receive a message of server disconnected!", expectDisconnetTimes,
                 pcObserver.onServerDisconnectedCalledTimes);
     }
@@ -390,10 +458,41 @@ public class P2PActions extends Assert {
 
     public static void assertActionSucceeded(CustomizedActionCallBack callBack, String actionName) {
         // waiting for the action to finish
-        SystemClock.sleep(waitingTime);
+        if (intervalWaitingMode) {
+            sleepWait("onSuccessCalled", callBack, 1);
+        } else {
+            SystemClock.sleep(waitingTime);
+        }
         assertEquals("Action <" + ":" + actionName + "> failed!", 0, callBack.onFailureCalled);
         assertTrue("OnSuccess hasn't been called!", callBack.onSuccessCalled > 0);
         assertEquals("OnSuccess has been called more than once in action <" + actionName + ">", 1,
                 callBack.onSuccessCalled);
+    }
+
+    public static void sleepWait(String fieldName, Object callbackObject, int expectNumber) {
+        int curInterval = waitingIntervalNum;
+        int observerValue;
+        while (curInterval > 0) {
+            SystemClock.sleep(waitingTimeInterval);
+            observerValue = (Integer) getFieldValueByName(fieldName, callbackObject);
+            if (observerValue == expectNumber) {
+                break;
+            }
+            Log.d(TAG, "wait for another interval!field:" + fieldName);
+            curInterval--;
+        }
+    }
+
+    private static Object getFieldValueByName(String fieldName, Object o) {
+        try {
+            String firstLetter = fieldName.substring(0, 1).toUpperCase();
+            String getter = "get" + firstLetter + fieldName.substring(1);
+            Method method = o.getClass().getMethod(getter, new Class[] {});
+            Object value = method.invoke(o, new Object[] {});
+            return value;
+        } catch (Exception e) {
+            Log.d(TAG, "error read field value, no field getter for:" + fieldName);
+            return null;
+        }
     }
 }

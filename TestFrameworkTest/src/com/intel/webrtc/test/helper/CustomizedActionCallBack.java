@@ -6,6 +6,26 @@ import com.intel.webrtc.base.WoogeenException;
 public class CustomizedActionCallBack<T> implements ActionCallback<T> {
     T result;
     public int onSuccessCalled;
+    public int getOnSuccessCalled() {
+        return onSuccessCalled;
+    }
+
+    public int getOnFailureCalled() {
+        return onFailureCalled;
+    }
+
+    public int getOnDisconnect() {
+        return onDisconnect;
+    }
+
+    public int getOnInValidIdOrStream() {
+        return onInValidIdOrStream;
+    }
+
+    public int getOnNoSuchPeer() {
+        return onNoSuchPeer;
+    }
+
     public int onFailureCalled;
     int onDisconnect, onInValidIdOrStream, onNoSuchPeer;
     private boolean isSuccess, isFailure;

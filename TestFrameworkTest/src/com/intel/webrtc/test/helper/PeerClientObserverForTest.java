@@ -15,8 +15,44 @@ public class PeerClientObserverForTest implements PeerClientObserver {
             onDeniedCalledTimes, onStreamAddedCalledTimes,
             onDataReceivedCalledTimes, onStreamRemovedCalledTimes,
             onServerDisconnectedCalledTimes;
+    public int getOnAcceptedCalledTimes() {
+        return onAcceptedCalledTimes;
+    }
+
+    public int getOnChatStartedCalledTimes() {
+        return onChatStartedCalledTimes;
+    }
+
+    public int getOnChatStoppedCalledTimes() {
+        return onChatStoppedCalledTimes;
+    }
+
+    public int getOnInvitedCalledTimes() {
+        return onInvitedCalledTimes;
+    }
+
+    public int getOnDeniedCalledTimes() {
+        return onDeniedCalledTimes;
+    }
+
+    public int getOnStreamAddedCalledTimes() {
+        return onStreamAddedCalledTimes;
+    }
+
+    public int getOnDataReceivedCalledTimes() {
+        return onDataReceivedCalledTimes;
+    }
+
+    public int getOnStreamRemovedCalledTimes() {
+        return onStreamRemovedCalledTimes;
+    }
+
+    public int getOnServerDisconnectedCalledTimes() {
+        return onServerDisconnectedCalledTimes;
+    }
+
     public List<String> dataReceived, dataSenders;
-    public RemoteStream removedStream, addedStream;
+    public List<RemoteStream> removedStream, addedStream;
     public String roomMember = "";
     public PeerClientObserverForTest() {
         onAcceptedCalledTimes = 0;
@@ -30,8 +66,8 @@ public class PeerClientObserverForTest implements PeerClientObserver {
         onServerDisconnectedCalledTimes = 0;
         dataReceived = new LinkedList<String>();
         dataSenders = new LinkedList<String>();
-        removedStream = null;
-        addedStream = null;
+        removedStream = new LinkedList<RemoteStream>();
+        addedStream = new LinkedList<RemoteStream>();
     }
 
     @Override
@@ -68,11 +104,12 @@ public class PeerClientObserverForTest implements PeerClientObserver {
     @Override
     public void onStreamAdded(RemoteStream stream) {
         onStreamAddedCalledTimes++;
-        addedStream = stream;
+        addedStream.add(stream);
     }
 
     @Override
     public void onDataReceived(String peerId, String msg) {
+        onDataReceivedCalledTimes++;
         if (msg != null) {
             dataReceived.add(msg);
         } else {
@@ -94,7 +131,7 @@ public class PeerClientObserverForTest implements PeerClientObserver {
     @Override
     public void onStreamRemoved(RemoteStream stream) {
         onStreamRemovedCalledTimes++;
-        removedStream = stream;
+        removedStream.add(stream);
     }
 
     @Override

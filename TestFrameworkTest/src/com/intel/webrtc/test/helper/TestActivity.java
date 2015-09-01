@@ -163,7 +163,7 @@ public class TestActivity extends Activity {
 
     public void attachRender3(Stream stream) {
         try {
-            stream.attach(renderer2);
+            stream.attach(renderer3);
         } catch (WoogeenException e) {
             e.printStackTrace();
             Log.e(TAG, "Error occured when attach local stream to render.");
@@ -172,7 +172,7 @@ public class TestActivity extends Activity {
 
     public void attachRender4(Stream stream) {
         try {
-            stream.attach(renderer2);
+            stream.attach(renderer4);
         } catch (WoogeenException e) {
             e.printStackTrace();
             Log.e(TAG, "Error occured when attach local stream to render.");

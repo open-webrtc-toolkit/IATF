@@ -33,8 +33,17 @@ public class P2PMain {
         device1.setName("device1");
         TestDevice2 device2 = new TestDevice2();
         device2.setName("device2");
+        TestDevice3 device3 = new TestDevice3();
+        device3.setName("device3");
         testSuite.addTestDevice(device1);
         testSuite.addTestDevice(device2);
+        testSuite.addTestDevice(device3);
+//        TestDevice4 device4=new TestDevice4();
+//        device4.setName("device1");
+//        TestDevice5 device5=new TestDevice5();
+//        device5.setName("device2");
+//        testSuite.addTestDevice(device4);
+//        testSuite.addTestDevice(device5);
         System.out.println(testSuite.toString());
         testRunner.runTest(testSuite);
     }
