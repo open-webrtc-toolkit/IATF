@@ -7,7 +7,6 @@ import com.intel.webrtc.base.LocalCameraStream;
 import com.intel.webrtc.base.RemoteStream;
 import com.intel.webrtc.p2p.PeerClient;
 import com.intel.webrtc.p2p.PeerClientConfiguration;
-import com.intel.webrtc.p2p.SocketSignalingChannel;
 import com.intel.webrtc.test.android.AndroidTestDevice;
 import com.intel.webrtc.test.helper.P2PActions;
 import com.intel.webrtc.test.helper.PeerClientObserverForTest;
@@ -20,6 +19,7 @@ public class TestDevice1 extends AndroidTestDevice {
     String TAG = "P2PTestDevice1";
     TestActivity act = null;
     private long waitingTime = 3000;
+    private String serverIP = "http://10.239.44.33:8095/";
 
     /**
      * Test a normal interaction process between two users.
@@ -46,7 +46,7 @@ public class TestDevice1 extends AndroidTestDevice {
     public void testTwoUserInteraction() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User1";
         String targetUserName = "User2";
         long waitingTime = 3000;
@@ -163,7 +163,7 @@ public class TestDevice1 extends AndroidTestDevice {
     public void test_TwoUser_bipublish() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User1";
         String targetUserName = "User2";
         long waitingTime = 3000;
@@ -233,7 +233,7 @@ public class TestDevice1 extends AndroidTestDevice {
     public void test_TwoUser_bipublishVideoOnly() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User1";
         String targetUserName = "User2";
         long waitingTime = 3000;
@@ -303,7 +303,7 @@ public class TestDevice1 extends AndroidTestDevice {
     public void test_TwoUser_bipublishAudioOnly() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User1";
         String targetUserName = "User2";
         long waitingTime = 3000;
@@ -373,7 +373,7 @@ public class TestDevice1 extends AndroidTestDevice {
     public void test_TwoUser_publishNormalTovideoOnly() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User1";
         String targetUserName = "User2";
         long waitingTime = 3000;
@@ -443,7 +443,7 @@ public class TestDevice1 extends AndroidTestDevice {
     public void test_TwoUser_publishNormalToAudioOnly() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User1";
         String targetUserName = "User2";
         long waitingTime = 3000;
@@ -513,7 +513,7 @@ public class TestDevice1 extends AndroidTestDevice {
     public void test_TwoUser_publishvideoOnlyToAudioOnly() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User1";
         String targetUserName = "User2";
         long waitingTime = 3000;
@@ -585,7 +585,7 @@ public class TestDevice1 extends AndroidTestDevice {
     public void test_TwoUser_biunpublish() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User1";
         String targetUserName = "User2";
         long waitingTime = 3000;
@@ -666,7 +666,7 @@ public class TestDevice1 extends AndroidTestDevice {
     public void test_TwoUser_bipublishBisend() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User1";
         String targetUserName = "User2";
         long waitingTime = 3000;
@@ -754,7 +754,7 @@ public class TestDevice1 extends AndroidTestDevice {
     public void test_TwoUser_biunpublishBisend() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User1";
         String targetUserName = "User2";
         long waitingTime = 3000;
@@ -853,7 +853,7 @@ public class TestDevice1 extends AndroidTestDevice {
     public void test_TwoUser_biclosestreamRepublish() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User1";
         String targetUserName = "User2";
         long waitingTime = 3000;
@@ -957,7 +957,7 @@ public class TestDevice1 extends AndroidTestDevice {
     public void test_TwoUser_biclosestreamSend() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User1";
         String targetUserName = "User2";
         long waitingTime = 3000;
@@ -1054,7 +1054,7 @@ public class TestDevice1 extends AndroidTestDevice {
     public void test_TwoUser_stopReinvite() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User1";
         String targetUserName = "User2";
         long waitingTime = 3000;
@@ -1155,7 +1155,7 @@ public class TestDevice1 extends AndroidTestDevice {
     public void test_TwoUser_inviterdisconnectReinvite() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User1";
         String targetUserName = "User2";
         long waitingTime = 3000;
@@ -1240,119 +1240,6 @@ public class TestDevice1 extends AndroidTestDevice {
     }
 
     /**
-     * Test a normal interaction process between three users.
-     * Actors: User1, User2 and User3
-     * Story:
-     * 1. User1ConnectAndCreateLocalStream
-     * 2. User2ConnectAndCreateLocalStream
-     * 3. User3ConnectAndCreateLocalStream
-     * 4. User1InviteUser2
-     * 5. User2AcceptUser1
-     * 6. User3InviteUser1
-     * 7. User1AcceptUser3
-     * 8. User2InivteUser3
-     * 9. User3AcceptUser2
-     * 10. User1PublishToUser2AndUser3
-     * 11. User2PublishToUser1AndUser3
-     * 12. User3PublishToUser1AndUser2
-     * 13. User1SendMessageToUser2AndUser3
-     * 14. User2SendMessageToUser1AndUser3
-     * 15. User3SendMessageToUser1AndUser2
-     * 16. User1UnpublishToUser2AndUser3
-     * 17. User2UnpublishToUser1AndUser3
-     * 18. User3UnpublishToUser1AndUser2
-     * 19. User1StopChatWithUser2
-     * 20. User2StopChatWithUser3
-     * 21. User3StopChatWithUser1
-     * 22. User1Disconnect
-     * 23. User2Disconnect
-     * 24. User3Disconnect
-     */
-    public void testThreeUserInteraction() {
-        initTestActivity();
-        // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
-        String actorUser1Name = "User1";
-        String targetUser2Name = "User2";
-        String targetUser3Name = "User3";
-        PeerClientObserverForTest pcObserver = new PeerClientObserverForTest();
-        PeerClientConfiguration peerClientConfiguration = new PeerClientConfiguration();
-        PeerClient actorUser1 = new PeerClient(peerClientConfiguration, new SocketSignalingChannel());
-        actorUser1.addObserver(pcObserver);
-        // Start notice
-        P2PActions.startStory("testInteraction");
-        act.makeToast("Test start, actor:" + actorUser1Name);
-        act.setTitle("Actor:" + actorUser1Name);
-        // Action 1. User1ConnectAndCreateLocalStream
-        P2PActions.connect(actorUser1, actorUser1Name, serverIP);
-        LocalCameraStream lcs = P2PActions.createLocalCameraStream(actorUser1Name, true, true);
-        act.attachRender1(lcs);
-        notifyLock("User1ConnectAndCreateLocalStream");
-        // Action 2. User2ConnectAndCreateLocalStream
-        // Action 3. User3ConnectAndCreateLocalStream
-        // Action 4. User1InviteUser2
-        waitLock("User3ConnectAndCreateLocalStream");
-        P2PActions.invite(actorUser1, actorUser1Name, targetUser2Name);
-        notifyLock("User1InviteUser2");
-        // Action 5. User2AcceptUser1
-        // Action 6. User3InviteUser1
-        // Action 7. User1AcceptUser3
-        waitLock("User3InviteUser1");
-        P2PActions.afterWaitAccept(actorUser1Name, pcObserver, 1, 1);
-        P2PActions.afterWaitInvite(actorUser1Name, pcObserver, 1);
-        P2PActions.accept(actorUser1, actorUser1Name, targetUser3Name);
-        P2PActions.afterAccept(actorUser1Name, pcObserver, 2);
-        notifyLock("User1AcceptUser3");
-        // Action 8. User2InivteUser3
-        // Action 9. User3AcceptUser2
-        // Action 10. User1PublishToUser2AndUser3
-        waitLock("User3AcceptUser2");
-        P2PActions.publish(actorUser1, actorUser1Name, targetUser2Name, lcs);
-        P2PActions.publish(actorUser1, actorUser1Name, targetUser3Name, lcs);
-        notifyLock("User1PublishToUser2AndUser3");
-        // Action 11. User2PublishToUser1AndUser3
-        // Action 12. User3PublishToUser1AndUser2
-        // Action 13. User1SendMessageToUser2AndUser3
-        waitLock("User3PublishToUser1AndUser2");
-        P2PActions.afterWaitPublish(actorUser1Name, pcObserver, 2);
-        List<RemoteStream> rslist = pcObserver.addedStream;
-        act.attachRender2(rslist.get(rslist.size() - 2));
-        act.attachRender3(rslist.get(rslist.size() - 1));
-        P2PActions.send(actorUser1, actorUser1Name, targetUser2Name, "Message:User1ToUser2");
-        P2PActions.send(actorUser1, actorUser1Name, targetUser3Name, "Message:User1ToUser3");
-        notifyLock("User1SendMessageToUser2AndUser3");
-        // Action 14. User2SendMessageToUser1AndUser3
-        // Action 15. User3SendMessageToUser1AndUser2
-        // Action 16. User1UnpublishToUser2AndUser3
-        waitLock("User3SendMessageToUser1AndUser2");
-        P2PActions.afterWaitSend(actorUser1Name, pcObserver, 2, 2);
-        P2PActions.unpublish(actorUser1, actorUser1Name, targetUser2Name, lcs);
-        P2PActions.unpublish(actorUser1, actorUser1Name, targetUser3Name, lcs);
-        notifyLock("User1UnpublishToUser2AndUser3");
-        // Action 17. User2UnpublishToUser1AndUser3
-        // Action 18. User3UnpublishToUser1AndUser2
-        // Action 19. User1StopChatWithUser2
-        waitLock("User3UnpublishToUser1AndUser2");
-        P2PActions.afterWaitUnpublish(actorUser1Name, pcObserver, 2);
-        P2PActions.stop(actorUser1, actorUser1Name, targetUser2Name);
-        P2PActions.afterStop(actorUser1Name, pcObserver, 1);
-        notifyLock("User1StopChatWithUser2");
-        // Action 20. User2StopChatWithUser3
-        // Action 21. User3StopChatWithUser1
-        // Action 22. User1Disconnect
-        waitLock("User3StopChatWithUser1");
-        P2PActions.afterWaitStop(actorUser1Name, pcObserver, 2);
-        P2PActions.disconnect(actorUser1, actorUser1Name);
-        P2PActions.afterDisconnect(actorUser1Name, pcObserver, 1);
-        notifyLock("User1Disconnect");
-        // sleep to make sure the notify message is sent out
-        SystemClock.sleep(waitingTime);
-        // Action 23. User2Disconnect
-        // Action 24. User3Disconnect
-        P2PActions.endStory();
-    }
-
-    /**
      * Case 14: Test accepter disconnect then rejoin.
      * Actors: User1 and User2
      * Story:
@@ -1376,7 +1263,7 @@ public class TestDevice1 extends AndroidTestDevice {
     public void test_TwoUser_accepterdisconnectReinvite() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User1";
         String targetUserName = "User2";
         long waitingTime = 3000;
@@ -1460,6 +1347,119 @@ public class TestDevice1 extends AndroidTestDevice {
         act.attachRender2(rslist.get(1));
         P2PActions.endStory();
         act.makeToast("Test end!");
+    }
+
+    /**
+     * Test a normal interaction process between three users.
+     * Actors: User1, User2 and User3
+     * Story:
+     * 1. User1ConnectAndCreateLocalStream
+     * 2. User2ConnectAndCreateLocalStream
+     * 3. User3ConnectAndCreateLocalStream
+     * 4. User1InviteUser2
+     * 5. User2AcceptUser1
+     * 6. User3InviteUser1
+     * 7. User1AcceptUser3
+     * 8. User2InivteUser3
+     * 9. User3AcceptUser2
+     * 10. User1PublishToUser2AndUser3
+     * 11. User2PublishToUser1AndUser3
+     * 12. User3PublishToUser1AndUser2
+     * 13. User1SendMessageToUser2AndUser3
+     * 14. User2SendMessageToUser1AndUser3
+     * 15. User3SendMessageToUser1AndUser2
+     * 16. User1UnpublishToUser2AndUser3
+     * 17. User2UnpublishToUser1AndUser3
+     * 18. User3UnpublishToUser1AndUser2
+     * 19. User1StopChatWithUser2
+     * 20. User2StopChatWithUser3
+     * 21. User3StopChatWithUser1
+     * 22. User1Disconnect
+     * 23. User2Disconnect
+     * 24. User3Disconnect
+     */
+    public void testThreeUserInteraction() {
+        initTestActivity();
+        // Init variables
+
+        String actorUser1Name = "User1";
+        String targetUser2Name = "User2";
+        String targetUser3Name = "User3";
+        PeerClientObserverForTest pcObserver = new PeerClientObserverForTest();
+        PeerClientConfiguration peerClientConfiguration = new PeerClientConfiguration();
+        PeerClient actorUser1 = new PeerClient(peerClientConfiguration, new SocketSignalingChannel());
+        actorUser1.addObserver(pcObserver);
+        // Start notice
+        P2PActions.startStory("testInteraction");
+        act.makeToast("Test start, actor:" + actorUser1Name);
+        act.setTitle("Actor:" + actorUser1Name);
+        // Action 1. User1ConnectAndCreateLocalStream
+        P2PActions.connect(actorUser1, actorUser1Name, serverIP);
+        LocalCameraStream lcs = P2PActions.createLocalCameraStream(actorUser1Name, true, true);
+        act.attachRender1(lcs);
+        notifyLock("User1ConnectAndCreateLocalStream");
+        // Action 2. User2ConnectAndCreateLocalStream
+        // Action 3. User3ConnectAndCreateLocalStream
+        // Action 4. User1InviteUser2
+        waitLock("User3ConnectAndCreateLocalStream");
+        P2PActions.invite(actorUser1, actorUser1Name, targetUser2Name);
+        notifyLock("User1InviteUser2");
+        // Action 5. User2AcceptUser1
+        // Action 6. User3InviteUser1
+        // Action 7. User1AcceptUser3
+        waitLock("User3InviteUser1");
+        P2PActions.afterWaitAccept(actorUser1Name, pcObserver, 1, 1);
+        P2PActions.afterWaitInvite(actorUser1Name, pcObserver, 1);
+        P2PActions.accept(actorUser1, actorUser1Name, targetUser3Name);
+        P2PActions.afterAccept(actorUser1Name, pcObserver, 2);
+        notifyLock("User1AcceptUser3");
+        // Action 8. User2InivteUser3
+        // Action 9. User3AcceptUser2
+        // Action 10. User1PublishToUser2AndUser3
+        waitLock("User3AcceptUser2");
+        P2PActions.publish(actorUser1, actorUser1Name, targetUser2Name, lcs);
+        P2PActions.publish(actorUser1, actorUser1Name, targetUser3Name, lcs);
+        notifyLock("User1PublishToUser2AndUser3");
+        // Action 11. User2PublishToUser1AndUser3
+        // Action 12. User3PublishToUser1AndUser2
+        // Action 13. User1SendMessageToUser2AndUser3
+        waitLock("User3PublishToUser1AndUser2");
+        P2PActions.afterWaitPublish(actorUser1Name, pcObserver, 2);
+        List<RemoteStream> rslist = pcObserver.addedStream;
+        act.attachRender2(rslist.get(rslist.size() - 2));
+        act.attachRender3(rslist.get(rslist.size() - 1));
+        P2PActions.send(actorUser1, actorUser1Name, targetUser2Name, "Message:User1ToUser2");
+        P2PActions.send(actorUser1, actorUser1Name, targetUser3Name, "Message:User1ToUser3");
+        notifyLock("User1SendMessageToUser2AndUser3");
+        // Action 14. User2SendMessageToUser1AndUser3
+        // Action 15. User3SendMessageToUser1AndUser2
+        // Action 16. User1UnpublishToUser2AndUser3
+        waitLock("User3SendMessageToUser1AndUser2");
+        P2PActions.afterWaitSend(actorUser1Name, pcObserver, 2, 2);
+        P2PActions.unpublish(actorUser1, actorUser1Name, targetUser2Name, lcs);
+        P2PActions.unpublish(actorUser1, actorUser1Name, targetUser3Name, lcs);
+        notifyLock("User1UnpublishToUser2AndUser3");
+        // Action 17. User2UnpublishToUser1AndUser3
+        // Action 18. User3UnpublishToUser1AndUser2
+        // Action 19. User1StopChatWithUser2
+        waitLock("User3UnpublishToUser1AndUser2");
+        P2PActions.afterWaitUnpublish(actorUser1Name, pcObserver, 2);
+        P2PActions.stop(actorUser1, actorUser1Name, targetUser2Name);
+        P2PActions.afterStop(actorUser1Name, pcObserver, 1);
+        notifyLock("User1StopChatWithUser2");
+        // Action 20. User2StopChatWithUser3
+        // Action 21. User3StopChatWithUser1
+        // Action 22. User1Disconnect
+        waitLock("User3StopChatWithUser1");
+        P2PActions.afterWaitStop(actorUser1Name, pcObserver, 2);
+        P2PActions.disconnect(actorUser1, actorUser1Name);
+        P2PActions.afterDisconnect(actorUser1Name, pcObserver, 1);
+        notifyLock("User1Disconnect");
+        // sleep to make sure the notify message is sent out
+        SystemClock.sleep(waitingTime);
+        // Action 23. User2Disconnect
+        // Action 24. User3Disconnect
+        P2PActions.endStory();
     }
 
     private void initTestActivity() {

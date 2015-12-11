@@ -7,7 +7,6 @@ import com.intel.webrtc.base.LocalCameraStream;
 import com.intel.webrtc.base.RemoteStream;
 import com.intel.webrtc.p2p.PeerClient;
 import com.intel.webrtc.p2p.PeerClientConfiguration;
-import com.intel.webrtc.p2p.SocketSignalingChannel;
 import com.intel.webrtc.test.android.AndroidTestDevice;
 import com.intel.webrtc.test.helper.P2PActions;
 import com.intel.webrtc.test.helper.PeerClientObserverForTest;
@@ -20,6 +19,7 @@ public class TestDevice2 extends AndroidTestDevice {
     String TAG = "P2PTestDevice2";
     TestActivity act = null;
     private long waitingTime = 3000;
+    private String serverIP = "http://10.239.44.33:8095/";
 
     /**
      * Test a normal interaction process between two users.
@@ -46,7 +46,7 @@ public class TestDevice2 extends AndroidTestDevice {
     public void testTwoUserInteraction() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User2";
         String targetUserName = "User1";
         PeerClientObserverForTest pcObserver = new PeerClientObserverForTest();
@@ -157,7 +157,7 @@ public class TestDevice2 extends AndroidTestDevice {
     public void test_TwoUser_bipublish() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User2";
         String targetUserName = "User1";
         PeerClientObserverForTest pcObserver = new PeerClientObserverForTest();
@@ -228,7 +228,7 @@ public class TestDevice2 extends AndroidTestDevice {
     public void test_TwoUser_bipublishVideoOnly() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User2";
         String targetUserName = "User1";
         PeerClientObserverForTest pcObserver = new PeerClientObserverForTest();
@@ -299,7 +299,7 @@ public class TestDevice2 extends AndroidTestDevice {
     public void test_TwoUser_bipublishAudioOnly() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User2";
         String targetUserName = "User1";
         PeerClientObserverForTest pcObserver = new PeerClientObserverForTest();
@@ -370,7 +370,7 @@ public class TestDevice2 extends AndroidTestDevice {
     public void test_TwoUser_publishNormalTovideoOnly() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User2";
         String targetUserName = "User1";
         PeerClientObserverForTest pcObserver = new PeerClientObserverForTest();
@@ -441,7 +441,7 @@ public class TestDevice2 extends AndroidTestDevice {
     public void test_TwoUser_publishNormalToAudioOnly() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User2";
         String targetUserName = "User1";
         PeerClientObserverForTest pcObserver = new PeerClientObserverForTest();
@@ -512,7 +512,7 @@ public class TestDevice2 extends AndroidTestDevice {
     public void test_TwoUser_publishvideoOnlyToAudioOnly() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User2";
         String targetUserName = "User1";
         PeerClientObserverForTest pcObserver = new PeerClientObserverForTest();
@@ -585,7 +585,7 @@ public class TestDevice2 extends AndroidTestDevice {
     public void test_TwoUser_biunpublish() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User2";
         String targetUserName = "User1";
         PeerClientObserverForTest pcObserver = new PeerClientObserverForTest();
@@ -663,7 +663,7 @@ public class TestDevice2 extends AndroidTestDevice {
     public void test_TwoUser_bipublishBisend() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User2";
         String targetUserName = "User1";
         PeerClientObserverForTest pcObserver = new PeerClientObserverForTest();
@@ -747,7 +747,7 @@ public class TestDevice2 extends AndroidTestDevice {
     public void test_TwoUser_biunpublishBisend() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User2";
         String targetUserName = "User1";
         PeerClientObserverForTest pcObserver = new PeerClientObserverForTest();
@@ -841,7 +841,7 @@ public class TestDevice2 extends AndroidTestDevice {
     public void test_TwoUser_biclosestreamRepublish() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User2";
         String targetUserName = "User1";
         PeerClientObserverForTest pcObserver = new PeerClientObserverForTest();
@@ -941,7 +941,7 @@ public class TestDevice2 extends AndroidTestDevice {
     public void test_TwoUser_biclosestreamSend() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User2";
         String targetUserName = "User1";
         PeerClientObserverForTest pcObserver = new PeerClientObserverForTest();
@@ -1033,7 +1033,7 @@ public class TestDevice2 extends AndroidTestDevice {
     public void test_TwoUser_stopReinvite() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User2";
         String targetUserName = "User1";
         PeerClientObserverForTest pcObserver = new PeerClientObserverForTest();
@@ -1129,7 +1129,7 @@ public class TestDevice2 extends AndroidTestDevice {
     public void test_TwoUser_inviterdisconnectReinvite() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User2";
         String targetUserName = "User1";
         PeerClientObserverForTest pcObserver = new PeerClientObserverForTest();
@@ -1231,7 +1231,7 @@ public class TestDevice2 extends AndroidTestDevice {
     public void test_TwoUser_accepterdisconnectReinvite() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUserName = "User2";
         String targetUserName = "User1";
         PeerClientObserverForTest pcObserver = new PeerClientObserverForTest();
@@ -1349,7 +1349,7 @@ public class TestDevice2 extends AndroidTestDevice {
     public void testThreeUserInteraction() {
         initTestActivity();
         // Init variables
-        String serverIP = "http://10.239.61.104:8095/";
+
         String actorUser2Name = "User2";
         String targetUser1Name = "User1";
         String targetUser3Name = "User3";

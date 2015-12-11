@@ -9,5 +9,8 @@
 	<classpathentry kind="lib" path="basesdk.jar"/>
 	<classpathentry kind="lib" path="p2psdk.jar"/>
 	<classpathentry kind="lib" path="android.jar"/>
+	<classpathentry kind="lib" path="libs/engine.io-client.jar"/>
+	<classpathentry kind="lib" path="libs/Java-WebSocket.jar"/>
+	<classpathentry kind="lib" path="libs/socket.io-client.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
