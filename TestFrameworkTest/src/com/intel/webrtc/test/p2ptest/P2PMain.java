@@ -27,7 +27,7 @@ public class P2PMain {
             path = args[0];
         File file = new File(path);
         Config config = new Config(file);
-        TestRunner testRunner = new TestRunner(config);
+//        AndroidTestRunner testRunner = new AndroidTestRunner(config);
         TestSuite testSuite = new TestSuite();
         TestDevice1 device1 = new TestDevice1();
         device1.setName("device1");
@@ -38,6 +38,7 @@ public class P2PMain {
         testSuite.addTestDevice(device1);
         testSuite.addTestDevice(device2);
         testSuite.addTestDevice(device3);
+        TestRunner testRunner = new TestRunner(config,testSuite);
 //        TestDevice4 device4=new TestDevice4();
 //        device4.setName("device1");
 //        TestDevice5 device5=new TestDevice5();
@@ -45,6 +46,6 @@ public class P2PMain {
 //        testSuite.addTestDevice(device4);
 //        testSuite.addTestDevice(device5);
         System.out.println(testSuite.toString());
-        testRunner.runTest(testSuite);
+        testRunner.runTestSuite(testSuite);
     }
 }

@@ -11,6 +11,8 @@ public class DemoTestDevice1 extends AndroidTestDevice {
     public void testWaitNotify() {
         SystemClock.sleep(waitingTime);
         notifyObject(lock);
+        //wait the notify message to be send correctly
+        SystemClock.sleep(1000);
         Log.d(TAG, "Wait-Notify Test Finished");
     }
 

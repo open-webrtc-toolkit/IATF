@@ -3,6 +3,8 @@ package com.intel.webrtc.test.android;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import com.intel.webrtc.test.ClientTestController;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.test.InstrumentationTestCase;
@@ -23,7 +25,7 @@ public class AndroidTestEntry extends InstrumentationTestCase implements
         AndroidTestDevice.InstrumentationWrapper {
     // TODO change all log.e() to fail();
 
-    private AndroidTestController testController = null;
+    private ClientTestController testController = null;
     private AndroidTestDevice testDevice;
 
     private Method testMethod;
@@ -58,7 +60,7 @@ public class AndroidTestEntry extends InstrumentationTestCase implements
             fail("Error occured in super.setUp().");
         }
         Log.d(TAG, "Super.setUp() finished.");
-        testController = new AndroidTestController(this);
+        testController = new AndroidClientController(this);
         synchronized (this) {
             // Waiting for the start message;
             try {
@@ -167,7 +169,7 @@ public class AndroidTestEntry extends InstrumentationTestCase implements
                 assertNotNull(activityClass);
                 testActivity=super.launchActivity(testPackage, activityClass, new Bundle());
                 Log.d(TAG, "testActivity:"+testActivity);
-            } catch (ClassNotFoundException | ClassCastException e) {
+            } catch (Exception e) {
                 // TODO Auto-generated catch block
                 Log.e(TAG, activityClass.toString());
                 Log.e(TAG, testActivityName);

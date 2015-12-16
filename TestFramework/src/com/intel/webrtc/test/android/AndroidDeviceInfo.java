@@ -12,8 +12,6 @@ public class AndroidDeviceInfo extends DeviceInfo {
     public String ip;
     public AndroidDeviceType deviceType;
     private static int portStart=10087;
-    //Store the binded localPort to communicate with android socket server
-    public int localPort;
     //TODO android-version?
 
     public enum AndroidDeviceType {
@@ -22,10 +20,9 @@ public class AndroidDeviceInfo extends DeviceInfo {
 
     public AndroidDeviceInfo(String serialId, AndroidDeviceType deviceType,
             String ip) {
-        super(serialId);
+        super(serialId, portStart++);
         this.deviceType = deviceType;
         this.ip = ip;
-        this.localPort = portStart++;
     }
 
     public String toString() {

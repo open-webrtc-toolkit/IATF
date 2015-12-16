@@ -13,7 +13,7 @@ public class Main {
             path = args[0];
         File file = new File(path);
         Config config = new Config(file);
-        TestRunner testRunner = new TestRunner(config);
+//        AndroidTestRunner testRunner = new AndroidTestRunner(config);
         TestSuite testSuite = new TestSuite();
         DemoTestDevice1 device1 = new DemoTestDevice1();
         device1.setName("device1");
@@ -21,7 +21,8 @@ public class Main {
         device2.setName("device2");
         testSuite.addTestDevice(device1);
         testSuite.addTestDevice(device2);
+        TestRunner testRunner=new TestRunner(config, testSuite);
         System.out.println(testSuite.toString());
-        testRunner.runTest(testSuite);
+        testRunner.runTestSuite(testSuite);
     }
 }

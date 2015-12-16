@@ -373,7 +373,7 @@ public class TestController implements ControllerWorkerObserver {
         }
     }
 
-    void deviceCrashed(String deviceId) {
+    public void deviceCrashed(String deviceId) {
         if (deviceStatus.containsKey(deviceId)) {
             deviceStatus.put(deviceId, TestStatus.Crashed);
             Logger.d(TAG, "The test on [" + deviceId + "] crashed.");
@@ -386,7 +386,7 @@ public class TestController implements ControllerWorkerObserver {
         }
     }
 
-    void deviceErred(String deviceId) {
+    public void deviceErred(String deviceId) {
         if (deviceStatus.containsKey(deviceId)) {
             deviceStatus.put(deviceId, TestStatus.Crashed);
             Logger.d(TAG, "The test on [" + deviceId + "] erred.");
@@ -399,7 +399,7 @@ public class TestController implements ControllerWorkerObserver {
         }
     }
 
-    void deviceFailed(String deviceId) {
+    public void deviceFailed(String deviceId) {
         if (deviceStatus.containsKey(deviceId)) {
             deviceStatus.put(deviceId, TestStatus.Failed);
             Logger.d(TAG, "The test on [" + deviceId + "] failed.");
@@ -412,7 +412,7 @@ public class TestController implements ControllerWorkerObserver {
         }
     }
 
-    void devicePassed(String deviceId) {
+    public void devicePassed(String deviceId) {
         if (deviceStatus.containsKey(deviceId)) {
             deviceStatus.put(deviceId, TestStatus.Passed);
             // Set the time stamp of the finished device to prevent it from
@@ -430,7 +430,7 @@ public class TestController implements ControllerWorkerObserver {
         }
     }
 
-    void deviceTimeOut(String deviceId) {
+    public void deviceTimeOut(String deviceId) {
         if (deviceStatus.containsKey(deviceId)) {
             deviceStatus.put(deviceId, TestStatus.Timeout);
             Logger.d(TAG, "The test on [" + deviceId + "] has been time out.");

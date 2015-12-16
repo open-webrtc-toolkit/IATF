@@ -1,5 +1,6 @@
 package com.intel.webrtc.test;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -14,30 +15,40 @@ public class TestCase {
     private String name;
 
     private LinkedList<TestDevice> testDevices;
+    //store the platform device number
+    private HashMap<String, Integer> platformCount;
 
     /**
      * This constructor is called by TestSuite to create a TestCase.
      * The name of the TestCase is equal to the test method's name.
      * @param name
      */
-    TestCase(String name) {
+    public TestCase(String name) {
         this.name = name;
         testDevices = new LinkedList<TestDevice>();
+        platformCount = new HashMap<String, Integer>();
     }
 
     public String getName() {
         return name;
     }
 
-    protected void addDevice(TestDevice device) {
+    public void addDevice(TestDevice device) {
         testDevices.add(device);
+        String platformName=device.getClass().getName();
+        if(platformCount.containsKey(platformName)){
+            int newCount=platformCount.get(platformName)+1;
+            platformCount.put(platformName, newCount);
+        }else{
+            platformCount.put(platformName, 1);
+        }
     }
 
     protected void removeDevice(TestDevice device) {
         testDevices.remove(device);
     }
 
-    protected LinkedList<TestDevice> getDevices() {
+    public LinkedList<TestDevice> getDevices() {
         return testDevices;
     }
 

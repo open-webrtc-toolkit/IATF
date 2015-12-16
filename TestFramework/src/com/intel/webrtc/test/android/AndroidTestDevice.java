@@ -3,8 +3,15 @@ package com.intel.webrtc.test.android;
 import android.app.Activity;
 import android.util.Log;
 
+import com.intel.webrtc.test.ClientTestController;
 import com.intel.webrtc.test.Logger;
+import com.intel.webrtc.test.TestCase;
 import com.intel.webrtc.test.TestDevice;
+import com.intel.webrtc.test.TestSuite;
+
+import java.lang.reflect.Method;
+import java.util.Hashtable;
+
 import org.junit.Assert;
 
 /**
@@ -12,6 +19,8 @@ import org.junit.Assert;
  * It is the base class for users to write their own test cases. <br>
  * AndroidTestDevice is a subclass of org.junit.Assert, so users can use <br>
  * assertions in this class.
+ * For andrid, it contains the test cases.
+ * Note: the test function name should start with prefix "test"
  *
  * @author xianglai
  *
@@ -28,7 +37,7 @@ public class AndroidTestDevice extends Assert implements TestDevice {
     private final static String TAG = "Woogeen-AndroidTestDevice";
 
     private String deviceName = "";
-    private AndroidTestController controller;
+    private ClientTestController controller;
     private InstrumentationWrapper testEntry;
     public Activity testActivity;
 
@@ -87,7 +96,9 @@ public class AndroidTestDevice extends Assert implements TestDevice {
      * Set the AndroidTestController to enable the communication with the server.
      * @param controller
      */
-    public void setController(AndroidTestController controller) {
+    //TODO: this should move to TestDevice
+    @Override
+    public void setController(ClientTestController controller) {
         this.controller = controller;
     }
 
@@ -130,4 +141,26 @@ public class AndroidTestDevice extends Assert implements TestDevice {
         assertNotNull(controller);
         controller.notifyObjectForAll(objectId);
     }
+
+	@Override
+	public void addDeviceToSuite(TestSuite testSuite) {
+		Method[] methods = this.getClass().getMethods();
+        int methodNum = methods.length;
+        Hashtable<String, TestCase> testCases=testSuite.getTestCases();
+        for (int i = 0; i < methodNum; i++) {
+            // If the method is a test method, add the device into
+            // related TestCase
+            String methodName = methods[i].getName();
+            if (methodName.startsWith("test")) {
+                // If the TestCase already exists, add the device in.
+                if (testCases.containsKey(methodName)) {
+                    testCases.get(methodName).addDevice(this);
+                } else {
+                    TestCase newTestCase = new TestCase(methodName);
+                    newTestCase.addDevice(this);
+                    testCases.put(methodName, newTestCase);
+                }
+            }
+        }
+	}
 }
