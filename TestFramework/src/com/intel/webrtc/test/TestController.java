@@ -16,8 +16,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.intel.webrtc.test.ControllerWorker.ControllerWorkerObserver;
+import com.intel.webrtc.test.javascript.JavascriptRunnerHelper;
 
-import android.R.integer;
 
 /**
  * This class takes charge of the executing process of a test case.
@@ -64,6 +64,10 @@ public class TestController implements ControllerWorkerObserver {
     private Hashtable<String, ControllerWorker> controllerWorkers = null;
     private Hashtable<String, Socket> sockets = null;
     private Hashtable<String, PrintWriter> printWriters = null;
+    private Hashtable<String, ControllerWorker> storedControllerWorkers = null;
+    private Hashtable<String, Socket> storedSockets = null;
+    private Hashtable<String, PrintWriter> storedPrintWriters = null;
+    private Hashtable<String, String> addressDeviceType = null;
 
     /**
      * create a new TestController instance with a device-address mapping and
@@ -74,9 +78,15 @@ public class TestController implements ControllerWorkerObserver {
      * @param startMessageTable
      */
     public TestController(Hashtable<String, String> addressTable,
-            Hashtable<String, String> startMessageTable) {
+            Hashtable<String, String> startMessageTable,
+            Hashtable<String, String> addressDeviceType,
+            final Hashtable<String, Socket> storedSockets,
+            final Hashtable<String, PrintWriter> storedPrintWriters,
+            final Hashtable<String, ControllerWorker> storedControllerWorkers
+            ) {
         this.addressTable = addressTable;
         this.startMessageTable = startMessageTable;
+        this.addressDeviceType = addressDeviceType;
         this.wnManager = new WaitNotifyManager();
 
         deviceStatus = new Hashtable<String, TestStatus>();
@@ -84,6 +94,9 @@ public class TestController implements ControllerWorkerObserver {
         sockets = new Hashtable<String, Socket>();
         printWriters = new Hashtable<String, PrintWriter>();
         testStatus = TestStatus.Ready;
+        this.storedControllerWorkers = storedControllerWorkers;
+        this.storedSockets = storedSockets;
+        this.storedPrintWriters = storedPrintWriters;
     }
 
     /**
@@ -155,16 +168,32 @@ public class TestController implements ControllerWorkerObserver {
             localPort = element.getValue();
             deviceIds[index++] = deviceId;
             try {
-                Logger.d(TAG, "Create connection to ip " + deviceId + " port "
-                        + localPort);
-                socket = new Socket(ip, Integer.parseInt(localPort));
-                bufferedReader = new BufferedReader(new InputStreamReader(
-                        socket.getInputStream()));
-                printWriter = new PrintWriter(new BufferedWriter(
-                        new OutputStreamWriter(socket.getOutputStream())));
-                controllerWorker = new ControllerWorker(this, deviceId,
-                        bufferedReader);
-                deviceStatus.put(deviceId, TestStatus.Ready);
+                //TODO: How to remove the relateness with specific platform
+                String deviceType=addressDeviceType.get(deviceId);
+                if(storedSockets.containsKey(deviceId)){
+                    Logger.d(TAG, "fetch socket from stored list:"+deviceId);
+                    socket=storedSockets.get(deviceId);
+                    printWriter=storedPrintWriters.get(deviceId);
+                    controllerWorker=storedControllerWorkers.get(deviceId);
+                }else{
+                    Logger.d(TAG, "Create connection to ip " + deviceId + " port "
+                            + localPort);
+                    socket = new Socket(ip, Integer.parseInt(localPort));
+                    bufferedReader = new BufferedReader(new InputStreamReader(
+                            socket.getInputStream()));
+                    printWriter = new PrintWriter(new BufferedWriter(
+                            new OutputStreamWriter(socket.getOutputStream())));
+                    controllerWorker = new ControllerWorker(this, deviceId,
+                            bufferedReader);
+                }
+                if((deviceType!=null&&deviceType.equals(JavascriptRunnerHelper.class.getName()))||deviceId.equals(LockServer.infoid)){
+                    storedSockets.put(deviceId, socket);
+                    storedPrintWriters.put(deviceId, printWriter);
+                    storedControllerWorkers.put(deviceId, controllerWorker);
+                }
+                if(!deviceId.equals(LockServer.infoid)){
+                    deviceStatus.put(deviceId, TestStatus.Ready);
+                }
                 sockets.put(deviceId, socket);
                 printWriters.put(deviceId, printWriter);
                 controllerWorkers.put(deviceId, controllerWorker);
@@ -199,7 +228,9 @@ public class TestController implements ControllerWorkerObserver {
             element = iterator.next();
             String startTestMessage = startMessageTable.get(element.getKey());
             sendMessage(element.getValue(), startTestMessage);
-            deviceStatus.put(element.getKey(), TestStatus.Running);
+            if(!element.getKey().equals(LockServer.infoid)){
+                deviceStatus.put(element.getKey(), TestStatus.Running);
+            }
         }
         testStatus = TestStatus.Running;
     }
@@ -249,7 +280,6 @@ public class TestController implements ControllerWorkerObserver {
     // }
 
     private boolean haveAllTestsFinished() {
-
         return !(deviceStatus.containsValue(TestStatus.Running));
     }
 
@@ -263,17 +293,20 @@ public class TestController implements ControllerWorkerObserver {
         while (iterator.hasNext()) {
             element = iterator.next();
             String deviceId = element.getKey();
-            // Close ControllerWorkers
-            controllerWorkers.get(deviceId).close();
-            // Close PrintWriters
-            printWriters.get(deviceId).close();
-            // Close Sockets
-            try {
-                sockets.get(deviceId).close();
-            } catch (IOException e) {
-                e.printStackTrace();
-                Logger.e(TAG, "Error occured when close the socket of device "
-                        + deviceId);
+            if(!storedSockets.containsKey(deviceId)){
+                Logger.d(TAG, "close deviceId:"+deviceId);
+             // Close ControllerWorkers
+                controllerWorkers.get(deviceId).close();
+                // Close PrintWriters
+                printWriters.get(deviceId).close();
+                // Close Sockets
+                try {
+                    sockets.get(deviceId).close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Logger.e(TAG, "Error occured when close the socket of device "
+                            + deviceId);
+                }
             }
         }
         Logger.d(TAG, "TestController closed.");
@@ -301,6 +334,7 @@ public class TestController implements ControllerWorkerObserver {
         Logger.d(TAG, "onNotify(): deviceId:\t" + deviceId + "\tlockId:\t"
                 + lockId);
         String notifiedDevice = wnManager.notifyObject(deviceId,lockId);
+        Logger.d(TAG, "notifiedDevice:"+notifiedDevice);
         if (notifiedDevice != null) {
             notifyDevice(notifiedDevice, lockId);
         }

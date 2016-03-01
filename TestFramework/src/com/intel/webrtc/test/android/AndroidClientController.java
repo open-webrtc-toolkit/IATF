@@ -1,11 +1,21 @@
 package com.intel.webrtc.test.android;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Hashtable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.intel.webrtc.test.ClientTestController;
+import com.intel.webrtc.test.Logger;
 import com.intel.webrtc.test.MessageProtocol;
 
 import android.util.Log;
@@ -14,12 +24,13 @@ public class AndroidClientController extends ClientTestController{
     private final static String TAG = "AndroidClientController";
     private AndroidTestEntry androidTestEntry;
     private Hashtable<String, String> locks;
+    public static int androidLocalPort=10086;
     
     public AndroidClientController(AndroidTestEntry androidTestEntry) {
         super();
+        startServer();
         locks = new Hashtable<String, String>();
         this.androidTestEntry = androidTestEntry;
-        startServer();
     }
 
     @Override
@@ -93,5 +104,11 @@ public class AndroidClientController extends ClientTestController{
         synchronized (androidTestEntry) {
             androidTestEntry.notify();
         }
+    }
+    @Override
+    protected synchronized void startServer() {
+        Log.d(TAG, "startServer called.");
+        localport=androidLocalPort;
+        super.startServer();
     }
 }

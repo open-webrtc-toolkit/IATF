@@ -143,7 +143,7 @@ public class TestDevice3 extends AndroidTestDevice {
             }
         }
         Log.d(TAG, testActivity.toString());
-        ClientContext.setApplicationContext(testActivity);
+//        ClientContext.setApplicationContext(testActivity);
         act = (TestActivity) testActivity;
     }
 

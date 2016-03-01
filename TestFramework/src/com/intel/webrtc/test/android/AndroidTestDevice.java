@@ -8,6 +8,7 @@ import com.intel.webrtc.test.Logger;
 import com.intel.webrtc.test.TestCase;
 import com.intel.webrtc.test.TestDevice;
 import com.intel.webrtc.test.TestSuite;
+import com.intel.webrtc.test.WaitNotifyLocalSupporter;
 
 import java.lang.reflect.Method;
 import java.util.Hashtable;
@@ -25,7 +26,7 @@ import org.junit.Assert;
  * @author xianglai
  *
  */
-public class AndroidTestDevice extends Assert implements TestDevice {
+public class AndroidTestDevice extends Assert implements TestDevice, WaitNotifyLocalSupporter {
 
     // AndroidTestDevice take advantage of the Instrumentation via this
     // interface.

@@ -13,8 +13,7 @@ import java.net.UnknownHostException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
-
+//TODO: Log && Logger!!
 /**
  * Take charge of communicating with the server, sends heart beat, and provides
  * APIs related to wait-notify.
@@ -27,17 +26,19 @@ import android.util.Log;
  * but for javascript, this controller can handle all javascript test client.
  */
 public abstract class ClientTestController{
-    private final static String TAG = "ClientTestController";
+    private static String TAG = "ClientTestController";
     //TODO: read from config file
-    protected static final int port = 10086;
+    public static int port = 10085;
+    public int localport=port--;
     protected Socket socketToServer;
     protected BufferedReader bufferedReader;
     protected PrintWriter printWriter;
+    private boolean printWriterInited;
     protected boolean alive = true;
     protected HeartBeatThread heartBeatThread;
     public ClientTestController() {
         socketToServer = null;
-        startServer();
+//        startServer();
     }
     /**
      * send a heartBeat message to server.
@@ -49,28 +50,33 @@ public abstract class ClientTestController{
             sendMessage(message.toString());
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.e(TAG, "Error occured when creating heart beat message.");
+            Logger.e(TAG, "Error occured when creating heart beat message.");
         }
     }
-    protected void startServer() {
+    protected synchronized void startServer() {
         new Thread() {
+
             public void run() {
-                Log.d(TAG, "creating socket start:");
+                Logger.d(TAG, "creating socket start:");
                 ServerSocket server = null;
+                synchronized (ClientTestController.class) {
                 try {
-                    server = new ServerSocket(port);
+                        Logger.d(TAG,"port:"+localport+", on waiting");
+                        server = new ServerSocket(localport);
                 } catch (UnknownHostException e) {
-                    Log.e(TAG, "Unknown host!");
+                    Logger.e(TAG, "Unknown host!");
                     e.printStackTrace();
                 } catch (IOException e) {
-                    Log.e(TAG, "Error occured while creating the socket.");
+                    Logger.e(TAG, "Error occured while creating the socket.");
                     e.printStackTrace();
+                    System.exit(1);
                 }
+            }
                 if (server != null) {
-                    try {
-                        socketToServer = server.accept();
+                    try {Socket temp=server.accept();
+                        socketToServer = temp;
                     } catch (IOException e) {
-                        Log.e(TAG,
+                        Logger.e(TAG,
                                 "Error occured while accepting new connection.");
                         e.printStackTrace();
                     }
@@ -79,7 +85,7 @@ public abstract class ClientTestController{
                     try {
                         server.close();
                     } catch (IOException e) {
-                        Log.e(TAG, "Error occured while closing serverSocket.");
+                        Logger.e(TAG, "Error occured while closing serverSocket.");
                         e.printStackTrace();
                     }
                     try {
@@ -89,15 +95,16 @@ public abstract class ClientTestController{
                         printWriter = new PrintWriter(new BufferedWriter(
                                 new OutputStreamWriter(
                                         socketToServer.getOutputStream())));
+                        printWriterInited=true;
                     } catch (IOException e) {
-                        Log.e(TAG,
+                        Logger.e(TAG,
                                 "Error occured while creating reader and writer.");
                         e.printStackTrace();
                     }
                     heartBeatThread = new HeartBeatThread();
                     heartBeatThread.start();
                     listenToServer();
-                    Log.d(TAG, "creating socket end.");
+                    Logger.d(TAG, "creating socket end.");
                 }
             }
         }.start();
@@ -109,9 +116,12 @@ public abstract class ClientTestController{
                 while (alive) {
                     try {
                         String messageReceived = bufferedReader.readLine();
-                        Log.d(TAG, "Received [" + messageReceived + "].");
-                        // TODO safe?
+//                        Logger.d(TAG, "Received [" + messageReceived + "].");
                         if(messageReceived==null){
+                            continue;
+                        }
+                        //strange
+                        if(messageReceived.equals("null")){
                             continue;
                         }
                         if (messageReceived.equals("End")) {
@@ -133,7 +143,7 @@ public abstract class ClientTestController{
         try {
             message = new JSONObject(msg);
         } catch (JSONException e) {
-            Log.e(TAG, "Message [" + msg + "] is not a legal JSONObject.");
+            Logger.e(TAG, "Message [" + msg + "] is not a legal JSONObject.");
             e.printStackTrace();
             return;
         }
@@ -145,17 +155,17 @@ public abstract class ClientTestController{
                 String notifyWhat = "";
                 notifyWhat = message.getString(MessageProtocol.WHAT);
                 if ("".equals(notifyWhat)) {
-                    Log.e(TAG, "Can not wait or notify an empty string.");
+                    Logger.e(TAG, "Can not wait or notify an empty string.");
                     return;
                 }
                 notifyLocalObject(notifyWhat);
             } else if (messageType.equals(MessageProtocol.TEST_START)) {
                 handleStartMessage(msg);
             }else {
-                Log.e(TAG, "Unknown message type: " + messageType);
+                Logger.e(TAG, "Unknown message type: " + messageType);
             }
         } catch (JSONException e) {
-            Log.e(TAG, "message[ " + msg + " ] has illegal arguments!");
+            Logger.e(TAG, "message[ " + msg + " ] has illegal arguments!");
             e.printStackTrace();
         }
     }
@@ -185,7 +195,7 @@ public abstract class ClientTestController{
             try {
                 socketToServer.close();
             } catch (IOException e) {
-                Log.e(TAG, "Error occured when closing the socket.");
+                Logger.e(TAG, "Error occured when closing the socket.");
                 e.printStackTrace();
                 socketToServer = null;
             }
@@ -201,9 +211,12 @@ public abstract class ClientTestController{
     protected void sendMessage(final String msg) {
         new Thread() {
             public void run() {
-                synchronized (printWriter) {
-                    printWriter.println(msg);
-                    printWriter.flush();
+                if(printWriterInited){
+//                    System.out.println("msg:"+msg+this.getClass().getName());
+                    synchronized (printWriter) {
+                        printWriter.println(msg);
+                        printWriter.flush();
+                    }
                 }
             }
         }.start();
@@ -219,7 +232,7 @@ public abstract class ClientTestController{
             sendMessage(message.toString());
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.e(TAG, "Error occured when creating message.");
+            Logger.e(TAG, "Error occured when creating message.");
         }
     }
 
@@ -236,7 +249,7 @@ public abstract class ClientTestController{
             localWaitOperations(objectId);
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.e(TAG, "Error occured when creating message.");
+            Logger.e(TAG, "Error occured when creating message.");
             RuntimeException re = new RuntimeException("JSONException");
             re.setStackTrace(e.getStackTrace());
             throw re;
@@ -259,7 +272,7 @@ public abstract class ClientTestController{
             sendMessage(message.toString());
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.e(TAG, "Error occured when creating message.");
+            Logger.e(TAG, "Error occured when creating message.");
         }
     }
 
@@ -277,7 +290,7 @@ public abstract class ClientTestController{
             sendMessage(message.toString());
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.e(TAG, "Error occured when creating message.");
+            Logger.e(TAG, "Error occured when creating message.");
         }
     }
 

@@ -113,7 +113,7 @@ class ControllerWorker extends Thread {
                 message = bufferedReader.readLine();
             } catch (IOException e) {
                 Logger.e(TAG+":"+deviceId, "Error occured when read message from socket!message:"+message);
-                e.printStackTrace();
+//                e.printStackTrace();
                 break;
             }
             if (message == null)

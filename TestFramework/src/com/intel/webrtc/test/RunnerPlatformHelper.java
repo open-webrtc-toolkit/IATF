@@ -41,8 +41,8 @@ public interface RunnerPlatformHelper {
      * @param startMessageTable 
      * @param startTestCountDownLatch
      */
-    public LinkedList<ExcuteEnv> startTestDevices(TestCase testCase, Hashtable<String, String> addressTable,
-            Hashtable<String, String> startMessageTable, CountDownLatch startTestCountDownLatch);
+    public void startTestDevices(TestCase testCase, Hashtable<String, String> addressTable,
+            Hashtable<String, String> startMessageTable,Hashtable<String, String> addressDeviceType, CountDownLatch startTestCountDownLatch,LinkedList<ExcuteEnv> retenv);
 
     /**
      * pass testController to runnerHelpers to enable test results to be passed back.

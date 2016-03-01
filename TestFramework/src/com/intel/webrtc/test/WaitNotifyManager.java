@@ -10,11 +10,11 @@ import java.util.List;
  *
  */
 public class WaitNotifyManager {
-    private Hashtable<String, List<String>> waitingLists;
+    private static Hashtable<String, List<String>> waitingLists= new Hashtable<String, List<String>>();;
     private Hashtable<String, Boolean> notifyLists;
 
     public WaitNotifyManager() {
-        waitingLists = new Hashtable<String, List<String>>();
+        waitingLists.clear();
         notifyLists = new Hashtable<String, Boolean>();
     }
 
@@ -31,38 +31,41 @@ public class WaitNotifyManager {
      * should be sent into the waiting list.
      */
     public boolean waitForObject(String deviceId, String objectId) {
-        List<String> waitingList = null;
-        Boolean notifyAll;
-        boolean notifyArrived = false;
-        synchronized (notifyLists) {
-            // Check whether the notify information has already arrived
-            if (notifyLists.containsKey(objectId)) {
-                // list of notify locks
-                notifyAll = notifyLists.get(objectId);
-                if (!notifyAll) {
-                    // notify one object, delete
-                    notifyLists.remove(objectId);
+        synchronized (WaitNotifyManager.class) {
+            List<String> waitingList = null;
+            Boolean notifyAll;
+            boolean notifyArrived = false;
+            synchronized (notifyLists) {
+                // Check whether the notify information has already arrived
+                if (notifyLists.containsKey(objectId)) {
+                    // list of notify locks
+                    notifyAll = notifyLists.get(objectId);
+                    if (!notifyAll) {
+                        // notify one object, delete
+                        notifyLists.remove(objectId);
+                    }
+                    notifyArrived = true;
+                    // no need to edit the waitingLists
+                    return notifyArrived;
                 }
-                notifyArrived = true;
-                // no need to edit the waitingLists
-                return notifyArrived;
             }
-        }
-        synchronized (waitingLists) {
-            // If the lock object exists, get it.
-            // Otherwise, create a new object.
-            if (waitingLists.containsKey(objectId)) {
-                waitingList = waitingLists.get(objectId);
-            } else {
-                waitingList = new LinkedList<String>();
-                waitingLists.put(objectId, waitingList);
+            synchronized (waitingLists) {
+                // If the lock object exists, get it.
+                // Otherwise, create a new object.
+                if (waitingLists.containsKey(objectId)) {
+                    waitingList = waitingLists.get(objectId);
+                } else {
+                    waitingList = new LinkedList<String>();
+                    waitingLists.put(objectId, waitingList);
+                }
+                synchronized (waitingList) {
+                    if (!waitingList.contains(deviceId)){
+                        waitingList.add(deviceId);
+                    }
+                }
             }
+            return notifyArrived;
         }
-        synchronized (waitingList) {
-            if (!waitingList.contains(deviceId))
-                waitingList.add(deviceId);
-        }
-        return notifyArrived;
     }
 
     /**
@@ -73,22 +76,24 @@ public class WaitNotifyManager {
      *            the name of the remote object
      */
     public String notifyObject(String deviceId, String objectId) {
-        List<String> waitingList = null;
-        synchronized (waitingLists) {
-            if (waitingLists.containsKey(objectId)) {
-                waitingList = waitingLists.get(objectId);
-            } else {
-                // no waiting items, store notify in list
-                notifyLists.put(objectId, false);
+        synchronized (WaitNotifyManager.class) {
+            List<String> waitingList = null;
+            synchronized (waitingLists) {
+                if (waitingLists.containsKey(objectId)) {
+                    waitingList = waitingLists.get(objectId);
+                } else {
+                    // no waiting items, store notify in list
+                    notifyLists.put(objectId, false);
+                    return null;
+                }
+            }
+            synchronized (waitingList) {
+                if (!waitingList.isEmpty()) {
+                    // TODO: further optimization needed
+                    return waitingList.remove(0);
+                }
                 return null;
             }
-        }
-        synchronized (waitingList) {
-            if (!waitingList.isEmpty()) {
-                // TODO: further optimization needed
-                return waitingList.remove(0);
-            }
-            return null;
         }
     }
 
@@ -100,28 +105,41 @@ public class WaitNotifyManager {
      *            the name of the remote object
      */
     public String[] notifyObjectForAll(String objectId) {
-        // There maybe some wait items not arrived yet
-        // Whenever notifyAll is arrived, should be stored
-        notifyLists.put(objectId, true);
-        List<String> waitingList = null;
-        synchronized (waitingLists) {
-            if (waitingLists.containsKey(objectId)) {
-                waitingList = waitingLists.get(objectId);
-            } else {
-                // no waiting items, store notify in list
-                return null;
-            }
-        }
-        synchronized (waitingList) {
-            if (!waitingList.isEmpty()) {
-                int n = waitingList.size();
-                String[] result = new String[n];
-                for (int i = 0; i < n; i++) {
-                    result[i] = waitingList.remove(0);
+        synchronized (WaitNotifyManager.class) {
+         // There maybe some wait items not arrived yet
+            // Whenever notifyAll is arrived, should be stored
+            notifyLists.put(objectId, true);
+            List<String> waitingList = null;
+            synchronized (waitingLists) {
+                if (waitingLists.containsKey(objectId)) {
+                    waitingList = waitingLists.get(objectId);
+                } else {
+                    // no waiting items, store notify in list
+                    return null;
                 }
-                return result;
             }
+            synchronized (waitingList) {
+                if (!waitingList.isEmpty()) {
+                    int n = waitingList.size();
+                    String[] result = new String[n];
+                    for (int i = 0; i < n; i++) {
+                        result[i] = waitingList.remove(0);
+                    }
+                    return result;
+                }
+            }
+            return null;
         }
-        return null;
     }
+//    private void printWaitingList(Hashtable<String, List<String>> waitingLists){
+//        System.out.println("printWaitingList");
+//        for(String key:waitingLists.keySet()){
+//            System.out.print(key+"\t");
+//            List<String> values=waitingLists.get(key);
+//            for(String value:values){
+//                System.out.print(value+",");
+//            }
+//            System.out.println();
+//        }
+//    }
 }

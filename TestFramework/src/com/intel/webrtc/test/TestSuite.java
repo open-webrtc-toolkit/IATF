@@ -17,7 +17,11 @@ public class TestSuite {
 	// TODO private LinkedList<Pair<String, Integer>> deviceRequired;
 	private LinkedList<TestDevice> testDevices;
 
-	private Hashtable<String, TestCase> testCases;
+	public LinkedList<TestDevice> getTestDevices() {
+        return testDevices;
+    }
+
+    private Hashtable<String, TestCase> testCases;
 
 	public TestSuite() {
 		testCases = new Hashtable<String, TestCase>();
@@ -37,6 +41,8 @@ public class TestSuite {
 	 */
 	public void addTestDevice(TestDevice testDevice) {
 		testDevice.addDeviceToSuite(this);
+		//for javascript client, this can be used to run 'karma start'
+		testDevices.add(testDevice);
 	}
 
 	/**

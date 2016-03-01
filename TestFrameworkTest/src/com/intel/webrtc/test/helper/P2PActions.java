@@ -27,7 +27,7 @@ public class P2PActions extends Assert {
     private static final String TAG = "P2PActions";
     private Activity testAct = null;
     private static long waitingTimeInterval = 1000;
-    private static int waitingIntervalNum = 10;
+    private static int waitingIntervalNum = 20;
     private static boolean intervalWaitingMode = true;
 
     private static String generateLoginToken(String serverIp, String userName) {

@@ -22,7 +22,7 @@ public class TestControllerTest {
         }
         startServer();
         TestController controller = new TestController(addressTable,
-                startMessageTable);
+                startMessageTable,null, null,null, null);
         controller.start();
 
     }

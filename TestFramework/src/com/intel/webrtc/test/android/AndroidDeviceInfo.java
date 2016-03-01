@@ -20,7 +20,7 @@ public class AndroidDeviceInfo extends DeviceInfo {
 
     public AndroidDeviceInfo(String serialId, AndroidDeviceType deviceType,
             String ip) {
-        super(serialId, portStart++);
+        super(serialId, ""+portStart++);
         this.deviceType = deviceType;
         this.ip = ip;
     }
