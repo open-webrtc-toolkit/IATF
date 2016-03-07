@@ -12,11 +12,10 @@ import java.util.LinkedList;
  *
  */
 public class TestCase {
+    // Case Name
     private String name;
-
+    // Device list in this case
     private LinkedList<TestDevice> testDevices;
-    //store the platform device number
-    private HashMap<String, Integer> platformCount;
 
     /**
      * This constructor is called by TestSuite to create a TestCase.
@@ -26,30 +25,31 @@ public class TestCase {
     public TestCase(String name) {
         this.name = name;
         testDevices = new LinkedList<TestDevice>();
-        platformCount = new HashMap<String, Integer>();
     }
 
+    /**
+     * Return the case name.
+     * @return
+     */
     public String getName() {
         return name;
     }
 
-    public void addDevice(TestDevice device) {
-        testDevices.add(device);
-        String platformName=device.getClass().getName();
-        if(platformCount.containsKey(platformName)){
-            int newCount=platformCount.get(platformName)+1;
-            platformCount.put(platformName, newCount);
-        }else{
-            platformCount.put(platformName, 1);
-        }
-    }
-
-    protected void removeDevice(TestDevice device) {
-        testDevices.remove(device);
-    }
-
+    /**
+     * Get the devices in this TestCase.
+     * @return testDevices devices in case.
+     */
     public LinkedList<TestDevice> getDevices() {
         return testDevices;
+    }
+
+    /**
+     * Add a device in a testCase and count devices under every platform.
+     * @param device
+     */
+    public void addDevice(TestDevice device) {
+        testDevices.add(device);
+        String platformName = device.getClass().getName();
     }
 
     /**

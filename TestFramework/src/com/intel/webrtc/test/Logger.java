@@ -14,8 +14,7 @@ public class Logger {
     private static boolean printToStandardIO = true;
     private static boolean printToLogFile = false;
     private File logFile = null;
-    private static DateFormat simpleDateFormat = new SimpleDateFormat(
-            "MM-dd HH:mm:ss");
+    private static DateFormat simpleDateFormat = new SimpleDateFormat("MM-dd HH:mm:ss");
 
     /**
      * Print a log in the Error level.

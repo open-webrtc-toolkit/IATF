@@ -10,12 +10,18 @@ import java.util.List;
  *
  */
 public class WaitNotifyManager {
-    private static Hashtable<String, List<String>> waitingLists= new Hashtable<String, List<String>>();;
-    private Hashtable<String, Boolean> notifyLists;
+    // Bean enhanced: The following two cache can tolerate wait-notify messages
+    // out-of-order.
+    // Store the waiting message, if notify has already arrived, it will
+    // directly consume that notify.
+    // Otherwise, the waiting message will be stored.
+    private static Hashtable<String, List<String>> waitingLists = new Hashtable<String, List<String>>();
+    // Store the notify message that arrives ahead of time
+    private static Hashtable<String, Boolean> notifyLists = new Hashtable<String, Boolean>();;
 
     public WaitNotifyManager() {
         waitingLists.clear();
-        notifyLists = new Hashtable<String, Boolean>();
+        notifyLists.clear();
     }
 
     /**
@@ -59,7 +65,7 @@ public class WaitNotifyManager {
                     waitingLists.put(objectId, waitingList);
                 }
                 synchronized (waitingList) {
-                    if (!waitingList.contains(deviceId)){
+                    if (!waitingList.contains(deviceId)) {
                         waitingList.add(deviceId);
                     }
                 }
@@ -106,7 +112,7 @@ public class WaitNotifyManager {
      */
     public String[] notifyObjectForAll(String objectId) {
         synchronized (WaitNotifyManager.class) {
-         // There maybe some wait items not arrived yet
+            // There maybe some wait items not arrived yet
             // Whenever notifyAll is arrived, should be stored
             notifyLists.put(objectId, true);
             List<String> waitingList = null;
@@ -131,15 +137,4 @@ public class WaitNotifyManager {
             return null;
         }
     }
-//    private void printWaitingList(Hashtable<String, List<String>> waitingLists){
-//        System.out.println("printWaitingList");
-//        for(String key:waitingLists.keySet()){
-//            System.out.print(key+"\t");
-//            List<String> values=waitingLists.get(key);
-//            for(String value:values){
-//                System.out.print(value+",");
-//            }
-//            System.out.println();
-//        }
-//    }
 }

@@ -8,34 +8,36 @@ import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.intel.webrtc.test.ClientTestController;
 import com.intel.webrtc.test.Logger;
 import com.intel.webrtc.test.TestCase;
 import com.intel.webrtc.test.TestDevice;
 import com.intel.webrtc.test.TestSuite;
 
 import junit.framework.Assert;
+
 /**
- * Logic device of javascript
+ * Logic device of javascript. Init by the test case file and karma config file.
  * @author bean
  *
  */
 public class JavascriptTestDevice extends Assert implements TestDevice {
-    // the prefix of test file, in order to figure the test case file from
-    // config file of karma
+    // Debug TAG
     public static String TAG = "JavascriptTestDevice";
-    // TODO: needed?
-    private String jsTestSourcePrefix = "test-peerwn";
+    // Device name
     private String deviceName = "";
-    private ClientTestController controller;
+    // All the test methods scaned from the js test file, describe block which
+    // starts with prefix 'test'
     private HashSet<String> testMethods;
+    // Karma config file
     public String jsConfFile;
+    // Physical device info, mainly stores the config infos
     public JavascriptDeviceInfo deviceInfo;
-    public Process karmaStartProcess=null;
+    // The process runs 'karma start' to start test
+    public Process karmaStartProcess = null;
 
     public JavascriptTestDevice(String jsTestFile, String jsConfFile) throws IOException {
-        this.jsConfFile=jsConfFile;
-        this.deviceInfo=new JavascriptDeviceInfo(jsConfFile);
+        this.jsConfFile = jsConfFile;
+        this.deviceInfo = new JavascriptDeviceInfo(jsConfFile);
         testMethods = new HashSet<String>();
         String deviceName;
         try {
@@ -87,11 +89,17 @@ public class JavascriptTestDevice extends Assert implements TestDevice {
         return deviceName;
     }
 
+    /**
+     * Get device name.
+     */
     @Override
     public String getName() {
         return deviceName;
     }
 
+    /**
+     * Set device name.
+     */
     @Override
     public void setName(String name) {
         this.deviceName = name;

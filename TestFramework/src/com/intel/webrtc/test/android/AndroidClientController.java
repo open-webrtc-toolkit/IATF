@@ -1,31 +1,34 @@
 package com.intel.webrtc.test.android;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.Hashtable;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.intel.webrtc.test.ClientTestController;
-import com.intel.webrtc.test.Logger;
-import com.intel.webrtc.test.MessageProtocol;
-
 import android.util.Log;
 
-public class AndroidClientController extends ClientTestController{
+import com.intel.webrtc.test.ClientTestController;
+import com.intel.webrtc.test.MessageProtocol;
+
+/**
+ * ClientTestController on android platform.
+ * @author bean
+ *
+ */
+public class AndroidClientController extends ClientTestController {
+    // Debug TAG
     private final static String TAG = "AndroidClientController";
+    // Wrapper class of InstrumentationTestCase to enable auto test
     private AndroidTestEntry androidTestEntry;
+    // String lock object table, to ensure lock with same String should mapping
+    // to same String object.
     private Hashtable<String, String> locks;
-    public static int androidLocalPort=10086;
-    
+    // Socket of ClientController, communicating with testController on server
+    // side
+    public static int androidLocalPort = 10086;
+
+    /**
+     * Start socket to communicate with testController.
+     * @param androidTestEntry
+     */
     public AndroidClientController(AndroidTestEntry androidTestEntry) {
         super();
         startServer();
@@ -33,8 +36,10 @@ public class AndroidClientController extends ClientTestController{
         this.androidTestEntry = androidTestEntry;
     }
 
-    @Override
-    public void localWaitOperations(String objectId) throws InterruptedException {
+    /**
+     * Local wait support on android, wait for a String lock object.
+     */
+    public void localWaitOperations(String objectId) {
         String lock = null;
         synchronized (locks) {
             if (locks.containsKey(objectId)) {
@@ -45,10 +50,18 @@ public class AndroidClientController extends ClientTestController{
             }
         }
         synchronized (lock) {
-            lock.wait();
+            try {
+                lock.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
+    /**
+     * Notify local object with lock id.
+     * Check up in lock object map and notify.
+     */
     @Override
     public void notifyLocalObject(String objectId) {
         String lock = null;
@@ -56,8 +69,7 @@ public class AndroidClientController extends ClientTestController{
             if (locks.containsKey(objectId)) {
                 lock = locks.get(objectId);
             } else {
-                Log.e(TAG, "The local object [" + objectId
-                        + "] does not exist!");
+                Log.e(TAG, "The local object [" + objectId + "] does not exist!");
                 return;
             }
         }
@@ -66,6 +78,11 @@ public class AndroidClientController extends ClientTestController{
         }
     }
 
+    /**
+     * Waiting for startMessage from testController. Set up the test params in testEntry
+     * with the infos in startMessage then notify testEntry to continue running the test
+     * method.
+     */
     @Override
     public void handleStartMessage(String msg) {
         JSONObject message;
@@ -94,8 +111,7 @@ public class AndroidClientController extends ClientTestController{
                 testActivity = message.getString(MessageProtocol.TEST_ACTIVITY);
                 testPackage = message.getString(MessageProtocol.TEST_PACKAGE);
                 androidTestEntry.setTestClassAndMethod(className, methodName);
-                androidTestEntry.setTestPackageAndActivity(testPackage,
-                        testActivity);
+                androidTestEntry.setTestPackageAndActivity(testPackage, testActivity);
             }
         } catch (JSONException e) {
             Log.e(TAG, "message[ " + msg + " ] has illegal arguments!");
@@ -105,10 +121,14 @@ public class AndroidClientController extends ClientTestController{
             androidTestEntry.notify();
         }
     }
+
+    /**
+     * Set localport then start socket server to communicate with testController.
+     */
     @Override
     protected synchronized void startServer() {
         Log.d(TAG, "startServer called.");
-        localport=androidLocalPort;
+        localport = androidLocalPort;
         super.startServer();
     }
 }

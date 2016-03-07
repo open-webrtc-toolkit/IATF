@@ -2,34 +2,33 @@ package com.intel.webrtc.test.android;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
-import com.intel.webrtc.test.ClientTestController;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.test.InstrumentationTestCase;
 import android.util.Log;
 
+import com.intel.webrtc.test.ClientTestController;
+
 /**
- * The wrapper class for user-write test cases.<p>
+ * The wrapper class for user-write test cases and a helper class for AndroidClientController.<br>
  * AndroidTestEntry will be started by InstrumentationTestRunner as a JUnit
  * test case, and it will initialize the environment for test client, set up the
  * network, and instantiate the specific user-defined AndroidTestDevice according
- * to server's command, and finally run the test.<p>
- * It also provides some APIs related to Instrumentation.
+ * to server's command, and finally run the test.<br>
+ * It also provides some APIs related to Instrumentation.<br>
  *
  * @author xianglai
  *
  */
-public class AndroidTestEntry extends InstrumentationTestCase implements
-        AndroidTestDevice.InstrumentationWrapper {
-    // TODO change all log.e() to fail();
-
+public class AndroidTestEntry extends InstrumentationTestCase implements AndroidTestDevice.InstrumentationWrapper {
+    // Debug TAG
+    private final static String TAG = "AndroidTestEntry";
+    // Start when
     private ClientTestController testController = null;
     private AndroidTestDevice testDevice;
 
     private Method testMethod;
-    private final static String TAG = "AndroidTestEntry";
+
     private String className, methodName, testActivityName, testPackage;
     private Activity testActivity;
 
@@ -37,7 +36,6 @@ public class AndroidTestEntry extends InstrumentationTestCase implements
      * called by InstrumentTestRunner.
      */
     public AndroidTestEntry() {
-        // TODO How to define a default constructor for JUnit?
         super();
         className = null;
         methodName = null;
@@ -45,13 +43,14 @@ public class AndroidTestEntry extends InstrumentationTestCase implements
         testActivityName = null;
         testDevice = null;
         testMethod = null;
-
     }
 
     /**
-     * Listen to test controller, and get test identity.
+     * Called by InstrumentationTestCase, before testEntry.
+     * Wait for test controller to set test params.
      * Invoke Devices's setUp();
      */
+    @Override
     public void setUp() {
         try {
             super.setUp();
@@ -60,9 +59,13 @@ public class AndroidTestEntry extends InstrumentationTestCase implements
             fail("Error occured in super.setUp().");
         }
         Log.d(TAG, "Super.setUp() finished.");
+        // start a client controller here !
         testController = new AndroidClientController(this);
         synchronized (this) {
             // Waiting for the start message;
+            // Android client test controller will call setTestClassAndMethod
+            // and setTestPackageAndActivity
+            // Then notify
             try {
                 wait();
             } catch (InterruptedException e) {
@@ -76,10 +79,10 @@ public class AndroidTestEntry extends InstrumentationTestCase implements
 
     /**
      * Instantiate the specific AndroidTestDevice, and get current test method.
+     * Called after testController has set the test params.
      */
     private void initTestClassAndMethod() {
         Class<?> testClass = null;
-
         try {
             testClass = Class.forName(className);
         } catch (ClassNotFoundException e) {
@@ -91,17 +94,11 @@ public class AndroidTestEntry extends InstrumentationTestCase implements
         try {
             object = testClass.newInstance();
         } catch (InstantiationException e) {
-            Log.e(TAG,
-                    "Class "
-                            + className
-                            + " doesn't have a defalut constructor, or it is not visable!");
+            Log.e(TAG, "Class " + className + " doesn't have a defalut constructor, or it is not visable!");
             e.printStackTrace();
             return;
         } catch (IllegalAccessException e) {
-            Log.e(TAG,
-                    "Class "
-                            + className
-                            + " doesn't have a defalut constructor, or it is not visable!");
+            Log.e(TAG, "Class " + className + " doesn't have a defalut constructor, or it is not visable!");
             e.printStackTrace();
             return;
         }
@@ -115,8 +112,7 @@ public class AndroidTestEntry extends InstrumentationTestCase implements
             testMethod = testClass.getMethod(methodName);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
-            fail("Class " + className + " doesn't have a method named "
-                    + methodName + ".");
+            fail("Class " + className + " doesn't have a method named " + methodName + ".");
         }
     }
 
@@ -127,13 +123,9 @@ public class AndroidTestEntry extends InstrumentationTestCase implements
      * @param methodName
      *      the name of the test method going to run.
      */
-    //TODO put the following two methods into a new interface.
     void setTestClassAndMethod(String className, String methodName) {
         this.className = className;
         this.methodName = methodName;
-        synchronized (this) {
-            notify();
-        }
     }
 
     /**
@@ -144,8 +136,7 @@ public class AndroidTestEntry extends InstrumentationTestCase implements
      * @param testActivity
      *      the qualified name of the activity.
      */
-    void setTestPackageAndActivity(String testPackage,
-            String testActivity) {
+    void setTestPackageAndActivity(String testPackage, String testActivity) {
         this.testPackage = testPackage;
         this.testActivityName = testActivity;
     }
@@ -160,17 +151,15 @@ public class AndroidTestEntry extends InstrumentationTestCase implements
     @SuppressWarnings("unchecked")
     public Activity getActivity() {
         if (testActivity == null) {
-            Class<Activity> activityClass=null;
+            Class<Activity> activityClass = null;
             try {
                 // TODO find a better way to solve this conversion.
                 // Do not suppress the warning.
-                activityClass = (Class<Activity>) Class
-                        .forName(testActivityName);
+                activityClass = (Class<Activity>) Class.forName(testActivityName);
                 assertNotNull(activityClass);
-                testActivity=super.launchActivity(testPackage, activityClass, new Bundle());
-                Log.d(TAG, "testActivity:"+testActivity);
+                testActivity = super.launchActivity(testPackage, activityClass, new Bundle());
+                Log.d(TAG, "testActivity:" + testActivity);
             } catch (Exception e) {
-                // TODO Auto-generated catch block
                 Log.e(TAG, activityClass.toString());
                 Log.e(TAG, testActivityName);
                 e.printStackTrace();
@@ -179,6 +168,10 @@ public class AndroidTestEntry extends InstrumentationTestCase implements
         return testActivity;
     }
 
+    /**
+     * Clear after the test method finishes.
+     */
+    @Override
     public void tearDown() {
         testDevice.tearDown();
         testController.testFinished();
@@ -206,8 +199,8 @@ public class AndroidTestEntry extends InstrumentationTestCase implements
             if (throwable instanceof AssertionError)
                 throw (AssertionError) throwable;
             else {
-                RuntimeException re = new RuntimeException(throwable.getClass()
-                        .getName() + " msg:" + throwable.getMessage());
+                RuntimeException re = new RuntimeException(
+                        throwable.getClass().getName() + " msg:" + throwable.getMessage());
                 re.setStackTrace(throwable.getStackTrace());
                 throw re;
             }

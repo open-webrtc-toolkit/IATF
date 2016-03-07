@@ -11,8 +11,27 @@ package com.intel.webrtc.test;
  *
  */
 public interface WaitNotifyLocalSupporter {
+    /**
+     * In order to call the ClientTestController to communicate with TestController
+     * @param controller client test controller.
+     */
     void setController(ClientTestController controller);
+
+    /**
+     * Fill local wait operations and call waitForObject in ClientTestController.
+     * @param objectId
+     */
     public void waitForObject(String objectId);
+
+    /**
+     * Fill local notify operations and call waitForObject in ClientTestController.
+     * @param objectId
+     */
     public void notifyObject(String objectId);
+
+    /**
+     * Fill local notify all operations and call waitForObject in ClientTestController.
+     * @param objectId
+     */
     public void notifyObjectForAll(String objectId);
 }

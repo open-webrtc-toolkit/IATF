@@ -1,7 +1,6 @@
 package com.intel.webrtc.test;
 
 import java.io.BufferedReader;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -11,56 +10,58 @@ import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.intel.webrtc.test.RunnerPlatformHelper.ExcuteEnv;
 import com.intel.webrtc.test.TestController.TestStatus;
 import com.intel.webrtc.test.android.AndroidRunnerHelper;
-import com.intel.webrtc.test.javascript.JavascriptClientController;
 import com.intel.webrtc.test.javascript.JavascriptRunnerHelper;
-import com.intel.webrtc.test.javascript.JavascriptTestDevice;
 
-public class TestRunner {
+public class TestRunner implements RunnerPlatformHelper {
+    // Debug tag
     final static private String TAG = "TestRunner";
-
+    // global config of this application, init from file
     private Config config;
+    // controller on test server side for current test case
     private TestController testController;
-    //deviceID-IP(communication socket server of the test client )
+    // deviceID-IP(communication socket server of the test client )
     private Hashtable<String, String> addressTable;
-    //deviceID-startMsg
+    // deviceID-startMsg
     private Hashtable<String, String> startMessageTable;
-    //deviceID-deviceType(JS, android,etc)
+    // deviceID-deviceType(JS, android,etc)
     private Hashtable<String, String> addressDeviceType;
-    //TODO: change to DeviceInfo
-    private LinkedList<DeviceInfo> deviceInfos;
+    // store the results of all the cases
     private LinkedList<TestResult> testResults;
+    // store all the RunnerPlatformHelpers, help the TestRunner to do some
+    // platform-related
+    // operations, see {@link .RunnerPlatformHelper RunnerPlatformHelper}.
+    // Register all the
+    // RunnerPlatformHelper before testing.
     private LinkedList<RunnerPlatformHelper> runnerHelpers;
-
+    // Store long-term socket connection to test clients
     private Hashtable<String, Socket> storedSockets = null;
+    // Mated with storedSockets, store printWriters to test clients instead.
     private Hashtable<String, PrintWriter> storedPrintWriters = null;
+    // Mate with storedControllerWorkers, store ControllerWorkers for test
+    // clients instead.
     private Hashtable<String, ControllerWorker> storedControllerWorkers = null;
-    // Get the port from the configuration, and pass it to the TestController
-    int port;
-    private TestCase currentTestCase;
+    // {@link .LockServer Lock server} for current testing.
+    protected LockServer ls = null;
+    // Thread which is started to run lock server.
+    private Thread lockServerThread = null;
 
-    protected LockServer ls=null;
-    private Thread lockServerThread=null;
-
+    /**
+     * Init a TestRunner with application config and the test suite to run.
+     * @param config config file of all the configuration needed.
+     * @param testSuite test suite inited from test file.
+     */
     public TestRunner(Config config, TestSuite testSuite) {
         if (config == null) {
             this.config = new Config(null);
         } else {
             this.config = config;
         }
-      //TODO: how to init runnerHelper properly
-        runnerHelpers=new LinkedList<RunnerPlatformHelper>();
-        runnerHelpers.add(new AndroidRunnerHelper());
-        runnerHelpers.add(new JavascriptRunnerHelper());
-        initParameters();
+        runnerHelpers = new LinkedList<RunnerPlatformHelper>();
         testController = null;
-        deviceInfos = new LinkedList<DeviceInfo>();
         addressTable = new Hashtable<String, String>();
         startMessageTable = new Hashtable<String, String>();
         addressDeviceType = new Hashtable<String, String>();
@@ -68,78 +69,55 @@ public class TestRunner {
         storedControllerWorkers = new Hashtable<String, ControllerWorker>();
         storedSockets = new Hashtable<String, Socket>();
         storedPrintWriters = new Hashtable<String, PrintWriter>();
-        lockServerThread=startLockServerThread();
-    }
-    private void initParameters() {
-        //keep in TestRunner
-        port = config.getPort();
-        for(RunnerPlatformHelper helper:runnerHelpers){
-            helper.initParameters(config);
-        }
+        lockServerThread = startLockServerThread();
+        // TODO: How to init runnerHelper properly
+        // All the RunnerPlatformHelper should be registered here
+        runnerHelpers.add(new AndroidRunnerHelper());
+        runnerHelpers.add(new JavascriptRunnerHelper());
     }
 
     /**
-     * run TestCases in the TestSuite one by one.
+     * Run TestCases in the TestSuite one by one, main logic of this class.
      *
-     * @param tests
+     * @param testSuite
      *            the test suite.
      */
-    public void runTestSuite(TestSuite tests) {
-        stopChrome();
-        try{
-            for(RunnerPlatformHelper helper:runnerHelpers){
-                helper.deployTests(tests);
-            }
-            Hashtable<String, TestCase> testCases = tests.getTestCases();
+    public void runTestSuite(TestSuite testSuite) {
+        try {
+            initParameters(config);
+            clearBeforeSuite();
+            deployTests(testSuite);
+            Hashtable<String, TestCase> testCases = testSuite.getTestCases();
             Iterator<Entry<String, TestCase>> iterator = testCases.entrySet().iterator();
             while (iterator.hasNext()) {
                 Entry<String, TestCase> entry = iterator.next();
                 runTestCase(entry.getValue());
             }
-            printResult(tests.getTestCases().size());
-            // TODO generate test result.
-        }catch(Exception e){
+            printResult(testSuite.getTestCases().size());
+            // TODO generate test result with enhance format.
+            clearAfterSuite(testSuite);
+        } catch (Exception e) {
             ls.close();
         }
-        closeAfterSuite(tests);
-        stopChrome();
     }
-    private void closeAfterSuite(TestSuite tests) {
-        for(String deviceId:storedSockets.keySet()){
+
+    /**
+     * Clear the stored long-term sockets to clients and close the LockServer.
+     */
+    private void closeAfterSuite() {
+        for (String deviceId : storedSockets.keySet()) {
             storedControllerWorkers.get(deviceId).close();
             storedPrintWriters.get(deviceId).close();
             try {
                 storedSockets.get(deviceId).close();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-        }
-        for(TestDevice device:tests.getTestDevices()){
-            if(device instanceof JavascriptTestDevice){
-                ((JavascriptTestDevice) device).karmaStartProcess.destroy();
-            }
-        }
-        for(JavascriptClientController jscc:JavascriptClientController.jsControllers){
-            jscc.close();
         }
         ls.close();
         lockServerThread.interrupt();
     }
-    private void stopChrome(){
-        String closeChromeCmd="ps -e | grep chrome | awk '{print $1}' | xargs kill -9";
-        Process p;
-        try {
-            p = executeByShell(closeChromeCmd);
-            p.waitFor();
-        } catch (IOException e) {
-            Logger.e(TAG, "Error occured while closing chrome.");
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            Logger.e(TAG, "Error occured while waiting for chrome to close.");
-            e.printStackTrace();
-        }
-    }
+
     /**
      * Run single test case.
      *
@@ -147,25 +125,15 @@ public class TestRunner {
      *            the test case which is going to run.
      */
     private void runTestCase(TestCase testCase) {
-        if (testController != null) {
-            testController.close();
-            testController = null;
-        }
-        //reset the test environment
-        currentTestCase = testCase;
+        // 1. reset the test environment before case
         clearBeforeCase();
-        //initialize the test devices
+        // 2. initialize and deploy on the physical test devices
         CountDownLatch startTestCountDownLatch = new CountDownLatch(testCase.getDevices().size());
-        //calling helpers to start the case
-        System.out.println("runnerHelper.size:"+runnerHelpers.size());
-        LinkedList<ExcuteEnv> envs=new LinkedList<ExcuteEnv>();
-        for(RunnerPlatformHelper helper:runnerHelpers){
-        	helper.startTestDevices(testCase, addressTable, startMessageTable,addressDeviceType, startTestCountDownLatch,envs);
-        }
-        //add lock server information in addressTable & startMessageTable
-        generateLockServerStartMessage(startMessageTable,addressTable);
+        LinkedList<ExcuteEnv> envs = new LinkedList<ExcuteEnv>();
+        startTestDevices(testCase, addressTable, startMessageTable, addressDeviceType, startTestCountDownLatch, envs);
+        generateLockServerStartMessage(startMessageTable, addressTable);
         try {
-            
+            // TODO: time should be read from config
             if (!startTestCountDownLatch.await(100000, TimeUnit.MILLISECONDS))
                 Logger.e(TAG, "Time out when start test cases.");
             else {
@@ -175,37 +143,32 @@ public class TestRunner {
             Logger.e(TAG, "Interrupted when start test cases.");
             e.printStackTrace();
         }
-        //TODO: this is not a good waiting!
+        // TODO: this is not a good waiting!
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
             Logger.e(TAG, "Interrupted when waiting for test cases ready.");
             e.printStackTrace();
         }
-        testController = new TestController(addressTable, startMessageTable, addressDeviceType, storedSockets,storedPrintWriters,storedControllerWorkers);
-        for(ExcuteEnv env:envs){
-            this.waitTestResult(env, startTestCountDownLatch);
+        // 3. Initialize a testController to test one single case and waiting
+        // for result
+        testController = new TestController(addressTable, startMessageTable, addressDeviceType, storedSockets,
+                storedPrintWriters, storedControllerWorkers);
+        for (ExcuteEnv env : envs) {
+            this.waitTestResult(env);
         }
-        //TODO: no need?
-//        for(RunnerPlatformHelper helper:runnerHelpers){
-//            helper.setTestController(testController);
-//        }
-        TestStatus testCaseReslut = testController.start();// TODO result?
+        // Controller controls testing one single test case
+        TestStatus testCaseReslut = testController.start();
+        // 4. Collect the test result
         testResults.add(new TestResult(testCase.getName(), testCaseReslut));
-        //calling helpers to clear after finishing a case
-        for(RunnerPlatformHelper helper:runnerHelpers){
-            helper.clearAfterCase();
-        }
+        // 5. reset the test environment after case
+        clearAfterCase();
     }
-    private void clearBeforeCase(){
-        deviceInfos.clear();
-        addressTable.clear();
-        addressDeviceType.clear();
-        startMessageTable.clear();
-        for(RunnerPlatformHelper helper:runnerHelpers){
-            helper.clearBeforeCase();
-        }
-    }
+
+    /**
+     * Print the test results collected in testResults.
+     * @param totalCaseNum
+     */
     private void printResult(int totalCaseNum) {
         Logger.d(TAG, "=============================");
         Logger.d(TAG, "Test Case\t\tResult");
@@ -248,6 +211,11 @@ public class TestRunner {
         Logger.d(TAG, "=============================");
     }
 
+    /**
+     * Record for test result.
+     * @author bean
+     *
+     */
     private class TestResult {
         String testCaseName;
         TestStatus status;
@@ -257,24 +225,27 @@ public class TestRunner {
             this.status = status;
         }
     }
-    
-    private void waitTestResult(final ExcuteEnv env, final CountDownLatch latch) {
+
+    /**
+     * Start a new thread to read the test results from the {@link .RunnerPlatformHelper.ExcuteEnv ExcuteEnv}.<br>
+     * @param env
+     *          {@link .RunnerPlatformHelper.ExcuteEnv Excuting environment}
+     */
+    private void waitTestResult(final ExcuteEnv env) {
         new Thread() {
             public void run() {
                 LinkedList<String> resultLines = new LinkedList<String>();
                 String resultLine;
-                BufferedReader standardIOReader=env.sio;
-                BufferedReader standardErrorStreamReader=env.seo;
-                String deviceName=env.deviceName;
-                String deviceId=env.deviceId;
+                BufferedReader standardIOReader = env.sio;
+                BufferedReader standardErrorStreamReader = env.seo;
+                String deviceName = env.deviceName;
+                String deviceId = env.deviceId;
                 try {
                     while (true) {
                         resultLine = standardIOReader.readLine();
                         if (resultLine == null)
                             break;
                         resultLines.add(resultLine);
-                        if (resultLine.equals("INSTRUMENTATION_STATUS_CODE: 1"))
-                            countDown(latch);
                     }
                     while (true) {
                         resultLine = standardErrorStreamReader.readLine();
@@ -290,73 +261,137 @@ public class TestRunner {
                     env.resultPaser.parseResult(resultLines, deviceId, testController);
                 } catch (IOException e) {
                     Logger.e(TAG, "Error occured when reading test result.");
-                    countDown(latch);
                     e.printStackTrace();
                 }
             }
         }.start();
     }
-    
-    static private void countDown(final CountDownLatch latch) {
-        Exception exception = new Exception();
-        StackTraceElement[] elements = exception.getStackTrace();
-        Logger.d(TAG, "CountDown, remains " + latch.getCount());
-        for (int i = 1; i < elements.length; i++) {
-            Logger.d(TAG, "at " + elements[i].toString());
-        }
-        latch.countDown();
-    }
 
+    /**
+     * Start a thread to create the Lock socket server.
+     * @return The thread runs lock socket server.
+     */
     private Thread startLockServerThread() {
-        Thread ret=new Thread(){
+        Thread ret = new Thread() {
             @Override
             public void run() {
                 super.run();
-                ls=new LockServer();
-                try{
+                ls = new LockServer();
+                try {
                     ls.start();
-                }catch(Exception e){
+                } catch (Exception e) {
                     System.out.println("Error occured while starting LockServer!");
                     System.exit(1);
                 }
-                
             }
         };
         ret.start();
         return ret;
     }
+
     /**
-     * This method is used to generate a start message for one android device.
-     *
-     * @param device
-     *            the AndroidTestDevice going to run.
-     * @param info
-     *            the AndroidDeviceInfo of the device.
+     * This method is used to add lock server information in addressTable & startMessageTable.
+     * @param startMessageTable start message table.
+     * @param addressTable address table.
      */
-    private void generateLockServerStartMessage(
-            Hashtable<String, String> startMessageTable, Hashtable<String, String> addressTable) {
+    private void generateLockServerStartMessage(Hashtable<String, String> startMessageTable,
+            Hashtable<String, String> addressTable) {
         JSONObject message = new JSONObject();
         try {
             message.put(MessageProtocol.MESSAGE_TYPE, MessageProtocol.TEST_START);
-            //TODO: tell lockserver to broadcast the message, case name needed ?
+            // TODO: tell lockserver to broadcast the message, case name needed
+            // ?
             startMessageTable.put(LockServer.infoid, message.toString());
-            addressTable.put(LockServer.infoid, ls.localport+"");
+            addressTable.put(LockServer.infoid, ls.localport + "");
         } catch (JSONException e) {
             Logger.e(TAG, "Error occured when generate start message for lock server ");
         }
     }
+
     /**
-     * This method will start a new process, and execute the inputed command in
-     * it, with shell (the default path is /bin/sh)
-     *
-     * @param cmd
-     *            The inputed command.
-     * @return The created process.
-     * @throws IOException
-     *             When error occurs during the execution, it may throw an
-     *             IOException.
+     * Init params from the config and pass config to RunnerPlatformHelpers.
      */
-    private Process executeByShell(String cmd) throws IOException {
-        return Runtime.getRuntime().exec(new String[] { config.getShellPath(), "-c", cmd });
+    @Override
+    public void initParameters(Config config) {
+        for (RunnerPlatformHelper helper : runnerHelpers) {
+            helper.initParameters(config);
+        }
+    }
+
+    /**
+     * Calling helpers to deploy the test case and starting the client test bed.<br>
+     */
+    @Override
+    public void deployTests(TestSuite testSuite) {
+        for (RunnerPlatformHelper helper : runnerHelpers) {
+            helper.deployTests(testSuite);
+        }
+    }
+
+    /**
+     * Calling helpers to start the case.<br>
+     * Helpers operations see {@link .RunnerPlatformHelper#startTestDevices startTestDevices}.
+     */
+    @Override
+    public void startTestDevices(TestCase testCase, Hashtable<String, String> addressTable,
+            Hashtable<String, String> startMessageTable, Hashtable<String, String> addressDeviceType,
+            CountDownLatch startTestCountDownLatch, LinkedList<ExcuteEnv> retenv) {
+        for (RunnerPlatformHelper helper : runnerHelpers) {
+            helper.startTestDevices(testCase, addressTable, startMessageTable, addressDeviceType,
+                    startTestCountDownLatch, retenv);
+        }
+    }
+
+    /**
+     * Do some cleaning before running a test suite and call the helper clear method.
+     */
+    @Override
+    public void clearBeforeSuite() {
+        for (RunnerPlatformHelper helper : runnerHelpers) {
+            helper.clearBeforeSuite();
+        }
+    }
+
+    /**
+     * Do some cleaning after running a test suite and call the helper clear method.
+     */
+    @Override
+    public void clearAfterSuite(TestSuite testSuite) {
+        closeAfterSuite();
+        for (RunnerPlatformHelper helper : runnerHelpers) {
+            helper.clearAfterSuite(testSuite);
+        }
+    }
+
+    /**
+     * Do some cleaning before running a case and call the helper clear method.
+     */
+    @Override
+    public void clearBeforeCase() {
+        if (testController != null) {
+            testController.close();
+            testController = null;
+        }
+        addressTable.clear();
+        addressDeviceType.clear();
+        startMessageTable.clear();
+        for (RunnerPlatformHelper helper : runnerHelpers) {
+            helper.clearBeforeCase();
+        }
+    }
+
+    /**
+     * Calling helpers to clear after finishing a case
+     */
+    @Override
+    public void clearAfterCase() {
+        for (RunnerPlatformHelper helper : runnerHelpers) {
+            helper.clearAfterCase();
+        }
+    }
+
+    @Override
+    public void parseResult(LinkedList<String> resultLines, String deviceId, TestController testController) {
+        // Do nothing
     }
 }

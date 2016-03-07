@@ -6,8 +6,10 @@ package com.intel.webrtc.test;
  *
  */
 public interface TestDevice {
-    //Logic device ID
+    //Get logic device ID name
     public String getName();
+    //Set logic device ID name
     public void setName(String name);
+    //Register test methods in this logic device into testSuite or testCase
     public void addDeviceToSuite(TestSuite testSuite);
 }

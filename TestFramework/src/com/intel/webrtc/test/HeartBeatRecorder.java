@@ -1,25 +1,23 @@
 package com.intel.webrtc.test;
 
+import java.util.Date;
 import java.util.Hashtable;
 
 /**
- * Manage the received heart beat messages automatically.
- * It specifically maintains the oldest heart beat.
+ * Manage the received heart beat messages from all test clients automatically.<br>
+ * HeartBeatRecorder keeps records on input heart beats, and put them in a
+ * minimum heap, so that it is easy to get the oldest heart beat, and check
+ * whether it has been timeout.<br>
+ * To update the heart beat record quickly, it also keeps a HashTable for
+ * Device-TimeStamp mapping.<br>
+ * If HeartBeatRecorder receives a new heart beat message from one device,
+ * it will find the Previous TimeStamp of the device via the HashTable,
+ * and update the time, and then maintain the minimum heap.
  * @author xianglai
  *
  */
 public class HeartBeatRecorder {
-
-    // *************************************************************************
-    // HeartBeatRecorder keeps records on input heart beats, and put them in a
-    // minimum heap, so that it is easy to get the oldest heart beat, and check
-    // whether it has been timeout.
-    // To update the heart beat record quickly, it also keeps a HashTable for
-    // Device-TimeStamp mapping.
-    // If HeartBeatRecorder receives a new heart beat message from one device,
-    // it will find the Previous TimeStamp of the device via the HashTable,
-    // and update the time, and then maintain the minimum heap.
-    // *************************************************************************
+    // Debug tag
     final static private String TAG = "HeartBeatRecorder";
 
     /**
@@ -28,8 +26,11 @@ public class HeartBeatRecorder {
      *
      */
     class TimeStamp {
+        // DeviceInfoID
         private String deviceName;
+        // time stamp time
         private long time;
+        // index in TimeStamp ArrayList
         private int index;
 
         /**
@@ -42,7 +43,7 @@ public class HeartBeatRecorder {
          *    the index of this TimeStamp object in the ArrayList.
          *
          */
-        TimeStamp(String deviceName, int time, int index) {
+        TimeStamp(String deviceName, long time, int index) {
             this.deviceName = deviceName;
             this.time = time;
             this.index = index;
@@ -115,12 +116,13 @@ public class HeartBeatRecorder {
         }
     }
 
+    // <DeviceInfoId-TimeStamp>, store the latest time stamp of devices
     Hashtable<String, TimeStamp> indexTable;
-    TimeStamp[] timeStamps; // A minimum heap, starts at index 1.
+    // A minimum heap, starts at index 1.
+    TimeStamp[] timeStamps;
 
     /**
      * Create a new HeartBeatRecorder, and all time will be initialized as the current time.
-     * TODO the value should be current time, rather than -1
      * @param devices
      *   the names of the test devices
      */
@@ -129,7 +131,7 @@ public class HeartBeatRecorder {
         timeStamps = new TimeStamp[numOfDevices + 1];
         indexTable = new Hashtable<String, TimeStamp>();
         for (int i = 0, j = 1; i < numOfDevices; i++, j++) {
-            TimeStamp timeStamp = new TimeStamp(devices[i], -1, j);
+            TimeStamp timeStamp = new TimeStamp(devices[i], new Date().getTime(), j);
             timeStamps[j] = timeStamp;
             indexTable.put(devices[i], timeStamp);
         }
@@ -192,10 +194,8 @@ public class HeartBeatRecorder {
                 int index = indexTable.get(device).getIndex();
                 timeStamps[index].setTime(time);
                 down(index);
-                Logger.d(TAG, "New heartbeat,Device:" + device + "\ttime :"
-                        + (time - 1430895891722L));
-                Logger.d(TAG, "Oldest heartbeat,Device:"
-                        + getEarliest().deviceName + "\ttime :"
+                Logger.d(TAG, "New heartbeat,Device:" + device + "\ttime :" + (time - 1430895891722L));
+                Logger.d(TAG, "Oldest heartbeat,Device:" + getEarliest().deviceName + "\ttime :"
                         + (getEarliest().time - 1430895891722L));
             }
         }

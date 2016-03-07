@@ -1,7 +1,9 @@
 package com.intel.webrtc.test.android;
 
 import android.app.Activity;
-import android.util.Log;
+import java.lang.reflect.Method;
+import java.util.Hashtable;
+import org.junit.Assert;
 
 import com.intel.webrtc.test.ClientTestController;
 import com.intel.webrtc.test.Logger;
@@ -10,23 +12,18 @@ import com.intel.webrtc.test.TestDevice;
 import com.intel.webrtc.test.TestSuite;
 import com.intel.webrtc.test.WaitNotifyLocalSupporter;
 
-import java.lang.reflect.Method;
-import java.util.Hashtable;
-
-import org.junit.Assert;
-
 /**
  * An abstract of all test logic that run on a single Android device. <br>
- * It is the base class for users to write their own test cases. <br>
- * AndroidTestDevice is a subclass of org.junit.Assert, so users can use <br>
- * assertions in this class.
- * For andrid, it contains the test cases.
+ * It is the base class for users to write their own test cases.
+ * AndroidTestDevice is a subclass of org.junit.Assert, so users can use
+ * assertions in this class.<br>
+ * For android, it contains the test cases.
  * Note: the test function name should start with prefix "test"
- *
  * @author xianglai
- *
  */
 public class AndroidTestDevice extends Assert implements TestDevice, WaitNotifyLocalSupporter {
+    // Debug TAG
+    private final static String TAG = "Woogeen-AndroidTestDevice";
 
     // AndroidTestDevice take advantage of the Instrumentation via this
     // interface.
@@ -35,18 +32,15 @@ public class AndroidTestDevice extends Assert implements TestDevice, WaitNotifyL
         Activity getActivity();
     }
 
-    private final static String TAG = "Woogeen-AndroidTestDevice";
-
+    // logic devic name
     private String deviceName = "";
+    // client test controller, to offer wait-notify support
     private ClientTestController controller;
+    // android instrument entry
     private InstrumentationWrapper testEntry;
+    // test Activity
     public Activity testActivity;
 
-    // TODO add wait-notify mechanism
-
-    /**
-     *
-     */
     public AndroidTestDevice() {
         super();
         Logger.d(TAG, "Created successfully.");
@@ -58,10 +52,8 @@ public class AndroidTestDevice extends Assert implements TestDevice, WaitNotifyL
      * Set the TestEntry, in order to enable AndroidTestDevice to use
      * Instrumentation.
      *
-     * @param entry
+     * @param entry AndroidTestEntry
      */
-    // TODO Should the name of this method be changed to
-    // setInstrumetationWrapper?
     public void setTestEntry(InstrumentationWrapper entry) {
         testEntry = entry;
     }
@@ -75,19 +67,24 @@ public class AndroidTestDevice extends Assert implements TestDevice, WaitNotifyL
      *   filed 'testActivity', rather than returned by this method.<br>
      *
      */
-    // TODO When the dependency issue is solved, amend this method and return
-    // the activity directly
     public void getActivity() {
+        // call android test entry to start the test activity
         if (testEntry != null && testActivity == null)
             testActivity = testEntry.getActivity();
         return;
     }
 
+    /**
+     * Get the device name
+     */
     @Override
     public String getName() {
         return deviceName;
     }
 
+    /**
+     * Set the device name
+     */
     @Override
     public void setName(String name) {
         deviceName = name;
@@ -97,16 +94,21 @@ public class AndroidTestDevice extends Assert implements TestDevice, WaitNotifyL
      * Set the AndroidTestController to enable the communication with the server.
      * @param controller
      */
-    //TODO: this should move to TestDevice
+    // TODO: this should move to TestDevice
     @Override
     public void setController(ClientTestController controller) {
         this.controller = controller;
     }
 
+    /**
+     * Device setUp, called after setting the test params by testEntry.
+     */
     public void setUp() {
-        // TODO
     }
 
+    /**
+     * Device tearDown, called after the test has finished.
+     */
     public void tearDown() {
     }
 
@@ -118,7 +120,7 @@ public class AndroidTestDevice extends Assert implements TestDevice, WaitNotifyL
      */
     public void waitForObject(String objectId) {
         assertNotNull(controller);
-        controller.waitForObject(objectId);
+        controller.informWaitForObject(objectId);
     }
 
     @Override
@@ -129,7 +131,7 @@ public class AndroidTestDevice extends Assert implements TestDevice, WaitNotifyL
      */
     public void notifyObject(String objectId) {
         assertNotNull(controller);
-        controller.notifyObject(objectId);
+        controller.informNotifyObject(objectId);
     }
 
     @Override
@@ -143,11 +145,16 @@ public class AndroidTestDevice extends Assert implements TestDevice, WaitNotifyL
         controller.notifyObjectForAll(objectId);
     }
 
-	@Override
-	public void addDeviceToSuite(TestSuite testSuite) {
-		Method[] methods = this.getClass().getMethods();
+    /**
+     * Add an android logic test device to testSuite.
+     * It will register all the methods that starts with 'test' as a case.
+     * testSuite will conbine all the devices under same testCase.
+     */
+    @Override
+    public void addDeviceToSuite(TestSuite testSuite) {
+        Method[] methods = this.getClass().getMethods();
         int methodNum = methods.length;
-        Hashtable<String, TestCase> testCases=testSuite.getTestCases();
+        Hashtable<String, TestCase> testCases = testSuite.getTestCases();
         for (int i = 0; i < methodNum; i++) {
             // If the method is a test method, add the device into
             // related TestCase
@@ -163,5 +170,5 @@ public class AndroidTestDevice extends Assert implements TestDevice, WaitNotifyL
                 }
             }
         }
-	}
+    }
 }

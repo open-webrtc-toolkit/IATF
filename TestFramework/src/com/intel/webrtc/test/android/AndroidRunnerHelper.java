@@ -7,7 +7,6 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,13 +21,16 @@ import com.intel.webrtc.test.TestSuite;
 import com.intel.webrtc.test.android.AndroidDeviceInfo.AndroidDeviceType;
 
 public class AndroidRunnerHelper implements RunnerPlatformHelper {
+    // Debug TAG
     public static String TAG = "AndroidRunnerHelper";
-    // androidHome and antHome should be read from configure files.
+    // Configurations
     private String adbPath, antPath, shellPath, apkName, androidTestPackage, androidTestClass, androidTestActivity;
-    // store information of all the android devices
+    // Store information of all the android devices
     private LinkedList<AndroidDeviceInfo> androidDeviceInfos;
-//    private TestController testController;
 
+    /**
+     * Init params from config
+     */
     @Override
     public void initParameters(Config config) {
         adbPath = config.getAdbPath();
@@ -41,6 +43,11 @@ public class AndroidRunnerHelper implements RunnerPlatformHelper {
         androidDeviceInfos = new LinkedList<AndroidDeviceInfo>();
     }
 
+    /**
+     * Deploy test apk on all the accessable android devices.
+     */
+    // TODO: but cannot make use of newly connected devices, because the
+    // apk is deployed only once before a suite test started.
     @Override
     public void deployTests(TestSuite testSuite) {
         buildApk();
@@ -62,31 +69,35 @@ public class AndroidRunnerHelper implements RunnerPlatformHelper {
         Logger.d(TAG, "APKs have been deployed successfully.");
     }
 
-//    @Override
-//    public void setTestController(TestController testController) {
-//        this.testController = testController;
-//    }
-
+    /**
+     * Refresh the device info before every case to avoid start a case on
+     * an offline device.
+     */
     @Override
     public void clearBeforeCase() {
-        // This enables refresh android Device before each testCase to avoid
-        // disconnection effects.
         androidDeviceInfos.clear();
         getTestDeviceInfo();
     }
 
+    /**
+     * Start all the android test devices in testCase.
+     */
     @Override
     public void startTestDevices(TestCase testCase, Hashtable<String, String> addressTable,
-            Hashtable<String, String> startMessageTable,Hashtable<String, String> addressDeviceType, CountDownLatch startTestCountDownLatch,LinkedList<ExcuteEnv> ret) {
+            Hashtable<String, String> startMessageTable, Hashtable<String, String> addressDeviceType,
+            CountDownLatch startTestCountDownLatch, LinkedList<ExcuteEnv> ret) {
         for (TestDevice testDevice : testCase.getDevices()) {
             if (testDevice instanceof AndroidTestDevice) {
                 ExcuteEnv env = startAndroidTestDevice(testCase, (TestDevice) testDevice, addressTable,
-                        startMessageTable,addressDeviceType, startTestCountDownLatch);
+                        startMessageTable, addressDeviceType, startTestCountDownLatch);
                 ret.add(env);
             }
         }
     }
 
+    /**
+     * Remove all the forward rules after the case done.
+     */
     @Override
     public void clearAfterCase() {
         removeForwardRules();
@@ -100,7 +111,8 @@ public class AndroidRunnerHelper implements RunnerPlatformHelper {
      *            the test result lines
      * @param deviceId
      *            the device id of the device.
-     * @param testController 
+     * @param testController
+                  the server controller to receive the test result.
      */
     @Override
     public void parseResult(LinkedList<String> resultLines, String deviceId, TestController testController) {
@@ -138,7 +150,6 @@ public class AndroidRunnerHelper implements RunnerPlatformHelper {
      * This method is used to build the test APK.
      */
     private void buildApk() {
-        // TODO: move to androidRunnerHelper
         Process process;
         BufferedReader sio, seo;
         try {
@@ -178,11 +189,6 @@ public class AndroidRunnerHelper implements RunnerPlatformHelper {
             e.printStackTrace();
             Logger.e(TAG, "Error occured when building test Apk.");
         }
-        // catch (InterruptedException e) {
-        // e.printStackTrace();
-        // Logger.e(TAG, "Interrupted when building test Apk.");
-        // }
-
     }
 
     /**
@@ -190,7 +196,6 @@ public class AndroidRunnerHelper implements RunnerPlatformHelper {
      * address of all Android device that attached to the computer.
      */
     private void getTestDeviceInfo() {
-        // TODO Move to androidRunnerHelper
         Process process = null;
         BufferedReader sio0, sio1 = null;
         String resultLine = null, serialId, ipAddr;
@@ -224,9 +229,7 @@ public class AndroidRunnerHelper implements RunnerPlatformHelper {
                 } else {
                     Logger.e(TAG, "The type of Device " + serialId + " is unknown!");
                 }
-                /**
-                 * GET CLIENT IP
-                 */
+                // GET CLIENT IP
                 try {
                     process = executeByShell(adbPath + " -s " + serialId + " shell netcfg");
                     sio1 = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -354,6 +357,10 @@ public class AndroidRunnerHelper implements RunnerPlatformHelper {
         return Runtime.getRuntime().exec(new String[] { shellPath, "-c", cmd });
     }
 
+    /**
+     * Count down latch and print the call stack info.
+     * @param latch
+     */
     static private void countDown(final CountDownLatch latch) {
         Exception exception = new Exception();
         StackTraceElement[] elements = exception.getStackTrace();
@@ -383,9 +390,27 @@ public class AndroidRunnerHelper implements RunnerPlatformHelper {
         Logger.d(TAG, "Remove all the forward rules.");
     }
 
+    /**
+     * Start an android test device, put the informations needed in table and
+     * return the {@link com.intel.webrtc.test.RunnerPlatformHelper.ExcuteEnv Excute environment}
+     * to read the test result. Finally count down the starting latch.
+     * @param curTestCase
+     *              current test case
+     * @param device
+     *              test device
+     * @param addressTable
+     *              addressTable for test controller to connect when test starts
+     * @param startMessageTable
+     *              table that stores start messages
+     * @param addressDeviceType
+     *              table that stores the device type of every communication address
+     * @param latch
+     *              starting latch
+     * @return Excute environment
+     */
     private ExcuteEnv startAndroidTestDevice(TestCase curTestCase, TestDevice device,
             Hashtable<String, String> addressTable, Hashtable<String, String> startMessageTable,
-            Hashtable<String, String> addressDeviceType,CountDownLatch latch) {
+            Hashtable<String, String> addressDeviceType, CountDownLatch latch) {
         // TODO this solution of device assigning is the simplest one.
         AndroidDeviceInfo info;
         if (!androidDeviceInfos.isEmpty()) {
@@ -393,8 +418,9 @@ public class AndroidRunnerHelper implements RunnerPlatformHelper {
             addressTable.put(info.id, "" + info.localPort);
             // set forward rule
             Process process;
-            String cmd = adbPath + " -s " + info.id + " forward tcp:" + info.localPort + " tcp:"+AndroidClientController.androidLocalPort;
-            Logger.d(TAG, "forward command:"+cmd);
+            String cmd = adbPath + " -s " + info.id + " forward tcp:" + info.localPort + " tcp:"
+                    + AndroidClientController.androidLocalPort;
+            Logger.d(TAG, "forward command:" + cmd);
             try {
                 process = executeByShell(cmd);
                 process.waitFor();
@@ -422,7 +448,7 @@ public class AndroidRunnerHelper implements RunnerPlatformHelper {
             countDown(latch);
             return new ExcuteEnv(process, sio, seo, device.getName(), info.id, this);
         } catch (IOException e) {
-            Logger.e(TAG, "Error occured when start instrument on "+device.getName());
+            Logger.e(TAG, "Error occured when start instrument on " + device.getName());
             e.printStackTrace();
             System.exit(1);
             return null;
@@ -451,5 +477,19 @@ public class AndroidRunnerHelper implements RunnerPlatformHelper {
         } catch (JSONException e) {
             Logger.e(TAG, "Error occured when generate start message for device " + device.getName());
         }
+    }
+
+    /**
+     * Clear operations before testSuite starts.
+     */
+    @Override
+    public void clearBeforeSuite() {
+    }
+
+    /**
+     * Clear opearations after testSuite ends.
+     */
+    @Override
+    public void clearAfterSuite(TestSuite testSuite) {
     }
 }

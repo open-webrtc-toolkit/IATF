@@ -1,6 +1,6 @@
 package com.intel.webrtc.test.android;
 
-import com.intel.webrtc.test.DeviceInfo;
+import com.intel.webrtc.test.PhysicalDeviceInfo;
 
 /**
  * An abstract of an Android Device.
@@ -8,12 +8,17 @@ import com.intel.webrtc.test.DeviceInfo;
  * @author xianglai
  *
  */
-public class AndroidDeviceInfo extends DeviceInfo {
+public class AndroidDeviceInfo extends PhysicalDeviceInfo {
+    //Currently, ip is not used after enhance the socket communication
+    //between testController and clientTestController.
     public String ip;
+    //The state of android device
     public AndroidDeviceType deviceType;
+    //Starting port number of forward socket
+    //Adb forward the message to clientTestController communicating port on android
+    //from this port. (Check the details in android forward rules)
     private static int portStart=10087;
-    //TODO android-version?
-
+    //The enum of android device state
     public enum AndroidDeviceType {
         DEVICE, EMULATOR, OFFLINE, UNAUTHORIZED
     };

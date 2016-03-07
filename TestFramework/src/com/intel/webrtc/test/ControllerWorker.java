@@ -2,7 +2,6 @@ package com.intel.webrtc.test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -14,13 +13,15 @@ import org.json.JSONObject;
  *
  */
 class ControllerWorker extends Thread {
-
+    // Debug tag
     final private static String TAG = "ControllerWorker";
-
+    // DeviceInfoID listening to
     private String deviceId;
+    // Observer of the received messages: TestController on test server sides
     private ControllerWorkerObserver observer = null;
-    private volatile boolean alive = true;
-
+    // While loop flag of ControllerWorker thread
+    private volatile boolean ctrlWrkerAlive = true;
+    // Socket bufferedReader, get message from one test client.
     private BufferedReader bufferedReader = null;
 
     /**
@@ -84,8 +85,7 @@ class ControllerWorker extends Thread {
      * @param bufferedReader
      *    the bufferedReader of a inputStream, often from a socket.
      */
-    ControllerWorker(ControllerWorkerObserver observer, String deviceId,
-            BufferedReader bufferedReader) {
+    ControllerWorker(ControllerWorkerObserver observer, String deviceId, BufferedReader bufferedReader) {
         if (observer == null) {
             Logger.e(TAG, "Error: controllerWorkerObserver is null!");
         }
@@ -103,17 +103,19 @@ class ControllerWorker extends Thread {
 
     /**
      * The main logic of this class.
-     * It always reads messages from the BufferedReader, until the 'alive' flag
+     * It always reads and dispatch messages from the BufferedReader, until the 'ctrlWrkerAlive' flag
      * is set to false.
      */
     public void run() {
         String message = "";
-        while (alive) {
-            try { // Read the message from socket.
+        while (ctrlWrkerAlive) {
+            try {
+                // Read the message from socket.
                 message = bufferedReader.readLine();
             } catch (IOException e) {
-                Logger.e(TAG+":"+deviceId, "Error occured when read message from socket!message:"+message);
-//                e.printStackTrace();
+                Logger.e(TAG + ":" + deviceId, "Error occured when read message from socket!message:" + message);
+                // TODO: socket read problem should be solved
+                // e.printStackTrace();
                 break;
             }
             if (message == null)
@@ -132,16 +134,16 @@ class ControllerWorker extends Thread {
     private void dispatchMessage(String message) {
         JSONObject jsonObject = null;
         String messageType = "";
-        try { // Forge the message to a jsonObject
+        try {
+            // Forge the message to a jsonObject
             jsonObject = new JSONObject(message);
         } catch (JSONException e) {
-            Logger.d(TAG, "message[ " + message
-                    + " ] is not a legal JSONObject!");
+            Logger.d(TAG, "message[ " + message + " ] is not a legal JSONObject!");
             e.printStackTrace();
             return;
         }
-        try { // Get the message type from the jsonObject
-              // Logger.d(TAG, message);
+        try {
+            // Get the message type from the jsonObject
             messageType = jsonObject.getString(MessageProtocol.MESSAGE_TYPE);
             if (messageType.equals(MessageProtocol.TEST_FINISH)) {
                 observer.onDeviceFinished(deviceId);
@@ -196,9 +198,9 @@ class ControllerWorker extends Thread {
     }
 
     /**
-     * Set the 'alive' flag to false, and end the circle.
+     * Set the 'ctrlWrkerAlive' flag to false, and end the thread loop.
      */
     public void close() {
-        alive = false;
+        ctrlWrkerAlive = false;
     }
 }

@@ -12,79 +12,74 @@ import java.util.Map.Entry;
  *
  */
 public class TestSuite {
-	private final static String TAG = "TestSuite";
+    // Debug TAG
+    private final static String TAG = "TestSuite";
+    // Store all the logic test devices
+    private LinkedList<TestDevice> testDevices;
+    // Store all the test cases in this suite
+    private Hashtable<String, TestCase> testCases;
 
-	// TODO private LinkedList<Pair<String, Integer>> deviceRequired;
-	private LinkedList<TestDevice> testDevices;
+    public TestSuite() {
+        testCases = new Hashtable<String, TestCase>();
+        testDevices = new LinkedList<TestDevice>();
+    }
 
-	public LinkedList<TestDevice> getTestDevices() {
+    public LinkedList<TestDevice> getTestDevices() {
         return testDevices;
     }
 
-    private Hashtable<String, TestCase> testCases;
+    public Hashtable<String, TestCase> getTestCases() {
+        return testCases;
+    }
 
-	public TestSuite() {
-		testCases = new Hashtable<String, TestCase>();
-		testDevices = new LinkedList<TestDevice>();
-	}
+    /**
+     * Add a TestDevice into the TestSuite. The TestSuite will scan the test
+     * methods of the new-coming TestDevice, and add the TestDevice into or
+     * create corresponding TestCases.
+     * @param testDevice
+     */
+    public void addTestDevice(TestDevice testDevice) {
+        testDevice.addDeviceToSuite(this);
+        // for javascript client, this can be used to run 'karma start'
+        testDevices.add(testDevice);
+    }
 
-	public Hashtable<String, TestCase> getTestCases() {
-		return testCases;
-	}
+    /**
+     * Remove a TestDevice from the TestSuite.
+     * @param testDeviceName
+     *            The name of the TestDevice.
+     */
+    public void removeTestDevice(String testDeviceName) {
+        // TODO
+    }
 
-	/**
-	 * Add a TestDevice into the TestSuite. The TestSuite will scan the test
-	 * methods of the new-coming TestDevice, and add the TestDevice into or
-	 * create corresponding TestCases.
-	 * 
-	 * @param testDevice
-	 */
-	public void addTestDevice(TestDevice testDevice) {
-		testDevice.addDeviceToSuite(this);
-		//for javascript client, this can be used to run 'karma start'
-		testDevices.add(testDevice);
-	}
+    /**
+     * Remove a TestDevice from the TestSuite.
+     * @param testDevice
+     *            The TestDevice going to remove.
+     */
+    public void removeTestDevice(TestDevice testDevice) {
+        // TODO
+    }
 
-	/**
-	 * Remove a TestDevice from the TestSuite.
-	 * 
-	 * @param testDeviceName
-	 *            The name of the TestDevice.
-	 */
-	public void removeTestDevice(String testDeviceName) {
-		// TODO
-	}
+    /**
+     * Remote a TestCase from the TestSuite.
+     * @param testCaseName
+     *            The name of the TestCase.
+     */
+    public void removeTestCase(String testCaseName) {
+        // TODO
+    }
 
-	/**
-	 * Remove a TestDevice from the TestSuite.
-	 * 
-	 * @param testDevice
-	 *            The TestDevice going to remove.
-	 */
-	public void removeTestDevice(TestDevice testDevice) {
-		// TODO
-	}
-
-	/**
-	 * Remote a TestCase from the TestSuite.
-	 * 
-	 * @param testCaseName
-	 *            The name of the TestCase.
-	 */
-	public void removeTestCase(String testCaseName) {
-		// TODO
-	}
-
-	/**
-	 * Convert a TestSuite to String, so that you can print it for debugging.
-	 */
-	public String toString() {
-		// TODO need verification
-		String resultString = "Testsuite:\n";
-		Iterator<Entry<String, TestCase>> iterator = testCases.entrySet().iterator();
-		for (int i = 0; iterator.hasNext(); i++) {
-			resultString += ("TestCase " + i + ": " + iterator.next().getValue().toString() + "\n");
-		}
-		return resultString;
-	}
+    /**
+     * Convert a TestSuite to String, so that you can print it for debugging.
+     */
+    public String toString() {
+        String resultString = "Testsuite:\n";
+        Iterator<Entry<String, TestCase>> iterator = testCases.entrySet().iterator();
+        for (int i = 0; iterator.hasNext(); i++) {
+            resultString += ("TestCase " + i + ": " + iterator.next().getValue().toString() + "\n");
+        }
+        return resultString;
+    }
 }

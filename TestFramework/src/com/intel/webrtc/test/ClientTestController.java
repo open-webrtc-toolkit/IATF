@@ -9,39 +9,47 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
-//TODO: Log && Logger!!
 /**
- * Take charge of communicating with the server, sends heart beat, and provides
- * APIs related to wait-notify.
- * Extend this class when you expand the test client to new platform.
+ * Abstract class of all client test controller which takes charge of communicating with
+ * the server, sends heart beat, and provides APIs related to wait-notify.
+ * Extend this class when you expand the test client to new platform.<br>
+ * For android, this controller is running on cell phone, but for javascript, it
+ * runs on the computer. There is a special client for clients behind socket.io
+ * server: {@link .LockServer LockServer}.
  * @author bean
  *
  */
-/*
- * TODO: for android, this controller is running on one device,
- * but for javascript, this controller can handle all javascript test client.
- */
-public abstract class ClientTestController{
+public abstract class ClientTestController {
     private static String TAG = "ClientTestController";
-    //TODO: read from config file
+    // The static counting down port number of ClientTestController from 10085
     public static int port = 10085;
-    public int localport=port--;
+    // Record the local port of this client test controller. this is the socket
+    // server port to communicate with test controller of test server.
+    public int localport = port--;
+    // Store the accepted socket to socket client on test server.
     protected Socket socketToServer;
+    // Buffer of socket to test server
     protected BufferedReader bufferedReader;
+    // Writer of socket to test server
     protected PrintWriter printWriter;
+    // Flag of whether the printWriter has been initialized(handle sendMessage
+    // error)
     private boolean printWriterInited;
+    // To keep HeartBeatThread and listening thread to test server alive.
+    // set to false whiling close ClientTestController and stop these threads.
     protected boolean alive = true;
+    // Store the HeartBeatThread
     protected HeartBeatThread heartBeatThread;
+
     public ClientTestController() {
         socketToServer = null;
-//        startServer();
     }
+
     /**
-     * send a heartBeat message to server.
+     * Send a heartBeat message to server.
      */
     protected void heartBeat() {
         JSONObject message = new JSONObject();
@@ -53,31 +61,34 @@ public abstract class ClientTestController{
             Logger.e(TAG, "Error occured when creating heart beat message.");
         }
     }
+
+    /**
+     * Start a socket server to wait for the test server to connect.
+     * This method should be called by all the subclass after setting the localPort.
+     */
     protected synchronized void startServer() {
         new Thread() {
-
             public void run() {
                 Logger.d(TAG, "creating socket start:");
                 ServerSocket server = null;
                 synchronized (ClientTestController.class) {
-                try {
-                        Logger.d(TAG,"port:"+localport+", on waiting");
+                    try {
+                        Logger.d(TAG, "port:" + localport + ", on waiting");
                         server = new ServerSocket(localport);
-                } catch (UnknownHostException e) {
-                    Logger.e(TAG, "Unknown host!");
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    Logger.e(TAG, "Error occured while creating the socket.");
-                    e.printStackTrace();
-                    System.exit(1);
-                }
-            }
-                if (server != null) {
-                    try {Socket temp=server.accept();
-                        socketToServer = temp;
+                    } catch (UnknownHostException e) {
+                        Logger.e(TAG, "Unknown host!");
+                        e.printStackTrace();
                     } catch (IOException e) {
-                        Logger.e(TAG,
-                                "Error occured while accepting new connection.");
+                        Logger.e(TAG, "Error occured while creating the socket.");
+                        e.printStackTrace();
+                        System.exit(1);
+                    }
+                }
+                if (server != null) {
+                    try {
+                        socketToServer = server.accept();
+                    } catch (IOException e) {
+                        Logger.e(TAG, "Error occured while accepting new connection.");
                         e.printStackTrace();
                     }
                 }
@@ -89,16 +100,12 @@ public abstract class ClientTestController{
                         e.printStackTrace();
                     }
                     try {
-                        bufferedReader = new BufferedReader(
-                                new InputStreamReader(
-                                        socketToServer.getInputStream()));
-                        printWriter = new PrintWriter(new BufferedWriter(
-                                new OutputStreamWriter(
-                                        socketToServer.getOutputStream())));
-                        printWriterInited=true;
+                        bufferedReader = new BufferedReader(new InputStreamReader(socketToServer.getInputStream()));
+                        printWriter = new PrintWriter(
+                                new BufferedWriter(new OutputStreamWriter(socketToServer.getOutputStream())));
+                        printWriterInited = true;
                     } catch (IOException e) {
-                        Logger.e(TAG,
-                                "Error occured while creating reader and writer.");
+                        Logger.e(TAG, "Error occured while creating reader and writer.");
                         e.printStackTrace();
                     }
                     heartBeatThread = new HeartBeatThread();
@@ -110,18 +117,20 @@ public abstract class ClientTestController{
         }.start();
     }
 
+    /**
+     * Listening to the socket buffer, after setting up a socket to the test server.
+     */
     protected void listenToServer() {
         new Thread() {
             public void run() {
                 while (alive) {
                     try {
                         String messageReceived = bufferedReader.readLine();
-//                        Logger.d(TAG, "Received [" + messageReceived + "].");
-                        if(messageReceived==null){
+                        if (messageReceived == null) {
                             continue;
                         }
-                        //strange
-                        if(messageReceived.equals("null")){
+                        // strange
+                        if (messageReceived.equals("null")) {
                             continue;
                         }
                         if (messageReceived.equals("End")) {
@@ -129,14 +138,22 @@ public abstract class ClientTestController{
                         }
                         dispatchMessage(messageReceived);
                     } catch (IOException e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
+                }
+                try {
+                    bufferedReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }.start();
     }
 
+    /**
+     * Dispatch json formatted message from the socket to test server.
+     * @param msg
+     */
     protected void dispatchMessage(String msg) {
         JSONObject message;
         String messageType;
@@ -161,7 +178,7 @@ public abstract class ClientTestController{
                 notifyLocalObject(notifyWhat);
             } else if (messageType.equals(MessageProtocol.TEST_START)) {
                 handleStartMessage(msg);
-            }else {
+            } else {
                 Logger.e(TAG, "Unknown message type: " + messageType);
             }
         } catch (JSONException e) {
@@ -182,17 +199,20 @@ public abstract class ClientTestController{
                     Thread.sleep(4900);
                     heartBeat();
                 } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
         }
     }
 
+    /**
+     * Close the socket and related buffers communicating with test server.
+     */
     public void close() {
         alive = false;
         if (socketToServer != null) {
             try {
+                printWriter.close();
                 socketToServer.close();
             } catch (IOException e) {
                 Logger.e(TAG, "Error occured when closing the socket.");
@@ -204,15 +224,14 @@ public abstract class ClientTestController{
     }
 
     /**
-     * send a message to the test controller
+     * Send a message to the test server.
      * @param msg
      *     the message
      */
     protected void sendMessage(final String msg) {
         new Thread() {
             public void run() {
-                if(printWriterInited){
-//                    System.out.println("msg:"+msg+this.getClass().getName());
+                if (printWriterInited) {
                     synchronized (printWriter) {
                         printWriter.println(msg);
                         printWriter.flush();
@@ -221,14 +240,14 @@ public abstract class ClientTestController{
             }
         }.start();
     }
+
     /**
      * Inform the server that the test case running on this device has finished.
      */
     public void testFinished() {
         JSONObject message = new JSONObject();
         try {
-            message.put(MessageProtocol.MESSAGE_TYPE,
-                    MessageProtocol.TEST_FINISH);
+            message.put(MessageProtocol.MESSAGE_TYPE, MessageProtocol.TEST_FINISH);
             sendMessage(message.toString());
         } catch (JSONException e) {
             e.printStackTrace();
@@ -240,7 +259,7 @@ public abstract class ClientTestController{
      * Inform the server that the test case running on this device is waiting for a remote object
      * @param objectId
      */
-    public void waitForObject(String objectId) {
+    public void informWaitForObject(String objectId) {
         JSONObject message = new JSONObject();
         try {
             message.put(MessageProtocol.MESSAGE_TYPE, MessageProtocol.WAIT);
@@ -254,17 +273,17 @@ public abstract class ClientTestController{
             re.setStackTrace(e.getStackTrace());
             throw re;
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
     /**
-     * Notify a client that waiting for the remote object.
+     * Inform the server that the test case running on this device is notifying a client that waiting
+     * for this remote object.
      * @param objectId
      *     the id of the object.
      */
-    public void notifyObject(String objectId) {
+    public void informNotifyObject(String objectId) {
         JSONObject message = new JSONObject();
         try {
             message.put(MessageProtocol.MESSAGE_TYPE, MessageProtocol.NOTIFY);
@@ -277,15 +296,15 @@ public abstract class ClientTestController{
     }
 
     /**
-     * Notify all client that waiting for the remote object.
+     * Inform the server that the test case running on this device is notifying
+     * all client that waiting for this remote object.
      * @param objectId
      *     the id of the object.
      */
     public void notifyObjectForAll(String objectId) {
         JSONObject message = new JSONObject();
         try {
-            message.put(MessageProtocol.MESSAGE_TYPE,
-                    MessageProtocol.NOTIFY_ALL);
+            message.put(MessageProtocol.MESSAGE_TYPE, MessageProtocol.NOTIFY_ALL);
             message.put(MessageProtocol.WHAT, objectId);
             sendMessage(message.toString());
         } catch (JSONException e) {
@@ -298,15 +317,16 @@ public abstract class ClientTestController{
      * Platform specific operations achieve waiting, called after send wait message to server.
      * @param objectId
      */
-    public abstract void localWaitOperations(String objectId) throws InterruptedException ;
+    public abstract void localWaitOperations(String objectId) throws InterruptedException;
+
     /**
-     * notify a local object<br>
-     * called when AndroidTestController receive a notify message from the server. 
+     * Notify a local object. Called after receiving a notify message from the server.
      * @param objectId
      */
     public abstract void notifyLocalObject(String objectId);
+
     /**
-     * handle the start message
+     * Handle the start message
      * @param messageReceived
      */
     public abstract void handleStartMessage(String messageReceived);

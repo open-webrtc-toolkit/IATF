@@ -37,13 +37,11 @@ public class Config {
      * The configure file.
      */
     public Config(File configFile) {
-        if (!(configFile != null && configFile.exists() && configFile.isFile() && configFile
-                .canRead()))
+        if (!(configFile != null && configFile.exists() && configFile.isFile() && configFile.canRead()))
             return;
         BufferedReader bufferedReader;
         try {
-            bufferedReader = new BufferedReader(new InputStreamReader(
-                    new FileInputStream(configFile)));
+            bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(configFile)));
         } catch (FileNotFoundException e1) {
             Logger.e(TAG, "File not found!");
             e1.printStackTrace();
@@ -114,8 +112,7 @@ public class Config {
             androidTestClass = value;
             return;
         }
-        if (key.equalsIgnoreCase("androidTestActivity"))
-        {
+        if (key.equalsIgnoreCase("androidTestActivity")) {
             androidTestActivity = value;
             return;
         }
@@ -128,8 +125,7 @@ public class Config {
             try {
                 heartbeatInterval = Math.abs(Integer.parseInt(value));
             } catch (NumberFormatException e) {
-                Logger.e(TAG, "HeartbeatInterval: " + value
-                        + " is not a number.");
+                Logger.e(TAG, "HeartbeatInterval: " + value + " is not a number.");
             }
             return;
         }
@@ -137,8 +133,7 @@ public class Config {
             try {
                 heartbeatTimeout = Math.abs(Integer.parseInt(value));
             } catch (NumberFormatException e) {
-                Logger.e(TAG, "heartbeatTimeout: " + value
-                        + " is not a number.");
+                Logger.e(TAG, "heartbeatTimeout: " + value + " is not a number.");
             }
             return;
         }
