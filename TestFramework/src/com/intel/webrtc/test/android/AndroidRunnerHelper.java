@@ -20,6 +20,11 @@ import com.intel.webrtc.test.TestDevice;
 import com.intel.webrtc.test.TestSuite;
 import com.intel.webrtc.test.android.AndroidDeviceInfo.AndroidDeviceType;
 
+/**
+ * RunnerHelper on android platform. Including deploy apk, manage android devices and parse Instrument result.
+ * @author bean
+ *
+ */
 public class AndroidRunnerHelper implements RunnerPlatformHelper {
     // Debug TAG
     public static String TAG = "AndroidRunnerHelper";

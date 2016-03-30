@@ -15,7 +15,15 @@ import org.json.JSONObject;
 import com.intel.webrtc.test.TestController.TestStatus;
 import com.intel.webrtc.test.android.AndroidRunnerHelper;
 import com.intel.webrtc.test.javascript.JavascriptRunnerHelper;
-
+/**
+ * Control the test process. <br>
+ * <li>Utilizing the RunnerHelper in different platform to deploy test</li>
+ * start test and access the third-party test tools.
+ * <li>Managing the LockServer to pass lock between test server and test devices.
+ * <li>Collecting the test result for the TestSuite.
+ * @author bean
+ *
+ */
 public class TestRunner implements RunnerPlatformHelper {
     // Debug tag
     final static private String TAG = "TestRunner";

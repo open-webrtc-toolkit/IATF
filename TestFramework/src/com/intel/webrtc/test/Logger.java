@@ -4,7 +4,11 @@ import java.io.File;
 import java.util.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-
+/**
+ * Logger to log out at different levels.
+ * @author bean
+ *
+ */
 public class Logger {
 
     // TODO add more log levels

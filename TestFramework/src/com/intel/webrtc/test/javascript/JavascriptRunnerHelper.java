@@ -18,7 +18,11 @@ import com.intel.webrtc.test.TestCase;
 import com.intel.webrtc.test.TestController;
 import com.intel.webrtc.test.TestDevice;
 import com.intel.webrtc.test.TestSuite;
-
+/**
+ * RunnerHelper on JS. Including start test, clear environment and parse result.
+ * @author bean
+ *
+ */
 public class JavascriptRunnerHelper implements RunnerPlatformHelper {
     // Debug TAG
     private static String TAG = "JavascriptRunnerHelper";

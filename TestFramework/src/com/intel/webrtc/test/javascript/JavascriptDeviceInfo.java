@@ -43,7 +43,9 @@ public class JavascriptDeviceInfo extends PhysicalDeviceInfo {
     // test source file
     public String testClient;
 
-    // Enum of JS device status
+    /**
+     * Enum of JS device status
+     */
     public enum JavascriptDeviceType {
         DISCONNECT, IDLE, EXCUTING, DEFAULT
     };

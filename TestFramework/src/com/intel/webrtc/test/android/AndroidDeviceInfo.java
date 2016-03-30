@@ -18,7 +18,9 @@ public class AndroidDeviceInfo extends PhysicalDeviceInfo {
     //Adb forward the message to clientTestController communicating port on android
     //from this port. (Check the details in android forward rules)
     private static int portStart=10087;
-    //The enum of android device state
+    /**
+     * The enum of android device state
+     */
     public enum AndroidDeviceType {
         DEVICE, EMULATOR, OFFLINE, UNAUTHORIZED
     };
