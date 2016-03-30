@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ClassDiagram>
+    <Class name="com.intel.webrtc.test.TestController" x="365" y="623">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+        <Association
+            destinationClassName="com.intel.webrtc.test.TestController.TestStatus"
+            endpointName="testStatus" kind="Simple"/>
+        <Association
+            destinationClassName="com.intel.webrtc.test.TestController.HeartBeatThread"
+            endpointName="heartBeatThread" kind="Simple"/>
+        <Communication destinationClassName="com.intel.webrtc.test.TestController.HeartBeatThread"/>
+    </Class>
+    <Class name="com.intel.webrtc.test.ClientTestController" x="-338" y="677">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+        <Association
+            destinationClassName="com.intel.webrtc.test.ClientTestController.HeartBeatThread"
+            endpointName="heartBeatThread" kind="Simple"/>
+    </Class>
+    <Class
+        name="com.intel.webrtc.test.ClientTestController.HeartBeatThread"
+        x="-273" y="1013">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+        <Communication destinationClassName="com.intel.webrtc.test.ClientTestController"/>
+    </Class>
+    <Class name="com.intel.webrtc.test.LockObject" x="-36" y="592">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+    </Class>
+    <Class name="com.intel.webrtc.test.TestController.TestStatus"
+        x="171" y="980">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+    </Class>
+    <Class name="com.intel.webrtc.test.Config" x="440" y="-26">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+    </Class>
+    <Class name="com.intel.webrtc.test.TestController.HeartBeatThread"
+        x="496" y="1157">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+    </Class>
+    <Class name="com.intel.webrtc.test.RunnerPlatformHelper" x="809" y="618">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+    </Class>
+    <Class name="com.intel.webrtc.test.LockServer" x="36" y="658">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+        <Extension destinationClassName="com.intel.webrtc.test.ClientTestController"/>
+        <Communication destinationClassName="com.intel.webrtc.test.ClientTestController"/>
+    </Class>
+    <Class name="com.intel.webrtc.test.TestRunner" x="23" y="230">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+        <Extension destinationClassName="com.intel.webrtc.test.RunnerPlatformHelper"/>
+        <Association
+            destinationClassName="com.intel.webrtc.test.TestController"
+            endpointName="testController" kind="Simple"/>
+        <Association
+            destinationClassName="com.intel.webrtc.test.LockServer"
+            endpointName="ls" kind="Simple"/>
+        <Association destinationClassName="com.intel.webrtc.test.Config"
+            endpointName="config" kind="Simple"/>
+        <Communication destinationClassName="com.intel.webrtc.test.TestController"/>
+        <Communication destinationClassName="com.intel.webrtc.test.RunnerPlatformHelper"/>
+        <Communication destinationClassName="com.intel.webrtc.test.LockServer"/>
+    </Class>
+    <Class name="com.intel.webrtc.test.RunnerPlatformHelper.ExcuteEnv"
+        x="1260" y="795">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+        <Association
+            destinationClassName="com.intel.webrtc.test.RunnerPlatformHelper"
+            endpointName="resultPaser" kind="Simple"/>
+    </Class>
+    <Class name="com.intel.webrtc.test.TestRunner.TestResult" x="129" y="1176">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+        <Association
+            destinationClassName="com.intel.webrtc.test.TestController.TestStatus"
+            endpointName="status" kind="Simple"/>
+    </Class>
+</ClassDiagram>

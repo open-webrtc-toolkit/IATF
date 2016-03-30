@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ClassDiagram>
+    <Class name="com.intel.webrtc.test.javascript.JavascriptTestDevice"
+        x="552" y="266">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+        <Extension destinationClassName="com.intel.webrtc.test.TestDevice"/>
+        <Association
+            destinationClassName="com.intel.webrtc.test.javascript.JavascriptDeviceInfo"
+            endpointName="deviceInfo" kind="Simple"/>
+    </Class>
+    <Class
+        name="com.intel.webrtc.test.javascript.JavascriptClientController"
+        x="842" y="134">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+        <Extension destinationClassName="com.intel.webrtc.test.ClientTestController"/>
+        <Communication destinationClassName="com.intel.webrtc.test.ClientTestController"/>
+    </Class>
+    <Class name="com.intel.webrtc.test.LockObject" x="1260" y="323">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+    </Class>
+    <Class name="com.intel.webrtc.test.javascript.JavascriptDeviceInfo"
+        x="129" y="110">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+        <Extension destinationClassName="com.intel.webrtc.test.PhysicalDeviceInfo"/>
+        <Association
+            destinationClassName="com.intel.webrtc.test.javascript.JavascriptClientController"
+            endpointName="jcc" kind="Simple"/>
+    </Class>
+    <Class name="com.intel.webrtc.test.LockServer" x="1145" y="399">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+        <Extension destinationClassName="com.intel.webrtc.test.ClientTestController"/>
+        <Communication destinationClassName="com.intel.webrtc.test.ClientTestController"/>
+    </Class>
+    <Class name="com.intel.webrtc.test.android.AndroidTestEntry" x="892" y="869">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+        <Extension destinationClassName="com.intel.webrtc.test.android.AndroidTestDevice.InstrumentationWrapper"/>
+        <Association
+            destinationClassName="com.intel.webrtc.test.ClientTestController"
+            endpointName="testController" kind="Simple"/>
+        <Association
+            destinationClassName="com.intel.webrtc.test.android.AndroidTestDevice"
+            endpointName="testDevice" kind="Simple"/>
+        <Communication destinationClassName="com.intel.webrtc.test.ClientTestController"/>
+        <Communication destinationClassName="com.intel.webrtc.test.android.AndroidTestDevice"/>
+    </Class>
+    <Class name="com.intel.webrtc.test.PhysicalDeviceInfo" x="170" y="530">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+    </Class>
+    <Class name="com.intel.webrtc.test.ClientTestController" x="839" y="397">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+        <Association
+            destinationClassName="com.intel.webrtc.test.ClientTestController.HeartBeatThread"
+            endpointName="heartBeatThread" kind="Simple"/>
+    </Class>
+    <Class
+        name="com.intel.webrtc.test.ClientTestController.HeartBeatThread"
+        x="1234" y="583">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+        <Communication destinationClassName="com.intel.webrtc.test.ClientTestController"/>
+    </Class>
+    <Class name="com.intel.webrtc.test.android.AndroidDeviceInfo"
+        x="138" y="701">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+        <Extension destinationClassName="com.intel.webrtc.test.PhysicalDeviceInfo"/>
+    </Class>
+    <Class name="com.intel.webrtc.test.TestDevice" x="611" y="532">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+    </Class>
+    <Class
+        name="com.intel.webrtc.test.android.AndroidTestDevice.InstrumentationWrapper"
+        x="553" y="966">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+    </Class>
+    <Class name="com.intel.webrtc.test.WaitNotifyLocalSupporter" x="359" y="505">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+    </Class>
+    <Class name="com.intel.webrtc.test.android.AndroidTestDevice"
+        x="531" y="705">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+        <Extension destinationClassName="com.intel.webrtc.test.TestDevice"/>
+        <Extension destinationClassName="com.intel.webrtc.test.WaitNotifyLocalSupporter"/>
+        <Association
+            destinationClassName="com.intel.webrtc.test.ClientTestController"
+            endpointName="controller" kind="Simple"/>
+        <Association
+            destinationClassName="com.intel.webrtc.test.android.AndroidTestDevice.InstrumentationWrapper"
+            endpointName="testEntry" kind="Simple"/>
+        <Communication destinationClassName="com.intel.webrtc.test.ClientTestController"/>
+        <Communication destinationClassName="com.intel.webrtc.test.android.AndroidTestDevice.InstrumentationWrapper"/>
+    </Class>
+    <Class name="com.intel.webrtc.test.android.AndroidClientController"
+        x="1016" y="707">
+        <AttributesDisplayFilter public-accepted="true"
+            private-accepted="true" protected-accepted="true"
+            default-accepted="true" static-accepted="false"/>
+        <MethodDisplayFilter public-accepted="true"
+            private-accepted="false" protected-accepted="false"
+            default-accepted="false" static-accepted="false"
+            accessors-accepted="false" constructors-accepted="false"/>
+        <Extension destinationClassName="com.intel.webrtc.test.ClientTestController"/>
+        <Association
+            destinationClassName="com.intel.webrtc.test.android.AndroidTestEntry"
+            endpointName="androidTestEntry" kind="Simple"/>
+        <Communication destinationClassName="com.intel.webrtc.test.android.AndroidTestEntry"/>
+    </Class>
+</ClassDiagram>

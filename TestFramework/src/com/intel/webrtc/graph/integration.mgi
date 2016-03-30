@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ClassDiagram>
+    <CommunicationClass
+        name="com.intel.webrtc.test.javascript.JavascriptClientController"
+        x="247" y="427">
+        <Extension destinationClassName="com.intel.webrtc.test.ClientTestController"/>
+        <Communication destinationClassName="com.intel.webrtc.test.ClientTestController"/>
+    </CommunicationClass>
+    <CommunicationClass name="com.intel.webrtc.test.LockServer" x="1160" y="321">
+        <Extension destinationClassName="com.intel.webrtc.test.ClientTestController"/>
+        <Communication destinationClassName="com.intel.webrtc.test.ClientTestController"/>
+    </CommunicationClass>
+    <CommunicationClass
+        name="com.intel.webrtc.test.android.AndroidTestEntry" x="502" y="67">
+        <Extension destinationClassName="com.intel.webrtc.test.android.AndroidTestDevice.InstrumentationWrapper"/>
+        <Association
+            destinationClassName="com.intel.webrtc.test.ClientTestController"
+            endpointName="testController" kind="Simple"/>
+        <Association
+            destinationClassName="com.intel.webrtc.test.android.AndroidTestDevice"
+            endpointName="testDevice" kind="Simple"/>
+        <Communication destinationClassName="com.intel.webrtc.test.ClientTestController"/>
+        <Communication destinationClassName="com.intel.webrtc.test.android.AndroidTestDevice"/>
+    </CommunicationClass>
+    <CommunicationClass
+        name="com.intel.webrtc.test.javascript.JavascriptRunnerHelper"
+        x="608" y="594">
+        <Extension destinationClassName="com.intel.webrtc.test.RunnerPlatformHelper"/>
+        <Communication destinationClassName="com.intel.webrtc.test.javascript.JavascriptTestDevice"/>
+        <Communication destinationClassName="com.intel.webrtc.test.TestController"/>
+        <Communication destinationClassName="com.intel.webrtc.test.ClientTestController"/>
+    </CommunicationClass>
+    <CommunicationClass
+        name="com.intel.webrtc.test.ClientTestController" x="618" y="315">
+        <Association
+            destinationClassName="com.intel.webrtc.test.ClientTestController.HeartBeatThread"
+            endpointName="heartBeatThread" kind="Simple"/>
+    </CommunicationClass>
+    <CommunicationClass
+        name="com.intel.webrtc.test.android.AndroidRunnerHelper" x="158" y="636">
+        <Extension destinationClassName="com.intel.webrtc.test.RunnerPlatformHelper"/>
+        <Communication destinationClassName="com.intel.webrtc.test.TestController"/>
+        <Communication destinationClassName="com.intel.webrtc.test.TestDevice"/>
+    </CommunicationClass>
+    <CommunicationClass
+        name="com.intel.webrtc.test.RunnerPlatformHelper" x="1127" y="974"/>
+    <CommunicationClass
+        name="com.intel.webrtc.test.TestController.HeartBeatThread"
+        x="222" y="969"/>
+    <CommunicationClass name="com.intel.webrtc.test.HeartBeatRecorder"
+        x="429" y="972"/>
+    <CommunicationClass name="com.intel.webrtc.test.TestRunner" x="1163" y="759">
+        <Extension destinationClassName="com.intel.webrtc.test.RunnerPlatformHelper"/>
+        <Association
+            destinationClassName="com.intel.webrtc.test.TestController"
+            endpointName="testController" kind="Simple"/>
+        <Association
+            destinationClassName="com.intel.webrtc.test.LockServer"
+            endpointName="ls" kind="Simple"/>
+        <Communication destinationClassName="com.intel.webrtc.test.TestController"/>
+        <Communication destinationClassName="com.intel.webrtc.test.RunnerPlatformHelper"/>
+        <Communication destinationClassName="com.intel.webrtc.test.LockServer"/>
+        <Communication destinationClassName="com.intel.webrtc.test.ControllerWorker"/>
+    </CommunicationClass>
+    <CommunicationClass
+        name="com.intel.webrtc.test.android.AndroidTestDevice" x="215" y="229">
+        <Extension destinationClassName="com.intel.webrtc.test.TestDevice"/>
+        <Association
+            destinationClassName="com.intel.webrtc.test.ClientTestController"
+            endpointName="controller" kind="Simple"/>
+        <Association
+            destinationClassName="com.intel.webrtc.test.android.AndroidTestDevice.InstrumentationWrapper"
+            endpointName="testEntry" kind="Simple"/>
+        <Communication destinationClassName="com.intel.webrtc.test.ClientTestController"/>
+        <Communication destinationClassName="com.intel.webrtc.test.android.AndroidTestDevice.InstrumentationWrapper"/>
+    </CommunicationClass>
+    <CommunicationClass
+        name="com.intel.webrtc.test.android.AndroidClientController"
+        x="833" y="68">
+        <Extension destinationClassName="com.intel.webrtc.test.ClientTestController"/>
+        <Association
+            destinationClassName="com.intel.webrtc.test.android.AndroidTestEntry"
+            endpointName="androidTestEntry" kind="Simple"/>
+        <Communication destinationClassName="com.intel.webrtc.test.android.AndroidTestEntry"/>
+    </CommunicationClass>
+    <CommunicationClass
+        name="com.intel.webrtc.test.javascript.JavascriptTestDevice"
+        x="243" y="481">
+        <Extension destinationClassName="com.intel.webrtc.test.TestDevice"/>
+    </CommunicationClass>
+    <CommunicationClass name="com.intel.webrtc.test.TestController"
+        x="643" y="757">
+        <Extension destinationClassName="com.intel.webrtc.test.ControllerWorker.ControllerWorkerObserver"/>
+        <Association
+            destinationClassName="com.intel.webrtc.test.HeartBeatRecorder"
+            endpointName="heartBeatRecorder" kind="Simple"/>
+        <Association
+            destinationClassName="com.intel.webrtc.test.WaitNotifyManager"
+            endpointName="wnManager" kind="Simple"/>
+        <Association
+            destinationClassName="com.intel.webrtc.test.TestController.HeartBeatThread"
+            endpointName="heartBeatThread" kind="Simple"/>
+        <Communication destinationClassName="com.intel.webrtc.test.WaitNotifyManager"/>
+        <Communication destinationClassName="com.intel.webrtc.test.TestController.HeartBeatThread"/>
+        <Communication destinationClassName="com.intel.webrtc.test.ControllerWorker"/>
+        <Communication destinationClassName="com.intel.webrtc.test.HeartBeatRecorder"/>
+    </CommunicationClass>
+    <CommunicationClass
+        name="com.intel.webrtc.test.ControllerWorker.ControllerWorkerObserver"
+        x="843" y="503"/>
+    <CommunicationClass
+        name="com.intel.webrtc.test.ClientTestController.HeartBeatThread"
+        x="935" y="188">
+        <Communication destinationClassName="com.intel.webrtc.test.ClientTestController"/>
+    </CommunicationClass>
+    <CommunicationClass name="com.intel.webrtc.test.TestDevice" x="195" y="744"/>
+    <CommunicationClass name="com.intel.webrtc.test.WaitNotifyManager"
+        x="626" y="971"/>
+    <CommunicationClass name="com.intel.webrtc.test.ControllerWorker"
+        x="874" y="646">
+        <Association
+            destinationClassName="com.intel.webrtc.test.ControllerWorker.ControllerWorkerObserver"
+            endpointName="observer" kind="Simple"/>
+        <Communication destinationClassName="com.intel.webrtc.test.ControllerWorker.ControllerWorkerObserver"/>
+    </CommunicationClass>
+    <CommunicationClass
+        name="com.intel.webrtc.test.android.AndroidTestDevice.InstrumentationWrapper"
+        x="195" y="71"/>
+</ClassDiagram>
