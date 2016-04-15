@@ -10,6 +10,7 @@ import com.intel.webrtc.p2p.PeerClientConfiguration;
 import com.intel.webrtc.test.android.AndroidTestDevice;
 import com.intel.webrtc.test.helper.P2PActions;
 import com.intel.webrtc.test.helper.PeerClientObserverForTest;
+import com.intel.webrtc.test.helper.SocketSignalingChannel;
 import com.intel.webrtc.test.helper.TestActivity;
 
 import android.os.SystemClock;

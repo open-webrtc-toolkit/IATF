@@ -23,7 +23,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.intel.webrtc.test.p2ptest;
+package com.intel.webrtc.test.helper;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;

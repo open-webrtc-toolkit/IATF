@@ -39,14 +39,8 @@
                     <LinearLayout
                         android:orientation="vertical"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <com.intel.webrtc.base.VideoStreamsView
-                android:id="@+id/streamViewLayout1"
-                android:layout_width="120dp"
-                android:layout_height="90dp"
-                android:orientation="vertical" />
-
+                        android:layout_height="match_parent"
+                        android:id="@+id/rendererContainer1">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -58,13 +52,8 @@
                     <LinearLayout
                         android:orientation="vertical"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                         <com.intel.webrtc.base.VideoStreamsView
-                android:id="@+id/streamViewLayout2"
-                android:layout_width="120dp"
-                android:layout_height="90dp"
-                android:orientation="vertical" />
+                        android:layout_height="match_parent"
+                        android:id="@+id/rendererContainer2">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -81,13 +70,8 @@
                     <LinearLayout
                         android:orientation="vertical"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <com.intel.webrtc.base.VideoStreamsView
-                android:id="@+id/streamViewLayout3"
-                android:layout_width="120dp"
-                android:layout_height="90dp"
-                android:orientation="vertical" />
+                        android:layout_height="match_parent"
+                        android:id="@+id/rendererContainer3">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -99,13 +83,8 @@
                     <LinearLayout
                         android:orientation="vertical"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <com.intel.webrtc.base.VideoStreamsView
-                android:id="@+id/streamViewLayout4"
-                android:layout_width="120dp"
-                android:layout_height="90dp"
-                android:orientation="vertical" />
+                        android:layout_height="match_parent"
+                        android:id="@+id/rendererContainer4">
 
                         <TextView
                             android:layout_width="wrap_content"

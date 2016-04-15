@@ -1,18 +1,19 @@
 package com.intel.webrtc.test.helper;
 
+import org.webrtc.EglBase;
+import org.webrtc.RendererCommon.ScalingType;
+
 import com.intel.webrtc.base.ClientContext;
-import com.intel.webrtc.base.EglBase;
 import com.intel.webrtc.base.Stream;
-import com.intel.webrtc.base.VideoStreamsView;
+import com.intel.webrtc.base.Stream.VideoRendererInterface;
 import com.intel.webrtc.base.WoogeenException;
+import com.intel.webrtc.base.WoogeenSurfaceRenderer;
 import com.intel.webrtc.test.demo.R;
 
 import android.app.Activity;
-import android.graphics.Point;
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.ViewTreeObserver;
-import android.view.ViewTreeObserver.OnPreDrawListener;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,7 +29,12 @@ public class TestActivity extends Activity {
     boolean hasDrawn1 = false, hasDrawn2 = false, hasDrawn3 = false, hasDrawn4 = false;
     LinearLayout StreamContainer1, StreamContainer2, StreamContainer3, StreamContainer4;
 
-    VideoStreamsView renderer1, renderer2, renderer3, renderer4;
+    // VideoStreamsView renderer2, renderer3, renderer4;
+    WoogeenSurfaceRenderer surfaceRenderer1, surfaceRenderer2, surfaceRenderer3, surfaceRenderer4;
+    VideoRendererInterface videoRenderer1, videoRenderer2, videoRenderer3, videoRenderer4;
+    WoogeenSampleView view1, view2, view3, view4;
+    LinearLayout rendererContainer1, rendererContainer2, rendererContainer3, rendererContainer4;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +43,6 @@ public class TestActivity extends Activity {
         testTitleTextView = (TextView) findViewById(R.id.testTitleTextView);
         curActionTextView = (TextView) findViewById(R.id.curActionTextViesw);
         initViews();
-        // handler=new UIHandler();
     }
 
     void setLock(Integer lock) {
@@ -56,23 +61,30 @@ public class TestActivity extends Activity {
     }
 
     void initViews() {
-//        StreamContainer1 = (LinearLayout) findViewById(R.id.streamViewLayout1);
-//        StreamContainer2 = (LinearLayout) findViewById(R.id.streamViewLayout2);
-//        StreamContainer3 = (LinearLayout) findViewById(R.id.streamViewLayout3);
-//        StreamContainer4 = (LinearLayout) findViewById(R.id.streamViewLayout4);
         this.rootEglBase = new EglBase();
-        renderer1 = (VideoStreamsView) findViewById(R.id.streamViewLayout1);
-        renderer2 = (VideoStreamsView) findViewById(R.id.streamViewLayout2);
-        renderer3 = (VideoStreamsView) findViewById(R.id.streamViewLayout3);
-        renderer4 = (VideoStreamsView) findViewById(R.id.streamViewLayout4);
-        renderer1.init(rootEglBase.getContext(), null);
-        renderer2.init(rootEglBase.getContext(), null);
-        renderer3.init(rootEglBase.getContext(), null);
-        renderer4.init(rootEglBase.getContext(), null);
-        renderer1.setZOrderMediaOverlay(true);
-        renderer2.setZOrderMediaOverlay(true);
-        renderer3.setZOrderMediaOverlay(true);
-        renderer4.setZOrderMediaOverlay(true);
+        view1=new WoogeenSampleView(this);
+        view2=new WoogeenSampleView(this);
+        view3=new WoogeenSampleView(this);
+        view4=new WoogeenSampleView(this);
+        rendererContainer1 = (LinearLayout) findViewById(R.id.rendererContainer1);
+        rendererContainer2 = (LinearLayout) findViewById(R.id.rendererContainer2);
+        rendererContainer3 = (LinearLayout) findViewById(R.id.rendererContainer3);
+        rendererContainer4 = (LinearLayout) findViewById(R.id.rendererContainer4);
+
+        rendererContainer1.addView(view1);
+        rendererContainer2.addView(view2);
+        rendererContainer3.addView(view3);
+        rendererContainer4.addView(view4);
+
+        surfaceRenderer1 = new WoogeenSurfaceRenderer(view1);
+        surfaceRenderer2 = new WoogeenSurfaceRenderer(view2);
+        surfaceRenderer3 = new WoogeenSurfaceRenderer(view3);
+        surfaceRenderer4 = new WoogeenSurfaceRenderer(view4);
+
+        videoRenderer1 = surfaceRenderer1.createVideoRenderer(0, 0, 100, 100, ScalingType.SCALE_ASPECT_FIT, true);
+        videoRenderer2 = surfaceRenderer2.createVideoRenderer(0, 0, 100, 100, ScalingType.SCALE_ASPECT_FIT, false);
+        videoRenderer3 = surfaceRenderer3.createVideoRenderer(0, 0, 100, 100, ScalingType.SCALE_ASPECT_FIT, false);
+        videoRenderer4 = surfaceRenderer4.createVideoRenderer(0, 0, 100, 100, ScalingType.SCALE_ASPECT_FIT, false);
         // Add listeners to initiate the video renderer
         ClientContext.setApplicationContext(this, rootEglBase.getContext());
     }
@@ -106,7 +118,7 @@ public class TestActivity extends Activity {
 
     public void attachRender1(Stream stream) {
         try {
-            stream.attach(renderer1);
+            stream.attach(videoRenderer1);
         } catch (WoogeenException e) {
             e.printStackTrace();
             Log.e(TAG, "Error occured when attach local stream to render.");
@@ -115,7 +127,7 @@ public class TestActivity extends Activity {
 
     public void attachRender2(Stream stream) {
         try {
-            stream.attach(renderer2);
+            stream.attach(videoRenderer2);
         } catch (WoogeenException e) {
             e.printStackTrace();
             Log.e(TAG, "Error occured when attach local stream to render.");
@@ -124,7 +136,7 @@ public class TestActivity extends Activity {
 
     public void attachRender3(Stream stream) {
         try {
-            stream.attach(renderer3);
+            stream.attach(videoRenderer3);
         } catch (WoogeenException e) {
             e.printStackTrace();
             Log.e(TAG, "Error occured when attach local stream to render.");
@@ -133,7 +145,7 @@ public class TestActivity extends Activity {
 
     public void attachRender4(Stream stream) {
         try {
-            stream.attach(renderer4);
+            stream.attach(videoRenderer4);
         } catch (WoogeenException e) {
             e.printStackTrace();
             Log.e(TAG, "Error occured when attach local stream to render.");
