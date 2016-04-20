@@ -62,7 +62,7 @@ The test framework is an java project, in order to run the sample test:
 
 3. Import 'TestFramework' and 'TestFrameworkTest' as existing android project.
 
-4. Import BaseSDK & P2PSDK under repo 'webrtc-android-sdk' and setting project dependency.
+4. Update androidSDK libs: `woogeenbase.jar` & `woogeenp2p.jar` under repo 'webrtc-android-sdk'.
 
 5. Change the 'Bootstrap Entries' of test entry:
 
@@ -74,9 +74,13 @@ The test framework is an java project, in order to run the sample test:
     + Move up the added JRE lib before android lib in 'Bootstrap Entries'.
 
 6. Build project:<br>
-Build BaseSDK -> Build P2PSDK -> Build TestFramework -> copy 'TestFramework/bin/testframework-android.jar' to 'TestFrameworkTest/libs' -> Build 'TestFrameworkTest'
+Build TestFramework -> copy 'TestFramework/bin/testframework-android.jar' to 'TestFrameworkTest/libs' -> Build 'TestFrameworkTest'
 
-7. Right click on the test entry class and run as java application.
+7. Change the serverIPURL in source code and start peer server.
+
+8. Right click on the test entry class and run as java application.
+
+> **Note**: The default shell path used is {/bin/sh}, `node`, `karma`, `adb` are supposed to be accessed directly in command line or you have to change the starting commands in related RunnerHelper.
 
 # Write Customized Test Guide{#section4}
 1. Create android project and import 'TestFramework/bin/testframework-android.jar', 'hamcrest-core-1.3.jar' and 'junit-4.12.jar'
