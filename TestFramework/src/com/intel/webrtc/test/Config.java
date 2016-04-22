@@ -25,6 +25,7 @@ public class Config {
     private String androidTestPackage = "com.intel.webrtc.test";
     private String androidTestClass = "com.intel.webrtc.test.AutoTest";
     private String androidTestActivity = "com.intel.webrtc.test.TestActivity";
+    private String karmaPath = "/usr/lib/node_modules/karma/bin/karma";
     private boolean buildApk = true;
     private int heartbeatInterval = 5000;
     private int heartbeatTimeout = 30000;
@@ -100,6 +101,10 @@ public class Config {
             shellPath = value;
             return;
         }
+        if (key.equalsIgnoreCase("karmaPath")) {
+        	karmaPath = value;
+        	return;
+        }
         if (key.equalsIgnoreCase("apkName")) {
             apkName = value;
             return;
@@ -154,7 +159,9 @@ public class Config {
     public String getShellPath() {
         return shellPath;
     }
-
+    public String getKarmaPath() {
+    	return karmaPath;
+    }
     public String getApkName() {
         return apkName;
     }

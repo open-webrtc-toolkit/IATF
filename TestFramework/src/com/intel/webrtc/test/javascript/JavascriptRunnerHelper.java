@@ -35,7 +35,8 @@ public class JavascriptRunnerHelper implements RunnerPlatformHelper {
     public void initParameters(Config config) {
         // TODO read karmaPath from config
         shellPath = config.getShellPath();
-        karmaPath = "karma";
+        //karmaPath = "/usr/lib/node_modules/karma/bin/karma";
+        karmaPath = config.getKarmaPath();
     }
 
     /**
