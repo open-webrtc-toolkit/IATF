@@ -33,9 +33,8 @@ public class JavascriptRunnerHelper implements RunnerPlatformHelper {
 
     @Override
     public void initParameters(Config config) {
-        // TODO read karmaPath from config
+        //  read karmaPath from config
         shellPath = config.getShellPath();
-        //karmaPath = "/usr/lib/node_modules/karma/bin/karma";
         karmaPath = config.getKarmaPath();
     }
 
@@ -48,8 +47,16 @@ public class JavascriptRunnerHelper implements RunnerPlatformHelper {
         for (TestDevice device : devices) {
             if (device instanceof JavascriptTestDevice) {
                 JavascriptTestDevice dev = (JavascriptTestDevice) device;
-                String startCmd = "cd " + dev.jsConfFile.substring(0, dev.jsConfFile.lastIndexOf("/")) + "\n"
+                System.out.println("===========os.name:"+System.getProperties().getProperty("os.name"));
+                String systemName = System.getProperties().getProperty("os.name");
+                String startCmd = "";
+                if (systemName.contains("Windows")) {
+                startCmd = karmaPath + " start " + dev.jsConfFile;
+                }
+                else{
+                startCmd = "cd " + dev.jsConfFile.substring(0, dev.jsConfFile.lastIndexOf("/")) + "\n"
                         + karmaPath + " start " + dev.jsConfFile;
+                }
                 Logger.d(TAG, "startcmd:" + startCmd);
                 try {
                     Process p = executeByShell(startCmd);
@@ -124,8 +131,17 @@ public class JavascriptRunnerHelper implements RunnerPlatformHelper {
     private ExcuteEnv startJSTestDevice(TestCase testCase, JavascriptTestDevice device,
             Hashtable<String, String> addressTable, Hashtable<String, String> startMessageTable,
             Hashtable<String, String> addressDeviceType, CountDownLatch startTestCountDownLatch) {
-        String cmd = "cd " + device.jsConfFile.substring(0, device.jsConfFile.lastIndexOf("/")) + "\n" + karmaPath
+        System.out.println("===========os.name:"+System.getProperties().getProperty("os.name"));
+        String systemName = System.getProperties().getProperty("os.name");
+        String cmd = "";
+        if (systemName.contains("Windows")) {
+        cmd = karmaPath
+                    + " run " + device.jsConfFile + " -- --grep=" + testCase.getName();
+        }
+        else{
+       cmd = "cd " + dev.jsConfFile.substring(0, dev.jsConfFile.lastIndexOf("/")) + "\n" + karmaPath
                 + " run " + device.jsConfFile + " -- --grep=" + testCase.getName();
+        }
         Logger.d(TAG, "run cmd:" + cmd);
         Process p;
         try {
@@ -231,14 +247,29 @@ public class JavascriptRunnerHelper implements RunnerPlatformHelper {
      *             IOException.
      */
     private Process executeByShell(String cmd) throws IOException {
-        return Runtime.getRuntime().exec(new String[] { shellPath, "-c", cmd });
+        System.out.println("===========os.name:"+System.getProperties().getProperty("os.name"));
+        String systemName = System.getProperties().getProperty("os.name");
+
+        if (systemName.contains("Windows")) {
+        return Runtime.getRuntime().exec(new String[] {"cmd.exe", "/c", cmd});
+        }
+        else{
+         return Runtime.getRuntime().exec(new String[] { shellPath, "-c", cmd });
+        }
     }
 
     /**
      * Stop all the chrome processes.
      */
     private void stopChrome() {
-        String closeChromeCmd = "ps -e | grep chrome | awk '{print $1}' | xargs kill -9";
+        String systemName = System.getProperties().getProperty("os.name");
+        String closeChromeCmd = "";
+        if (systemName.contains("Windows")) {
+            closeChromeCmd = "TASKKILL /IM chrome.exe /F";
+        }
+        else {
+            closeChromeCmd = "ps -e | grep chrome | awk '{print $1}' | xargs kill -9";
+        }
         Process p;
         try {
             p = executeByShell(closeChromeCmd);
@@ -250,15 +281,42 @@ public class JavascriptRunnerHelper implements RunnerPlatformHelper {
             Logger.e(TAG, "Error occured while waiting for chrome to close.");
             e.printStackTrace();
         }
+        System.out.println("stopChrome ");
+    }
+    /**
+     * Stop all the IE processes.
+     */
+    private void stopIE() {
+        String systemName = System.getProperties().getProperty("os.name");
+        String closeIECmd = "";
+        if (systemName.contains("Windows")) {
+            closeIECmd = "TASKKILL /IM /F iexplore.exe";
+        }
+        else {
+            closeIECmd = "ps -e | grep iexplore | awk '{print $1}' | xargs kill -9";
+        }
+        Process p;
+        try {
+            p = executeByShell(closeIECmd);
+            p.waitFor();
+        } catch (IOException e) {
+            Logger.e(TAG, "Error occured while closing IE.");
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            Logger.e(TAG, "Error occured while waiting for IEto close.");
+            e.printStackTrace();
+        }
+       System.out.println("stopIE ");
     }
 
     /**
-     * Stop all the chrome windows before test suite starts.
+     * Stop all the browser windows before test suite starts.
      */
     @Override
     public void clearBeforeSuite() {
-        System.out.println("stopChrome before suite");
+        System.out.println("stop all browsers before suite");
         stopChrome();
+        stopIE();
     }
 
     /**
@@ -279,5 +337,6 @@ public class JavascriptRunnerHelper implements RunnerPlatformHelper {
         }
         System.out.println("stopChrome after suite");
         stopChrome();
+        stopIE();
     }
 }

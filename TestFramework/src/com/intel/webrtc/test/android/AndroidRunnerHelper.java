@@ -117,7 +117,7 @@ public class AndroidRunnerHelper implements RunnerPlatformHelper {
      * @param deviceId
      *            the device id of the device.
      * @param testController
-                  the server controller to receive the test result.
+     *             the server controller to receive the test result.
      */
     @Override
     public void parseResult(LinkedList<String> resultLines, String deviceId, TestController testController) {
@@ -170,8 +170,14 @@ public class AndroidRunnerHelper implements RunnerPlatformHelper {
                     break;
                 if (resultLine.endsWith(".apk")) {
                     if (resultLine.endsWith("-debug.apk")) {
+                        String systemName = System.getProperties().getProperty("os.name");
+                        if (systemName.contains("Windows")) {
+                            apkName = "bin/TestFrameworkTest-debug-unaligned.apk";
+                        }
+                        else{
                         String[] pathItems = resultLine.split("/");
-                        apkName = "bin/" + pathItems[pathItems.length - 1];
+                         apkName = "bin/" + pathItems[pathItems.length - 1];
+                        }
                         Logger.d(TAG, "apk name is " + apkName);
                     }
                 }
@@ -244,7 +250,7 @@ public class AndroidRunnerHelper implements RunnerPlatformHelper {
                         resultLine = sio1.readLine();
                         if (resultLine == null)
                             break;
-                        if (resultLine.startsWith("wlan0")) {
+                        if (resultLine.startsWith("wlan0")|| resultLine.startsWith("eth0")) {
                             int i, offset = resultLine.indexOf("/");
                             for (i = offset; i > 0; i--) {
                                 if (resultLine.charAt(i) == ' ') {
@@ -359,7 +365,13 @@ public class AndroidRunnerHelper implements RunnerPlatformHelper {
      *             IOException.
      */
     private Process executeByShell(String cmd) throws IOException {
-        return Runtime.getRuntime().exec(new String[] { shellPath, "-c", cmd });
+        String systemName = System.getProperties().getProperty("os.name");
+        if (systemName.contains("Windows")) {
+        return Runtime.getRuntime().exec(new String[] {"cmd.exe", "/c", cmd});
+         }
+         else{
+         return Runtime.getRuntime().exec(new String[] { shellPath, "-c", cmd });
+         }
     }
 
     /**
