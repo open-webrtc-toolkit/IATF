@@ -1,0 +1,7 @@
+python module install
+subprocess
+
+psutil
+$ sudo apt-get install gcc python-dev
+$ pip install psutil
+
