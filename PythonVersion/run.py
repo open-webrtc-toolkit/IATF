@@ -12,27 +12,51 @@ Created on Jan,16 2016
 
 import sys, getopt, time
 from socketIO_client import SocketIO, LoggingNamespace
-#from socketConnect.socketioconnect import socketioconnect as a
 import subprocess
 from com.deploy import Deploy
 from com.serverresult import JSResultParse
 from com.cleanEnv import CleanEnv
 from com.getAndroidDevicesInfo import getAndroidDevice
 import psutil
-
+import commands
 
 print 'Number of arguments:', len(sys.argv), 'arguments.'
 print 'Argument List:', str(sys.argv)
 
-socketIO = SocketIO('10.239.10.122', 9092)
+caselistfile = ''
+mode = ''
+try:
+   opts, args = getopt.getopt(sys.argv[1:],"hc:m:",["help", "caselistfile=","mode="])
+except getopt.GetoptError:
+   print 'error : run.py -c <caselistfile> -m <mode>'
+   sys.exit(2)
+for opt, arg in opts:
+   if opt in ("-h", "--help"):
+      print 'run.py -c <caselistfile> -m <mode> \n mode 0: JS to JS \n mode 1: JS to Android \n mode 2: Android to Android'
+      sys.exit()
+   elif opt == "-c":
+      caselistfile = arg
+   elif opt == '-m':
+      mode = arg
+   else:
+      assert False, "unhandled option"
+if caselistfile == ''or mode == '':
+   print 'Error !!! \n Please use: run.py -c <caselistfile> -m <mode> \n mode 0: JS to JS \n mode 1: JS to Android \n mode 2: Android to Android'
+   sys.exit()
 
+print 'caselistfile is:', caselistfile
+print 'mode is:', mode
+
+socketIO = SocketIO('10.239.10.122', 9092)
 def start_test(filename, mode):
     target = open("TestResult.txt", 'w');
     lines = [line.rstrip('\n') for line in open(filename)]
     CleanEnv.kill_karmaRun()
-    for index in range(len(lines)): 
-      number=1 
-      interval=10    
+    emitmessage("lockevent",{"lock":"InitLock"})
+
+    for index in range(len(lines)):
+      number=1
+      interval=10
       caseinfo=split_line(lines[index]);
       print "case is", caseinfo[0];
       print "classname is", caseinfo[1];
@@ -40,16 +64,16 @@ def start_test(filename, mode):
       CleanEnv.kill_karmaStart()
       time.sleep(20)
       socket_connect()
-      if mode == 0:  #  begining js to js test 
+      if mode == 0:  #  begining js to js test
         deployjs1=Deploy.deploy_js("testclient1.conf.js")
         deployjs2=Deploy.deploy_js("testclient2.conf.js")
-        if (deployjs1 == 0) and (deployjs2 == 0): 
-          emitmessage("lockevent",{"lock":"STARTTEST"})   
+        if (deployjs1 == 0) and (deployjs2 == 0):
+          emitmessage("lockevent",{"lock":"STARTTEST"})
           startjs1=Deploy.start_js("testclient1.conf.js",caseinfo[0])
           startjs2=Deploy.start_js("testclient2.conf.js",caseinfo[0])
           print "startjs1 PID is: ", startjs1;
           print "startjs2 PID is: ", startjs2;
-          while number < 10:
+          while number < 8:
             print "number is:", number
             time_remaining = interval-time.time()%interval
             print_ts("Sleeping until %s (%s seconds)..."%((time.ctime(time.time()+time_remaining)), time_remaining))
@@ -57,14 +81,14 @@ def start_test(filename, mode):
             print_ts("Starting command.")
             p=psutil.pids();
             print p
-            jsPID1 = startjs1+1; 
-            jsPID2 = startjs2+1;           
-            if ( jsPID1 in p ) or ( jsPID2 in P) :
+            jsPID1 = startjs1+1;
+            jsPID2 = startjs2+1;
+            if ( jsPID1 in p ) or ( jsPID2 in p) :
               print_ts("-"*100)
               print("js running process still running");
             else:
               break
-          number=number+1
+            number=number+1
           case1result=JSResultParse.parseJSResult("test-results-client1.xml")
           case2result=JSResultParse.parseJSResult("test-results-client2.xml")
           print "case1result is ", case1result;
@@ -78,7 +102,7 @@ def start_test(filename, mode):
             target.write('\n');
             print "JS-JS case: ",caseinfo[0],": fail"
           CleanEnv.kill_karmaStart() # only need make sure karma start command is killed.
-          emitmessage("lockevent",{"lock":"InitLock"})  
+          emitmessage("lockevent",{"lock":"InitLock"})
         else:
           print("startBrowser error: ");
     ########################################################################################
@@ -91,13 +115,13 @@ def start_test(filename, mode):
         print androidTestDevices
         deployAndroid=Deploy.deploy_android(androidTestDevices[0])
         if (deployjs1 == 0) and (deployAndroid == 0):
-          emitmessage("lockevent",{"lock":"STARTTEST"})   
+          emitmessage("lockevent",{"lock":"STARTTEST"})
           startjs1=Deploy.start_js("testclient1.conf.js",caseinfo[0])
           print "startjs1 PID is: ", startjs1;
-          startAndorid=Deploy.start_android_withResult(androidTestDevices[0],caseinfo[0],caseinfo[1]);
+          startAndorid=Deploy.start_android_withResult(androidTestDevices[0],caseinfo[0],caseinfo[2]);
           # following code is used to check js job is finished or not. Currently it is implement at main process.
-          # ToDo: multi-process implementation should be added. waiting And check function should be wrapper. 
-          while number < 10:
+          # ToDo: multi-process implementation should be added. waiting And check function should be wrapper.
+          while number < 8:
             print "number is:", number
             time_remaining = interval-time.time()%interval
             print_ts("Sleeping until %s (%s seconds)..."%((time.ctime(time.time()+time_remaining)), time_remaining))
@@ -105,7 +129,7 @@ def start_test(filename, mode):
             print_ts("Starting command.")
             p=psutil.pids();
             print p
-            jsPID = startjs1+1;            
+            jsPID = startjs1+1;
             if jsPID in p:
               print_ts("-"*100)
               print("process ",jsPID," still running");
@@ -134,12 +158,12 @@ def start_test(filename, mode):
         deployAndroid1=Deploy.deploy_android(androidTestDevices[0])
         deployAndroid2=Deploy.deploy_android(androidTestDevices[1])
         if (deployAndroid1 == 0) and (deployAndroid2 == 0):
-          emitmessage("lockevent",{"lock":"STARTTEST"})   
+          emitmessage("lockevent",{"lock":"STARTTEST"})
 
           startAndorid1=Deploy.start_android_sync(androidTestDevices[1],caseinfo[0],caseinfo[1]);
           startAndorid2=Deploy.start_android_withResult(androidTestDevices[0],caseinfo[0],caseinfo[2]);
           # following code is used to check js job is finished or not. Currently it is implement at main process.
-          # ToDo: multi-process implementation should be added. waiting And check function should be wrapper. 
+          # ToDo: multi-process implementation should be added. waiting And check function should be wrapper.
           while number < 10:
             print "number is:", number
             time_remaining = interval-time.time()%interval
@@ -148,7 +172,7 @@ def start_test(filename, mode):
             print_ts("Starting command.")
             p=psutil.pids();
             print p
-            androidPID = startAndorid1+1;            
+            androidPID = startAndorid1+1;
             if androidPID in p:
               print_ts("-"*100)
               print("process ",androidPID ," still running");
@@ -165,8 +189,8 @@ def start_test(filename, mode):
             target.write("Android-Android case: "+caseinfo[0]+" : fail");
             target.write('\n');
         CleanEnv.kill_karmaStart() # only need make sure karma start command is killed.
-        emitmessage("lockevent",{"lock":"InitLock"})          
-    target.close()     
+        emitmessage("lockevent",{"lock":"InitLock"})
+    target.close()
 
 
 def split_line(text):
@@ -175,8 +199,6 @@ def split_line(text):
        caseInfoList = casename.split(";");
        caseInfoList[0] = caseInfoList[0].replace("\"", "");
        caseInfoList[-1] = caseInfoList[-1].replace("\"", "");
-       #print "case is", case;
-       #print "classname is", classname;
        return caseInfoList
 
 def on_aaa_response(*args):
@@ -205,8 +227,8 @@ def waitProcess(interval, processnumber):
             print_ts("Sleeping until %s (%s seconds)..."%((time.ctime(time.time()+time_remaining)), time_remaining))
             time.sleep(time_remaining)
             print_ts("Starting command.")
-            # get current process  
-            p=psutil.pids();            
+            # get current process
+            p=psutil.pids();
             if processnumber in p:
               print_ts("-"*100)
               print("process still running");
@@ -216,7 +238,8 @@ def waitProcess(interval, processnumber):
             print e
         number=number+1
 
-#start_test('caselist',0)
-#start_test('caselist',1)
-start_test('caselist',2)
+start_test(caselistfile,mode)
+#test#
+#if __name__ == "__main__":
+#    start_test(caselist,0)
 
