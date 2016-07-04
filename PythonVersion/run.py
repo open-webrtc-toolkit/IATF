@@ -64,7 +64,8 @@ def start_test(filename, mode):
       CleanEnv.kill_karmaStart()
       time.sleep(20)
       socket_connect()
-      if mode == 0:  #  begining js to js test
+      if int(mode) == 0:
+        print "start test js to js "  #  begining js to js test
         deployjs1=Deploy.deploy_js("testclient1.conf.js")
         deployjs2=Deploy.deploy_js("testclient2.conf.js")
         if (deployjs1 == 0) and (deployjs2 == 0):
@@ -108,7 +109,7 @@ def start_test(filename, mode):
     ########################################################################################
     # JS to Android #
     ########################################################################################
-      elif mode == 1:
+      elif int(mode) == 1:
         print "start test JS to Android"
         deployjs1=Deploy.deploy_js("testclient1.conf.js")
         androidTestDevices=getAndroidDevice.getDevices();
@@ -151,7 +152,7 @@ def start_test(filename, mode):
     ########################################################################################
     # Android to Android #
     ########################################################################################
-      elif mode == 2:
+      elif int(mode) == 2:
         print "start Android to Android"
         androidTestDevices=getAndroidDevice.getDevices();
         print androidTestDevices
