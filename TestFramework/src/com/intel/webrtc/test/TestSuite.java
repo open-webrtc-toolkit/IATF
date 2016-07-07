@@ -3,6 +3,7 @@ package com.intel.webrtc.test;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 
 /**
@@ -17,10 +18,10 @@ public class TestSuite {
     // Store all the logic test devices
     private LinkedList<TestDevice> testDevices;
     // Store all the test cases in this suite
-    private Hashtable<String, TestCase> testCases;
+    private TreeMap<String, TestCase> testCases;
 
     public TestSuite() {
-        testCases = new Hashtable<String, TestCase>();
+        testCases = new TreeMap<String, TestCase>();
         testDevices = new LinkedList<TestDevice>();
     }
 
@@ -28,7 +29,7 @@ public class TestSuite {
         return testDevices;
     }
 
-    public Hashtable<String, TestCase> getTestCases() {
+    public TreeMap<String, TestCase> getTestCases() {
         return testCases;
     }
 
@@ -43,7 +44,18 @@ public class TestSuite {
         // for javascript client, this can be used to run 'karma start'
         testDevices.add(testDevice);
     }
-
+    /**
+     * Add a TestDevice into the TestSuite. The TestSuite will scan the test
+     * methods of the new-coming TestDevice, and add the TestDevice into or
+     * create corresponding TestCases.
+     * @param testDevice
+     * @param caseName
+     */
+    public void addTestDevice(TestDevice testDevice,String caseName) {
+        testDevice.addDeviceToSuite(this,caseName);
+        // for javascript client, this can be used to run 'karma start'
+        testDevices.add(testDevice);
+    }
     /**
      * Remove a TestDevice from the TestSuite.
      * @param testDeviceName

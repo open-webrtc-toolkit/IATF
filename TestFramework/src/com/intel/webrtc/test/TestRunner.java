@@ -4,14 +4,20 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import com.intel.webrtc.test.TestController.TestStatus;
 import com.intel.webrtc.test.android.AndroidRunnerHelper;
 import com.intel.webrtc.test.javascript.JavascriptRunnerHelper;
@@ -95,11 +101,19 @@ public class TestRunner implements RunnerPlatformHelper {
             initParameters(config);
             clearBeforeSuite();
             deployTests(testSuite);
-            Hashtable<String, TestCase> testCases = testSuite.getTestCases();
-            Iterator<Entry<String, TestCase>> iterator = testCases.entrySet().iterator();
-            while (iterator.hasNext()) {
-                Entry<String, TestCase> entry = iterator.next();
-                runTestCase(entry.getValue());
+            TreeMap<String, TestCase> testCases = testSuite.getTestCases();
+            ArrayList<Entry<String, TestCase>> list=new ArrayList<Entry<String, TestCase>>(testCases.entrySet());
+            Collections.sort(list,new Comparator<Entry<String, TestCase>>() {
+                @Override
+                public int compare(Entry<String, TestCase> o1,
+                        Entry<String, TestCase> o2) {
+                    String name1=o1.getValue().getName().substring(0,6);
+                    String name2=o2.getValue().getName().substring(0,6);
+                    return name1.compareTo(name2);
+                }
+            });
+            for(Entry<String, TestCase> entry:list){
+                 runTestCase(entry.getValue());
             }
             printResult(testSuite.getTestCases().size());
             // TODO generate test result with enhance format.

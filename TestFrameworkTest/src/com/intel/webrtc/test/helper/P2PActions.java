@@ -12,6 +12,7 @@ import com.intel.webrtc.base.LocalCameraStreamParameters;
 import com.intel.webrtc.base.RemoteStream;
 import com.intel.webrtc.base.WoogeenException;
 import com.intel.webrtc.p2p.PeerClient;
+import com.intel.webrtc.p2p.PublishOptions;
 
 import android.app.Activity;
 import android.os.SystemClock;
@@ -49,24 +50,23 @@ public class P2PActions extends Assert {
      * @param actorUserName The name of the peer client user to take an action.
      * @param serverIP P2P server IP.
      */
-    public static void connect(PeerClient actorUser, String actorUserName, String serverIP) {
+    public static void connect(PeerClient actorUser, String actorUserName, String serverIP,boolean expect) {
         String token = generateLoginToken(serverIP, actorUserName);
         CustomizedActionCallBack<String> stringCallBack = new CustomizedActionCallBack<String>();
         actorUser.connect(token, stringCallBack);
-        assertActionSucceeded(stringCallBack, actorUserName + " connect to server");
+        assertActionSucceeded(stringCallBack, actorUserName + " connect to server",expect);
         Log.d(TAG, actorUserName + " connect to server");
     }
-
     /**
      * ActorUser invite targetUser.
      * @param actorUser The peer client user to take a test action.
      * @param actorUserName The name of the peer client user to take an action.
      * @param targetUserName The name of the action target user.
      */
-    public static void invite(PeerClient actorUser, String actorUserName, String targetUserName) {
+    public static void invite(PeerClient actorUser, String actorUserName, String targetUserName,boolean expect) {
         CustomizedActionCallBack<Void> callBack = new CustomizedActionCallBack<Void>();
         actorUser.invite(targetUserName, callBack);
-        assertActionSucceeded(callBack, actorUserName + " invite " + targetUserName);
+        assertActionSucceeded(callBack, actorUserName + " invite " + targetUserName,expect);
         Log.d(TAG, actorUserName + " invite " + targetUserName);
     }
 
@@ -76,10 +76,10 @@ public class P2PActions extends Assert {
      * @param actorUserName The name of the peer client user to take an action.
      * @param targetUserName The name of the action target user.
      */
-    public static void accept(PeerClient actorUser, String actorUserName, String targetUserName) {
+    public static void accept(PeerClient actorUser, String actorUserName, String targetUserName,boolean expect) {
         CustomizedActionCallBack<Void> callBack = new CustomizedActionCallBack<Void>();
         actorUser.accept(targetUserName, callBack);
-        assertActionSucceeded(callBack, actorUserName + " accept " + targetUserName);
+        assertActionSucceeded(callBack, actorUserName + " accept " + targetUserName,expect);
         Log.d(TAG, actorUserName + " accept " + targetUserName);
     }
 
@@ -89,10 +89,10 @@ public class P2PActions extends Assert {
      * @param actorUserName The name of the peer client user to take an action.
      * @param targetUserName The name of the action target user.
      */
-    public static void deny(PeerClient actorUser, String actorUserName, String targetUserName) {
+    public static void deny(PeerClient actorUser, String actorUserName, String targetUserName,boolean expect) {
         CustomizedActionCallBack<Void> callBack = new CustomizedActionCallBack<Void>();
         actorUser.deny(targetUserName, callBack);
-        assertActionSucceeded(callBack, actorUserName + " deny " + targetUserName);
+        assertActionSucceeded(callBack, actorUserName + " deny " + targetUserName,expect);
         Log.d(TAG, actorUserName + " deny " + targetUserName);
     }
 
@@ -102,10 +102,10 @@ public class P2PActions extends Assert {
      * @param actorUserName The name of the peer client user to take an action.
      * @param targetUserName The name of the action target user.
      */
-    public static void stop(PeerClient actorUser, String actorUserName, String targetUserName) {
+    public static void stop(PeerClient actorUser, String actorUserName, String targetUserName,boolean expect) {
         CustomizedActionCallBack<Void> callBack = new CustomizedActionCallBack<Void>();
         actorUser.stop(targetUserName, callBack);
-        assertActionSucceeded(callBack, actorUserName + " stop chat to " + targetUserName);
+        assertActionSucceeded(callBack, actorUserName + " stop chat to " + targetUserName,expect);
         Log.d(TAG, actorUserName + " stop chat to " + targetUserName);
     }
 
@@ -152,13 +152,27 @@ public class P2PActions extends Assert {
      * @param actorLocalCameraStream Local stream of the test actor peer client.
      */
     public static void publish(PeerClient actorUser, String actorUserName, String targetUserName,
-            LocalCameraStream actorLocalCameraStream) {
+            LocalCameraStream actorLocalCameraStream,boolean expect) {
         CustomizedActionCallBack<Void> callBack = new CustomizedActionCallBack<Void>();
         actorUser.publish(actorLocalCameraStream, targetUserName, callBack);
-        assertActionSucceeded(callBack, actorUserName + " publish local camera stream to " + targetUserName);
+        assertActionSucceeded(callBack, actorUserName + " publish local camera stream to " + targetUserName,expect);
         Log.d(TAG, actorUserName + " publish local camera stream to " + targetUserName);
     }
-
+    /**
+     * ActorUser publish local camera stream to targetUser.
+     * @param actorUser The peer client user to take a test action.
+     * @param actorUserName The name of the peer client user to take an action.
+     * @param targetUserName The name of the action target user.
+     * @param actorLocalCameraStream Local stream of the test actor peer client.
+     * @param option Publish local stream of option.
+     */
+    public static void publish(PeerClient actorUser, String actorUserName, String targetUserName,
+            LocalCameraStream actorLocalCameraStream,PublishOptions option,boolean expect){
+        CustomizedActionCallBack<Void> callBack = new CustomizedActionCallBack<Void>();
+        actorUser.publish(actorLocalCameraStream, targetUserName,option,callBack);
+        assertActionSucceeded(callBack, actorUserName + " publish local camera stream to " + targetUserName,expect);
+        Log.d(TAG, actorUserName + " publish local camera stream to " + targetUserName);
+    }
     /**
      * ActorUser unpublish local camera stream to targetUser.
      * @param actorUser The peer client user to take a test action.
@@ -167,10 +181,10 @@ public class P2PActions extends Assert {
      * @param actorLocalCameraStream Local stream of the test actor peer client.
      */
     public static void unpublish(PeerClient actorUser, String actorUserName, String targetUserName,
-            LocalCameraStream actorLocalCameraStream) {
+            LocalCameraStream actorLocalCameraStream,boolean expect) {
         CustomizedActionCallBack<Void> callBack = new CustomizedActionCallBack<Void>();
         actorUser.unpublish(actorLocalCameraStream, targetUserName, callBack);
-        assertActionSucceeded(callBack, actorUserName + " unpublish local camera stream to " + targetUserName);
+        assertActionSucceeded(callBack, actorUserName + " unpublish local camera stream to " + targetUserName,expect);
         Log.d(TAG, actorUserName + " unpublish local camera stream to " + targetUserName);
     }
 
@@ -181,10 +195,10 @@ public class P2PActions extends Assert {
      * @param targetUserName The name of the action target user.
      * @param message The content to be sent.
      */
-    public static void send(PeerClient actorUser, String actorUserName, String targetUserName, String message) {
+    public static void send(PeerClient actorUser, String actorUserName, String targetUserName, String message,boolean expect) {
         CustomizedActionCallBack<Void> callBack = new CustomizedActionCallBack<Void>();
         actorUser.send(message, targetUserName, callBack);
-        assertActionSucceeded(callBack, actorUserName + " send message to " + targetUserName);
+        assertActionSucceeded(callBack, actorUserName + " send message to " + targetUserName,expect);
         Log.d(TAG, actorUserName + " send message to " + targetUserName);
     }
 
@@ -193,10 +207,10 @@ public class P2PActions extends Assert {
      * @param actorUser The peer client user to take a test action.
      * @param actorUserName The name of the peer client user to take an action.
      */
-    public static void disconnect(PeerClient actorUser, String actorUserName) {
+    public static void disconnect(PeerClient actorUser, String actorUserName,boolean expect) {
         CustomizedActionCallBack<Void> callBack = new CustomizedActionCallBack<Void>();
         actorUser.disconnect(callBack);
-        assertActionSucceeded(callBack, actorUserName + " disconnect");
+        assertActionSucceeded(callBack, actorUserName + " disconnect",expect);
         Log.d(TAG, actorUserName + " disconnect");
     }
 
@@ -456,17 +470,28 @@ public class P2PActions extends Assert {
         Log.d(TAG, "===========================================================");
     }
 
-    public static void assertActionSucceeded(CustomizedActionCallBack callBack, String actionName) {
-        // waiting for the action to finish
-        if (intervalWaitingMode) {
-            sleepWait("onSuccessCalled", callBack, 1);
+    public static void assertActionSucceeded(CustomizedActionCallBack callBack, String actionName,boolean expect) {
+        if(expect){
+            if (intervalWaitingMode) {
+                sleepWait("onSuccessCalled", callBack, 1);
+            } else {
+                SystemClock.sleep(waitingTime);
+            }
+            assertEquals("Action <" + ":" + actionName + "> failed!", 0, callBack.onFailureCalled);
+            assertTrue("OnSuccess hasn't been called!", callBack.onSuccessCalled > 0);
+            assertEquals("OnSuccess has been called more than once in action <" + actionName + ">", 1,
+                    callBack.onSuccessCalled);
         } else {
-            SystemClock.sleep(waitingTime);
+            if (intervalWaitingMode) {
+                sleepWait("onFailureCalled", callBack, 1);
+            } else {
+                SystemClock.sleep(waitingTime);
+            }
+            assertEquals("Action <" + ":" + actionName + "> failed!", 0, callBack.onSuccessCalled);
+            assertTrue("OnFailure hasn't been called!", callBack.onFailureCalled > 0);
+            assertEquals("OnFailure has been called more than once in action <" + actionName + ">", 1,
+                    callBack.onFailureCalled);
         }
-        assertEquals("Action <" + ":" + actionName + "> failed!", 0, callBack.onFailureCalled);
-        assertTrue("OnSuccess hasn't been called!", callBack.onSuccessCalled > 0);
-        assertEquals("OnSuccess has been called more than once in action <" + actionName + ">", 1,
-                callBack.onSuccessCalled);
     }
 
     public static void sleepWait(String fieldName, Object callbackObject, int expectNumber) {

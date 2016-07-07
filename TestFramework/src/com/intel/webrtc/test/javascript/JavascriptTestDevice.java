@@ -3,8 +3,11 @@ package com.intel.webrtc.test.javascript;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,7 +30,7 @@ public class JavascriptTestDevice extends Assert implements TestDevice {
     private String deviceName = "";
     // All the test methods scaned from the js test file, describe block which
     // starts with prefix 'test'
-    private HashSet<String> testMethods;
+    private TreeSet<String> testMethods;
     // Karma config file
     public String jsConfFile;
     // Physical device info, mainly stores the config infos
@@ -38,7 +41,14 @@ public class JavascriptTestDevice extends Assert implements TestDevice {
     public JavascriptTestDevice(String jsTestFile, String jsConfFile) throws IOException {
         this.jsConfFile = jsConfFile;
         this.deviceInfo = new JavascriptDeviceInfo(jsConfFile);
-        testMethods = new HashSet<String>();
+        testMethods = new TreeSet<String>(new Comparator<String>() {
+            @Override
+            public int compare(String s1, String s2) {
+                String name1=s1.substring(0,6);
+                String name2=s2.substring(0,6);
+                return name1.compareTo(name2);
+            }
+        });
         String deviceName;
         try {
             deviceName = scanJsTestCaseFile(jsTestFile);
@@ -62,7 +72,7 @@ public class JavascriptTestDevice extends Assert implements TestDevice {
         String deviceName = null;
         String suitePatStr = "\\s*describe\\(\\s*['\"]([^'\"]+)['\"]\\s*,\\s*function\\(.*";
         Pattern suitePat = Pattern.compile(suitePatStr);
-        String casePatStr = "\\s*it\\(\\s*['\"]([^'\"]+)['\"]\\s*,\\s*function\\(.*";
+        String casePatStr = "\\s*[^x]it\\(\\s*['\"]([^'\"]+)['\"]\\s*,\\s*function\\(.*";
         Pattern casePat = Pattern.compile(casePatStr);
         BufferedReader reader = new BufferedReader(new FileReader(jsfile));
         String line;
@@ -111,7 +121,7 @@ public class JavascriptTestDevice extends Assert implements TestDevice {
      */
     @Override
     public void addDeviceToSuite(TestSuite testSuite) {
-        Hashtable<String, TestCase> testCases = testSuite.getTestCases();
+        TreeMap<String, TestCase> testCases = testSuite.getTestCases();
         for (String method : testMethods) {
             if (testCases.containsKey(method)) {
                 // the method have already been added
@@ -123,7 +133,18 @@ public class JavascriptTestDevice extends Assert implements TestDevice {
             }
         }
     }
-
+    @Override
+    public void addDeviceToSuite(TestSuite testSuite,String caseName) {
+        TreeMap<String, TestCase> testCases = testSuite.getTestCases();
+        // If the TestCase already exists, add the device in.
+        if (testCases.containsKey(caseName)) {
+            testCases.get(caseName).addDevice(this);
+        } else {
+            TestCase newTestCase = new TestCase(caseName);
+            newTestCase.addDevice(this);
+            testCases.put(caseName, newTestCase);
+        }
+    }
     @Override
     public String toString() {
         String ret = "JSDevice:" + deviceName + "\nTest Methods:";
@@ -133,4 +154,6 @@ public class JavascriptTestDevice extends Assert implements TestDevice {
         ret += "\n";
         return ret;
     }
+
+
 }

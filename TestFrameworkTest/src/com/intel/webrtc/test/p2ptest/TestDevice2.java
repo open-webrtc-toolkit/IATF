@@ -20,7 +20,7 @@ public class TestDevice2 extends AndroidTestDevice {
     String TAG = "P2PTestDevice2";
     TestActivity act = null;
     private long waitingTime = 3000;
-    private String serverIP = "http://10.239.44.33:8095/";
+    private String serverIP = "http://10.239.44.74:8095/";
 
     /**
      * Test a normal interaction process between two users.
@@ -62,7 +62,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1Connect");
         act.setCurActionText("Action 2: User2Connect");
         P2PActions.afterWaitConnect();
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User2Connect");
         // Action 3:User1InviteUser2
@@ -71,7 +71,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1InviteUser2");
         act.setCurActionText("Action 4: User2AcceptUser1");
         P2PActions.afterWaitInvite(actorUserName, pcObserver, 1);
-        P2PActions.accept(actorUser, actorUserName, targetUserName);
+        P2PActions.accept(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterAccept(actorUserName, pcObserver, 1);
         notifyLock("User2AcceptUser1");
         // Action 5:User1CreateLocalStream
@@ -92,7 +92,7 @@ public class TestDevice2 extends AndroidTestDevice {
         P2PActions.afterWaitPublish(actorUserName, pcObserver, 1);
         List<RemoteStream> rslist = pcObserver.addedStream;
         act.attachRender2(rslist.get(0));
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User2PublishToUser1");
         Log.d(TAG, "OBSERVER:" + pcObserver);
@@ -103,9 +103,9 @@ public class TestDevice2 extends AndroidTestDevice {
         act.setCurActionText("Action 10: User2SendTwoMessagesToUser1");
         P2PActions.afterWaitSend(actorUserName, pcObserver, 2, 2);
         P2PActions.send(actorUser, actorUserName, targetUserName,
-                actorUserName + " send message1 to " + targetUserName);
+                actorUserName + " send message1 to " + targetUserName,true);
         P2PActions.send(actorUser, actorUserName, targetUserName,
-                actorUserName + " send message2 to " + targetUserName);
+                actorUserName + " send message2 to " + targetUserName,true);
         P2PActions.afterSend();
         notifyLock("User2SendTwoMessagesToUser1");
         // Action 11:User1UnpublishToUser2
@@ -114,7 +114,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1UnpublishToUser2");
         act.setCurActionText("Action 12: User2UnpublishToUser1");
         P2PActions.afterWaitUnpublish(actorUserName, pcObserver, 1);
-        P2PActions.unpublish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.unpublish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterUnpublish();
         notifyLock("User2UnpublishToUser1");
         // Action 13:User1StopChatWithUser2
@@ -123,7 +123,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1StopChatWithUser2");
         act.setCurActionText("Action 14:User2InviteUser1");
         P2PActions.afterWaitStop(actorUserName, pcObserver, 1);
-        P2PActions.invite(actorUser, actorUserName, targetUserName);
+        P2PActions.invite(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterInvite();
         notifyLock("User2InviteUser1");
         // Action 15:User1DenyUser2
@@ -132,7 +132,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1DenyUser2");
         act.setCurActionText("Action 16:User2Disconnect");
         P2PActions.afterWaitDeny(actorUserName, pcObserver, 1);
-        P2PActions.disconnect(actorUser, actorUserName);
+        P2PActions.disconnect(actorUser, actorUserName,true);
         P2PActions.afterDisconnect(actorUserName, pcObserver, 1);
         notifyLock("User2Disconnect");
         // Action 17:User1Disconnect
@@ -176,7 +176,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1Connect");
         act.setCurActionText("Action 2: User2Connect");
         P2PActions.afterWaitConnect();
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User2Connect");
         // Action 3:User1InviteUser2
@@ -185,7 +185,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1InviteUser2");
         act.setCurActionText("Action 4: User2AcceptUser1");
         P2PActions.afterWaitInvite(actorUserName, pcObserver, 1);
-        P2PActions.accept(actorUser, actorUserName, targetUserName);
+        P2PActions.accept(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterAccept(actorUserName, pcObserver, 1);
         notifyLock("User2AcceptUser1");
         // Action 5:User1CreateLocalStream
@@ -206,7 +206,7 @@ public class TestDevice2 extends AndroidTestDevice {
         P2PActions.afterWaitPublish(actorUserName, pcObserver, 1);
         List<RemoteStream> rslist = pcObserver.addedStream;
         act.attachRender2(rslist.get(0));
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
 
         P2PActions.endStory();
@@ -247,7 +247,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1Connect");
         act.setCurActionText("Action 2: User2Connect");
         P2PActions.afterWaitConnect();
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User2Connect");
         // Action 3:User1InviteUser2
@@ -256,7 +256,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1InviteUser2");
         act.setCurActionText("Action 4: User2AcceptUser1");
         P2PActions.afterWaitInvite(actorUserName, pcObserver, 1);
-        P2PActions.accept(actorUser, actorUserName, targetUserName);
+        P2PActions.accept(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterAccept(actorUserName, pcObserver, 1);
         notifyLock("User2AcceptUser1");
         // Action 5:User1CreateVideoOnlyLocalStream
@@ -277,7 +277,7 @@ public class TestDevice2 extends AndroidTestDevice {
         P2PActions.afterWaitPublish(actorUserName, pcObserver, 1);
         List<RemoteStream> rslist = pcObserver.addedStream;
         act.attachRender2(rslist.get(0));
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
 
         P2PActions.endStory();
@@ -318,7 +318,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1Connect");
         act.setCurActionText("Action 2: User2Connect");
         P2PActions.afterWaitConnect();
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User2Connect");
         // Action 3:User1InviteUser2
@@ -327,7 +327,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1InviteUser2");
         act.setCurActionText("Action 4: User2AcceptUser1");
         P2PActions.afterWaitInvite(actorUserName, pcObserver, 1);
-        P2PActions.accept(actorUser, actorUserName, targetUserName);
+        P2PActions.accept(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterAccept(actorUserName, pcObserver, 1);
         notifyLock("User2AcceptUser1");
         // Action 5:User1CreateAudioOnlyLocalStream
@@ -348,7 +348,7 @@ public class TestDevice2 extends AndroidTestDevice {
         P2PActions.afterWaitPublish(actorUserName, pcObserver, 1);
         List<RemoteStream> rslist = pcObserver.addedStream;
         act.attachRender2(rslist.get(0));
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
 
         P2PActions.endStory();
@@ -389,7 +389,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1Connect");
         act.setCurActionText("Action 2: User2Connect");
         P2PActions.afterWaitConnect();
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User2Connect");
         // Action 3:User1InviteUser2
@@ -398,7 +398,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1InviteUser2");
         act.setCurActionText("Action 4: User2AcceptUser1");
         P2PActions.afterWaitInvite(actorUserName, pcObserver, 1);
-        P2PActions.accept(actorUser, actorUserName, targetUserName);
+        P2PActions.accept(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterAccept(actorUserName, pcObserver, 1);
         notifyLock("User2AcceptUser1");
         // Action 5:User1CreateLocalStream
@@ -419,7 +419,7 @@ public class TestDevice2 extends AndroidTestDevice {
         P2PActions.afterWaitPublish(actorUserName, pcObserver, 1);
         List<RemoteStream> rslist = pcObserver.addedStream;
         act.attachRender2(rslist.get(0));
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
 
         P2PActions.endStory();
@@ -460,7 +460,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1Connect");
         act.setCurActionText("Action 2: User2Connect");
         P2PActions.afterWaitConnect();
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User2Connect");
         // Action 3:User1InviteUser2
@@ -469,7 +469,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1InviteUser2");
         act.setCurActionText("Action 4: User2AcceptUser1");
         P2PActions.afterWaitInvite(actorUserName, pcObserver, 1);
-        P2PActions.accept(actorUser, actorUserName, targetUserName);
+        P2PActions.accept(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterAccept(actorUserName, pcObserver, 1);
         notifyLock("User2AcceptUser1");
         // Action 5:User1CreateLocalStream
@@ -490,7 +490,7 @@ public class TestDevice2 extends AndroidTestDevice {
         P2PActions.afterWaitPublish(actorUserName, pcObserver, 1);
         List<RemoteStream> rslist = pcObserver.addedStream;
         act.attachRender2(rslist.get(0));
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
 
         P2PActions.endStory();
@@ -531,7 +531,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1Connect");
         act.setCurActionText("Action 2: User2Connect");
         P2PActions.afterWaitConnect();
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User2Connect");
         // Action 3:User1InviteUser2
@@ -540,7 +540,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1InviteUser2");
         act.setCurActionText("Action 4: User2AcceptUser1");
         P2PActions.afterWaitInvite(actorUserName, pcObserver, 1);
-        P2PActions.accept(actorUser, actorUserName, targetUserName);
+        P2PActions.accept(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterAccept(actorUserName, pcObserver, 1);
         notifyLock("User2AcceptUser1");
         // Action 5:User1CreatevideoOnlyLocalStream
@@ -561,7 +561,7 @@ public class TestDevice2 extends AndroidTestDevice {
         P2PActions.afterWaitPublish(actorUserName, pcObserver, 1);
         List<RemoteStream> rslist = pcObserver.addedStream;
         act.attachRender2(rslist.get(0));
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
 
         P2PActions.endStory();
@@ -601,7 +601,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1Connect");
         act.setCurActionText("Action 2: User2Connect");
         P2PActions.afterWaitConnect();
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User2Connect");
         // Action 3:User1InviteUser2
@@ -610,7 +610,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1InviteUser2");
         act.setCurActionText("Action 4: User2AcceptUser1");
         P2PActions.afterWaitInvite(actorUserName, pcObserver, 1);
-        P2PActions.accept(actorUser, actorUserName, targetUserName);
+        P2PActions.accept(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterAccept(actorUserName, pcObserver, 1);
         notifyLock("User2AcceptUser1");
         // Action 5:User1CreateLocalStream
@@ -631,7 +631,7 @@ public class TestDevice2 extends AndroidTestDevice {
         P2PActions.afterWaitPublish(actorUserName, pcObserver, 1);
         List<RemoteStream> rslist = pcObserver.addedStream;
         act.attachRender2(rslist.get(0));
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User2PublishToUser1");
         // Action 9:User1UnpublishToUser2
@@ -640,7 +640,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1UnpublishToUser2");
         act.setCurActionText("Action 10: User2UnpublishToUser1");
         P2PActions.afterWaitUnpublish(actorUserName, pcObserver, 1);
-        P2PActions.unpublish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.unpublish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterUnpublish();
         P2PActions.endStory();
         act.makeToast("Test End!");
@@ -679,7 +679,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1Connect");
         act.setCurActionText("Action 2: User2Connect");
         P2PActions.afterWaitConnect();
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User2Connect");
         // Action 3:User1InviteUser2
@@ -688,7 +688,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1InviteUser2");
         act.setCurActionText("Action 4: User2AcceptUser1");
         P2PActions.afterWaitInvite(actorUserName, pcObserver, 1);
-        P2PActions.accept(actorUser, actorUserName, targetUserName);
+        P2PActions.accept(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterAccept(actorUserName, pcObserver, 1);
         notifyLock("User2AcceptUser1");
         // Action 5:User1CreateLocalStream
@@ -709,7 +709,7 @@ public class TestDevice2 extends AndroidTestDevice {
         P2PActions.afterWaitPublish(actorUserName, pcObserver, 1);
         List<RemoteStream> rslist = pcObserver.addedStream;
         act.attachRender2(rslist.get(0));
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User2PublishToUser1");
         Log.d(TAG, "OBSERVER:" + pcObserver);
@@ -720,9 +720,9 @@ public class TestDevice2 extends AndroidTestDevice {
         act.setCurActionText("Action 10: User2SendTwoMessagesToUser1");
         P2PActions.afterWaitSend(actorUserName, pcObserver, 2, 2);
         P2PActions.send(actorUser, actorUserName, targetUserName,
-                actorUserName + " send message1 to " + targetUserName);
+                actorUserName + " send message1 to " + targetUserName,true);
         P2PActions.send(actorUser, actorUserName, targetUserName,
-                actorUserName + " send message2 to " + targetUserName);
+                actorUserName + " send message2 to " + targetUserName,true);
         P2PActions.afterSend();
         P2PActions.endStory();
         act.makeToast("Test End!");
@@ -763,7 +763,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1Connect");
         act.setCurActionText("Action 2: User2Connect");
         P2PActions.afterWaitConnect();
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User2Connect");
         // Action 3:User1InviteUser2
@@ -772,7 +772,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1InviteUser2");
         act.setCurActionText("Action 4: User2AcceptUser1");
         P2PActions.afterWaitInvite(actorUserName, pcObserver, 1);
-        P2PActions.accept(actorUser, actorUserName, targetUserName);
+        P2PActions.accept(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterAccept(actorUserName, pcObserver, 1);
         notifyLock("User2AcceptUser1");
         // Action 5:User1CreateLocalStream
@@ -793,7 +793,7 @@ public class TestDevice2 extends AndroidTestDevice {
         P2PActions.afterWaitPublish(actorUserName, pcObserver, 1);
         List<RemoteStream> rslist = pcObserver.addedStream;
         act.attachRender2(rslist.get(0));
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User2PublishToUser1");
         // Action 9:User1UnpublishToUser2
@@ -802,7 +802,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1UnpublishToUser2");
         act.setCurActionText("Action 10: User2UnpublishToUser1");
         P2PActions.afterWaitUnpublish(actorUserName, pcObserver, 1);
-        P2PActions.unpublish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.unpublish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterUnpublish();
         notifyLock("User2UnpublishToUser1");
         // Action 11:User1SendTwoMessagesToUser2
@@ -812,9 +812,9 @@ public class TestDevice2 extends AndroidTestDevice {
         act.setCurActionText("Action 12: User2SendTwoMessagesToUser1");
         P2PActions.afterWaitSend(actorUserName, pcObserver, 2, 2);
         P2PActions.send(actorUser, actorUserName, targetUserName,
-                actorUserName + " send message1 to " + targetUserName);
+                actorUserName + " send message1 to " + targetUserName,true);
         P2PActions.send(actorUser, actorUserName, targetUserName,
-                actorUserName + " send message2 to " + targetUserName);
+                actorUserName + " send message2 to " + targetUserName,true);
         P2PActions.afterSend();
         P2PActions.endStory();
         act.makeToast("Test End!");
@@ -857,7 +857,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1Connect");
         act.setCurActionText("Action 2: User2Connect");
         P2PActions.afterWaitConnect();
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User2Connect");
         // Action 3:User1InviteUser2
@@ -866,7 +866,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1InviteUser2");
         act.setCurActionText("Action 4: User2AcceptUser1");
         P2PActions.afterWaitInvite(actorUserName, pcObserver, 1);
-        P2PActions.accept(actorUser, actorUserName, targetUserName);
+        P2PActions.accept(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterAccept(actorUserName, pcObserver, 1);
         notifyLock("User2AcceptUser1");
         // Action 5:User1CreateLocalStream
@@ -887,7 +887,7 @@ public class TestDevice2 extends AndroidTestDevice {
         P2PActions.afterWaitPublish(actorUserName, pcObserver, 1);
         List<RemoteStream> rslist = pcObserver.addedStream;
         act.attachRender2(rslist.get(0));
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User2PublishToUser1");
         // Action 9:User1CloseLocalStream
@@ -915,7 +915,7 @@ public class TestDevice2 extends AndroidTestDevice {
         P2PActions.afterWaitPublish(actorUserName, pcObserver, 2);
         rslist = pcObserver.addedStream;
         act.attachRender2(rslist.get(1));
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User2RepublishToUser1");
         P2PActions.endStory();
@@ -957,7 +957,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1Connect");
         act.setCurActionText("Action 2: User2Connect");
         P2PActions.afterWaitConnect();
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User2Connect");
         // Action 3:User1InviteUser2
@@ -966,7 +966,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1InviteUser2");
         act.setCurActionText("Action 4: User2AcceptUser1");
         P2PActions.afterWaitInvite(actorUserName, pcObserver, 1);
-        P2PActions.accept(actorUser, actorUserName, targetUserName);
+        P2PActions.accept(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterAccept(actorUserName, pcObserver, 1);
         notifyLock("User2AcceptUser1");
         // Action 5:User1CreateLocalStream
@@ -987,7 +987,7 @@ public class TestDevice2 extends AndroidTestDevice {
         P2PActions.afterWaitPublish(actorUserName, pcObserver, 1);
         List<RemoteStream> rslist = pcObserver.addedStream;
         act.attachRender2(rslist.get(0));
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User2PublishToUser1");
         // Action 9:User1CloseLocalStream
@@ -1004,9 +1004,9 @@ public class TestDevice2 extends AndroidTestDevice {
         act.setCurActionText("Action 10: User2SendTwoMessagesToUser1");
         P2PActions.afterWaitSend(actorUserName, pcObserver, 2, 2);
         P2PActions.send(actorUser, actorUserName, targetUserName,
-                actorUserName + " send message1 to " + targetUserName);
+                actorUserName + " send message1 to " + targetUserName,true);
         P2PActions.send(actorUser, actorUserName, targetUserName,
-                actorUserName + " send message2 to " + targetUserName);
+                actorUserName + " send message2 to " + targetUserName,true);
         notifyLock("User2SendTwoMessagesToUser1");
         SystemClock.sleep(waitingTime);
         P2PActions.endStory();
@@ -1049,7 +1049,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1Connect");
         act.setCurActionText("Action 2: User2Connect");
         P2PActions.afterWaitConnect();
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User2Connect");
         // Action 3:User1InviteUser2
@@ -1058,7 +1058,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1InviteUser2");
         act.setCurActionText("Action 4: User2AcceptUser1");
         P2PActions.afterWaitInvite(actorUserName, pcObserver, 1);
-        P2PActions.accept(actorUser, actorUserName, targetUserName);
+        P2PActions.accept(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterAccept(actorUserName, pcObserver, 1);
         notifyLock("User2AcceptUser1");
         // Action 5:User1CreateLocalStream
@@ -1079,7 +1079,7 @@ public class TestDevice2 extends AndroidTestDevice {
         P2PActions.afterWaitPublish(actorUserName, pcObserver, 1);
         List<RemoteStream> rslist = pcObserver.addedStream;
         act.attachRender2(rslist.get(0));
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User2PublishToUser1");
         // Action 9:User1StopChatWithUser2
@@ -1088,7 +1088,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1StopChatWithUser2");
         act.setCurActionText("Action 10:User2InviteUser1");
         P2PActions.afterWaitStop(actorUserName, pcObserver, 1);
-        P2PActions.invite(actorUser, actorUserName, targetUserName);
+        P2PActions.invite(actorUser, actorUserName, targetUserName,true);
         notifyLock("User2InviteUser1");
         // Action 11:User1AcceptUser2
         act.setCurActionText("Action 11:User1AcceptUser2");
@@ -1096,7 +1096,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1AcceptUser2");
         act.setCurActionText("Action 12:User2PublishToUser1");
         P2PActions.afterWaitAccept(actorUserName, pcObserver, 1, 2);
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         notifyLock("User2PublishToUser1");
         // Action 13:User1PublishToUser2
         act.setCurActionText("Action 13:User1PublishToUser2");
@@ -1145,7 +1145,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1Connect");
         act.setCurActionText("Action 2: User2Connect");
         P2PActions.afterWaitConnect();
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User2Connect");
         // Action 3:User1InviteUser2
@@ -1154,7 +1154,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1InviteUser2");
         act.setCurActionText("Action 4: User2AcceptUser1");
         P2PActions.afterWaitInvite(actorUserName, pcObserver, 1);
-        P2PActions.accept(actorUser, actorUserName, targetUserName);
+        P2PActions.accept(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterAccept(actorUserName, pcObserver, 1);
         notifyLock("User2AcceptUser1");
         // Action 5:User1CreateLocalStream
@@ -1175,7 +1175,7 @@ public class TestDevice2 extends AndroidTestDevice {
         P2PActions.afterWaitPublish(actorUserName, pcObserver, 1);
         List<RemoteStream> rslist = pcObserver.addedStream;
         act.attachRender2(rslist.get(0));
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User2PublishToUser1");
         // Action 9:User1Disconnect
@@ -1191,7 +1191,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1LoginAndInviteUser2");
         act.setCurActionText("Action 12:User2AcceptUser1");
         P2PActions.afterWaitInvite(actorUserName, pcObserver, 2);
-        P2PActions.accept(actorUser, actorUserName, targetUserName);
+        P2PActions.accept(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterAccept(actorUserName, pcObserver, 2);
         notifyLock("User2AcceptUser1");
         // Action 13:User1PublishToUser2
@@ -1201,7 +1201,7 @@ public class TestDevice2 extends AndroidTestDevice {
         rslist = pcObserver.addedStream;
         act.attachRender2(rslist.get(1));
         P2PActions.afterWaitPublish(actorUserName, pcObserver, 2);
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         notifyLock("User2PublishToUser1");
         SystemClock.sleep(waitingTime);
         P2PActions.endStory();
@@ -1247,7 +1247,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1Connect");
         act.setCurActionText("Action 2: User2Connect");
         P2PActions.afterWaitConnect();
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User2Connect");
         // Action 3:User1InviteUser2
@@ -1256,7 +1256,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1InviteUser2");
         act.setCurActionText("Action 4: User2AcceptUser1");
         P2PActions.afterWaitInvite(actorUserName, pcObserver, 1);
-        P2PActions.accept(actorUser, actorUserName, targetUserName);
+        P2PActions.accept(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterAccept(actorUserName, pcObserver, 1);
         notifyLock("User2AcceptUser1");
         // Action 5:User1CreateLocalStream
@@ -1277,7 +1277,7 @@ public class TestDevice2 extends AndroidTestDevice {
         P2PActions.afterWaitPublish(actorUserName, pcObserver, 1);
         List<RemoteStream> rslist = pcObserver.addedStream;
         act.attachRender2(rslist.get(0));
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User2PublishToUser1");
         // Action 9: User1CheckStreamAdded
@@ -1285,14 +1285,14 @@ public class TestDevice2 extends AndroidTestDevice {
         // Action 10: User2Disconnect
         waitLock("User1CheckStreamAdded");
         act.setCurActionText("Action 10: User2Disconnect");
-        P2PActions.disconnect(actorUser, actorUserName);
+        P2PActions.disconnect(actorUser, actorUserName,true);
         P2PActions.afterDisconnect(actorUserName, pcObserver, 1);
         notifyLock("User2Disconnect");
         // Action 11: User1CheckChatStopped
         act.setCurActionText("Action 11: User1CheckChatStopped");
         // Action 12:User2Connect
         waitLock("User1CheckChatStopped");
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         notifyLock("User2Connect");
         // Action 13:User1InviteUser2
         act.setCurActionText("Action 13:User1InviteUser2");
@@ -1300,7 +1300,7 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1InviteUser2");
         act.setCurActionText("Action 14: User2AcceptUser1");
         P2PActions.afterWaitInvite(actorUserName, pcObserver, 2);
-        P2PActions.accept(actorUser, actorUserName, targetUserName);
+        P2PActions.accept(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterAccept(actorUserName, pcObserver, 2);
         notifyLock("User2AcceptUser1");
         // Action 15: User1PublishToUser2
@@ -1311,7 +1311,7 @@ public class TestDevice2 extends AndroidTestDevice {
         P2PActions.afterWaitPublish(actorUserName, pcObserver, 2);
         rslist = pcObserver.addedStream;
         act.attachRender2(rslist.get(1));
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         notifyLock("User2PublishToUser1");
         SystemClock.sleep(waitingTime);
         P2PActions.endStory();
@@ -1365,7 +1365,7 @@ public class TestDevice2 extends AndroidTestDevice {
         // Action 1. User1ConnectAndCreateLocalStream
         // Action 2. User2ConnectAndCreateLocalStream
         waitLock("User1ConnectAndCreateLocalStream");
-        P2PActions.connect(actorUser2, actorUser2Name, serverIP);
+        P2PActions.connect(actorUser2, actorUser2Name, serverIP,true);
         LocalCameraStream lcs = P2PActions.createLocalCameraStream(actorUser2Name, true, true);
         act.attachRender1(lcs);
         notifyLock("User2ConnectAndCreateLocalStream");
@@ -1374,14 +1374,14 @@ public class TestDevice2 extends AndroidTestDevice {
         // Action 5. User2AcceptUser1
         waitLock("User1InviteUser2");
         P2PActions.afterWaitInvite(actorUser2Name, pcObserver, 1);
-        P2PActions.accept(actorUser2, actorUser2Name, targetUser1Name);
+        P2PActions.accept(actorUser2, actorUser2Name, targetUser1Name,true);
         P2PActions.afterAccept(actorUser2Name, pcObserver, 1);
         notifyLock("User2AcceptUser1");
         // Action 6. User3InviteUser1
         // Action 7. User1AcceptUser3
         // Action 8. User2InivteUser3
         waitLock("User1AcceptUser3");
-        P2PActions.invite(actorUser2, actorUser2Name, targetUser3Name);
+        P2PActions.invite(actorUser2, actorUser2Name, targetUser3Name,true);
         notifyLock("User2InivteUser3");
         // Action 9. User3AcceptUser2
         // Action 10. User1PublishToUser2AndUser3
@@ -1391,8 +1391,8 @@ public class TestDevice2 extends AndroidTestDevice {
         P2PActions.afterWaitPublish(actorUser2Name, pcObserver, 1);
         List<RemoteStream> rslist = pcObserver.addedStream;
         act.attachRender2(rslist.get(rslist.size() - 1));
-        P2PActions.publish(actorUser2, actorUser2Name, targetUser1Name, lcs);
-        P2PActions.publish(actorUser2, actorUser2Name, targetUser3Name, lcs);
+        P2PActions.publish(actorUser2, actorUser2Name, targetUser1Name, lcs,true);
+        P2PActions.publish(actorUser2, actorUser2Name, targetUser3Name, lcs,true);
         notifyLock("User2PublishToUser1AndUser3");
         // Action 12. User3PublishToUser1AndUser2
         // Action 13. User1SendMessageToUser2AndUser3
@@ -1401,8 +1401,8 @@ public class TestDevice2 extends AndroidTestDevice {
         P2PActions.afterWaitPublish(actorUser2Name, pcObserver, 2);
         act.attachRender3(rslist.get(rslist.size() - 1));
         P2PActions.afterWaitSend(actorUser2Name, pcObserver, 1, 1);
-        P2PActions.send(actorUser2, actorUser2Name, targetUser1Name, "Message:User2ToUser1");
-        P2PActions.send(actorUser2, actorUser2Name, targetUser3Name, "Message:User2ToUser3");
+        P2PActions.send(actorUser2, actorUser2Name, targetUser1Name, "Message:User2ToUser1",true);
+        P2PActions.send(actorUser2, actorUser2Name, targetUser3Name, "Message:User2ToUser3",true);
         notifyLock("User2SendMessageToUser1AndUser3");
         // Action 15. User3SendMessageToUser1AndUser2
         // Action 16. User1UnpublishToUser2AndUser3
@@ -1410,8 +1410,8 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1UnpublishToUser2AndUser3");
         P2PActions.afterWaitSend(actorUser2Name, pcObserver, 2, 2);
         P2PActions.afterWaitUnpublish(actorUser2Name, pcObserver, 1);
-        P2PActions.unpublish(actorUser2, actorUser2Name, targetUser1Name, lcs);
-        P2PActions.unpublish(actorUser2, actorUser2Name, targetUser3Name, lcs);
+        P2PActions.unpublish(actorUser2, actorUser2Name, targetUser1Name, lcs,true);
+        P2PActions.unpublish(actorUser2, actorUser2Name, targetUser3Name, lcs,true);
         notifyLock("User2UnpublishToUser1AndUser3");
         // Action 18. User3UnpublishToUser1AndUser2
         // Action 19. User1StopChatWithUser2
@@ -1419,14 +1419,14 @@ public class TestDevice2 extends AndroidTestDevice {
         waitLock("User1StopChatWithUser2");
         P2PActions.afterWaitUnpublish(actorUser2Name, pcObserver, 2);
         P2PActions.afterWaitStop(actorUser2Name, pcObserver, 1);
-        P2PActions.stop(actorUser2, actorUser2Name, targetUser3Name);
+        P2PActions.stop(actorUser2, actorUser2Name, targetUser3Name,true);
         P2PActions.afterStop(actorUser2Name, pcObserver, 2);
         notifyLock("User2StopChatWithUser3");
         // Action 21. User3StopChatWithUser1
         // Action 22. User1Disconnect
         // Action 23. User2Disconnect
         waitLock("User1Disconnect");
-        P2PActions.disconnect(actorUser2, actorUser2Name);
+        P2PActions.disconnect(actorUser2, actorUser2Name,true);
         notifyLock("User2Disconnect");
         // sleep to make sure the notify message is sent out
         SystemClock.sleep(waitingTime);

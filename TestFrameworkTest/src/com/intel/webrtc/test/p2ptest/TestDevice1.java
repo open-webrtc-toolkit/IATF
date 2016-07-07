@@ -20,7 +20,7 @@ public class TestDevice1 extends AndroidTestDevice {
     String TAG = "P2PTestDevice1";
     TestActivity act = null;
     private long waitingTime = 3000;
-    private String serverIP = "http://10.239.44.33:8095/";
+    private String serverIP = "http://10.239.44.74:8095/";
 
     /**
      * Test a normal interaction process between two users.
@@ -62,7 +62,7 @@ public class TestDevice1 extends AndroidTestDevice {
 
         // Action 1: User1Connect
         act.setCurActionText("Action 1: User1Connect");
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User1Connect");
         // Action 2: User2Connect
@@ -71,7 +71,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2Connect");
         act.setCurActionText("Action 3: User1InviteUser2");
         P2PActions.afterWaitConnect();
-        P2PActions.invite(actorUser, actorUserName, targetUserName);
+        P2PActions.invite(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterInvite();
         notifyLock("User1InviteUser2");
         // Action 4: User2AcceptUser1
@@ -90,7 +90,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2CreateLocalStream");
         act.setCurActionText("Action 7: User1PublishToUser2");
         P2PActions.afterWaitCreateLocalCameraStream();
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User1PublishToUser2");
         // Action 8: User2PublishToUser1
@@ -103,9 +103,9 @@ public class TestDevice1 extends AndroidTestDevice {
         List<RemoteStream> rslist = pcObserver.addedStream;
         act.attachRender2(rslist.get(0));
         P2PActions.send(actorUser, actorUserName, targetUserName,
-                actorUserName + " send message1 to " + targetUserName);
+                actorUserName + " send message1 to " + targetUserName,true);
         P2PActions.send(actorUser, actorUserName, targetUserName,
-                actorUserName + " send message2 to " + targetUserName);
+                actorUserName + " send message2 to " + targetUserName,true);
         P2PActions.afterSend();
         notifyLock("User1SendTwoMessagesToUser2");
         // Action 10: User2SendTwoMessagesToUser1
@@ -114,7 +114,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2SendTwoMessagesToUser1");
         act.setCurActionText("Action 11: User1UnpublishToUser2");
         P2PActions.afterWaitSend(actorUserName, pcObserver, 2, 2);
-        P2PActions.unpublish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.unpublish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterUnpublish();
         notifyLock("User1UnpublishToUser2");
         // Action 12: User2UnpublishToUser1
@@ -123,7 +123,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2UnpublishToUser1");
         act.setCurActionText("Action 13: User1StopChatWithUser2");
         P2PActions.afterWaitUnpublish(actorUserName, pcObserver, 1);
-        P2PActions.stop(actorUser, actorUserName, targetUserName);
+        P2PActions.stop(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterStop(actorUserName, pcObserver, 1);
         notifyLock("User1StopChatWithUser2");
         // Action 14:User2InviteUser1
@@ -132,7 +132,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2InviteUser1");
         act.setCurActionText("Action 15:User1DenyUser2");
         P2PActions.afterWaitInvite(actorUserName, pcObserver, 1);
-        P2PActions.deny(actorUser, actorUserName, targetUserName);
+        P2PActions.deny(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterDeny();
         notifyLock("User1DenyUser2");
         // Action 16:User2Disconnect
@@ -141,7 +141,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2Disconnect");
         act.setCurActionText("Action 17:User1Disconnect");
         P2PActions.afterWaitDisconnect();
-        P2PActions.disconnect(actorUser, actorUserName);
+        P2PActions.disconnect(actorUser, actorUserName,true);
         P2PActions.afterDisconnect(actorUserName, pcObserver, 1);
 
         P2PActions.endStory();
@@ -179,7 +179,7 @@ public class TestDevice1 extends AndroidTestDevice {
 
         // Action 1: User1Connect
         act.setCurActionText("Action 1: User1Connect");
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User1Connect");
         // Action 2: User2Connect
@@ -188,7 +188,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2Connect");
         act.setCurActionText("Action 3: User1InviteUser2");
         P2PActions.afterWaitConnect();
-        P2PActions.invite(actorUser, actorUserName, targetUserName);
+        P2PActions.invite(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterInvite();
         notifyLock("User1InviteUser2");
         // Action 4: User2AcceptUser1
@@ -207,7 +207,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2CreateLocalStream");
         act.setCurActionText("Action 7: User1PublishToUser2");
         P2PActions.afterWaitCreateLocalCameraStream();
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User1PublishToUser2");
         // Action 8: User2PublishToUser1
@@ -249,7 +249,7 @@ public class TestDevice1 extends AndroidTestDevice {
 
         // Action 1: User1Connect
         act.setCurActionText("Action 1: User1Connect");
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User1Connect");
         // Action 2: User2Connect
@@ -258,7 +258,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2Connect");
         act.setCurActionText("Action 3: User1InviteUser2");
         P2PActions.afterWaitConnect();
-        P2PActions.invite(actorUser, actorUserName, targetUserName);
+        P2PActions.invite(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterInvite();
         notifyLock("User1InviteUser2");
         // Action 4: User2AcceptUser1
@@ -277,7 +277,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2CreateVideoOnlyLocalStream");
         act.setCurActionText("Action 7: User1PublishToUser2");
         P2PActions.afterWaitCreateLocalCameraStream();
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User1PublishToUser2");
         // Action 8: User2PublishToUser1
@@ -319,7 +319,7 @@ public class TestDevice1 extends AndroidTestDevice {
 
         // Action 1: User1Connect
         act.setCurActionText("Action 1: User1Connect");
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User1Connect");
         // Action 2: User2Connect
@@ -328,7 +328,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2Connect");
         act.setCurActionText("Action 3: User1InviteUser2");
         P2PActions.afterWaitConnect();
-        P2PActions.invite(actorUser, actorUserName, targetUserName);
+        P2PActions.invite(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterInvite();
         notifyLock("User1InviteUser2");
         // Action 4: User2AcceptUser1
@@ -347,7 +347,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2CreateAudioOnlyLocalStream");
         act.setCurActionText("Action 7: User1PublishToUser2");
         P2PActions.afterWaitCreateLocalCameraStream();
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User1PublishToUser2");
         // Action 8: User2PublishToUser1
@@ -389,7 +389,7 @@ public class TestDevice1 extends AndroidTestDevice {
 
         // Action 1: User1Connect
         act.setCurActionText("Action 1: User1Connect");
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User1Connect");
         // Action 2: User2Connect
@@ -398,7 +398,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2Connect");
         act.setCurActionText("Action 3: User1InviteUser2");
         P2PActions.afterWaitConnect();
-        P2PActions.invite(actorUser, actorUserName, targetUserName);
+        P2PActions.invite(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterInvite();
         notifyLock("User1InviteUser2");
         // Action 4: User2AcceptUser1
@@ -417,7 +417,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2CreatevideoOnlyLocalStream");
         act.setCurActionText("Action 7: User1PublishToUser2");
         P2PActions.afterWaitCreateLocalCameraStream();
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User1PublishToUser2");
         // Action 8: User2PublishToUser1
@@ -459,7 +459,7 @@ public class TestDevice1 extends AndroidTestDevice {
 
         // Action 1: User1Connect
         act.setCurActionText("Action 1: User1Connect");
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User1Connect");
         // Action 2: User2Connect
@@ -468,7 +468,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2Connect");
         act.setCurActionText("Action 3: User1InviteUser2");
         P2PActions.afterWaitConnect();
-        P2PActions.invite(actorUser, actorUserName, targetUserName);
+        P2PActions.invite(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterInvite();
         notifyLock("User1InviteUser2");
         // Action 4: User2AcceptUser1
@@ -487,7 +487,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2CreateAudioOnlyLocalStream");
         act.setCurActionText("Action 7: User1PublishToUser2");
         P2PActions.afterWaitCreateLocalCameraStream();
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User1PublishToUser2");
         // Action 8: User2PublishToUser1
@@ -529,7 +529,7 @@ public class TestDevice1 extends AndroidTestDevice {
 
         // Action 1: User1Connect
         act.setCurActionText("Action 1: User1Connect");
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User1Connect");
         // Action 2: User2Connect
@@ -538,7 +538,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2Connect");
         act.setCurActionText("Action 3: User1InviteUser2");
         P2PActions.afterWaitConnect();
-        P2PActions.invite(actorUser, actorUserName, targetUserName);
+        P2PActions.invite(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterInvite();
         notifyLock("User1InviteUser2");
         // Action 4: User2AcceptUser1
@@ -557,7 +557,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2CreateAudioOnlyLocalStream");
         act.setCurActionText("Action 7: User1PublishToUser2");
         P2PActions.afterWaitCreateLocalCameraStream();
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User1PublishToUser2");
         // Action 8: User2PublishToUser1
@@ -601,7 +601,7 @@ public class TestDevice1 extends AndroidTestDevice {
 
         // Action 1: User1Connect
         act.setCurActionText("Action 1: User1Connect");
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User1Connect");
         // Action 2: User2Connect
@@ -610,7 +610,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2Connect");
         act.setCurActionText("Action 3: User1InviteUser2");
         P2PActions.afterWaitConnect();
-        P2PActions.invite(actorUser, actorUserName, targetUserName);
+        P2PActions.invite(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterInvite();
         notifyLock("User1InviteUser2");
         // Action 4: User2AcceptUser1
@@ -629,7 +629,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2CreateLocalStream");
         act.setCurActionText("Action 7: User1PublishToUser2");
         P2PActions.afterWaitCreateLocalCameraStream();
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User1PublishToUser2");
         // Action 8: User2PublishToUser1
@@ -638,7 +638,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2PublishToUser1");
         act.setCurActionText("Action 9: User1UnpublishToUser2");
         P2PActions.afterWaitPublish(actorUserName, pcObserver, 1);
-        P2PActions.unpublish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.unpublish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterUnpublish();
         notifyLock("User1UnpublishToUser2");
         // Action 10: User2UnpublishToUser1
@@ -682,7 +682,7 @@ public class TestDevice1 extends AndroidTestDevice {
 
         // Action 1: User1Connect
         act.setCurActionText("Action 1: User1Connect");
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User1Connect");
         // Action 2: User2Connect
@@ -691,7 +691,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2Connect");
         act.setCurActionText("Action 3: User1InviteUser2");
         P2PActions.afterWaitConnect();
-        P2PActions.invite(actorUser, actorUserName, targetUserName);
+        P2PActions.invite(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterInvite();
         notifyLock("User1InviteUser2");
         // Action 4: User2AcceptUser1
@@ -710,7 +710,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2CreateLocalStream");
         act.setCurActionText("Action 7: User1PublishToUser2");
         P2PActions.afterWaitCreateLocalCameraStream();
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User1PublishToUser2");
         // Action 8: User2PublishToUser1
@@ -723,9 +723,9 @@ public class TestDevice1 extends AndroidTestDevice {
         List<RemoteStream> rslist = pcObserver.addedStream;
         act.attachRender2(rslist.get(0));
         P2PActions.send(actorUser, actorUserName, targetUserName,
-                actorUserName + " send message1 to " + targetUserName);
+                actorUserName + " send message1 to " + targetUserName,true);
         P2PActions.send(actorUser, actorUserName, targetUserName,
-                actorUserName + " send message2 to " + targetUserName);
+                actorUserName + " send message2 to " + targetUserName,true);
         P2PActions.afterSend();
         notifyLock("User1SendTwoMessagesToUser2");
         // Action 10: User2SendTwoMessagesToUser1
@@ -770,7 +770,7 @@ public class TestDevice1 extends AndroidTestDevice {
 
         // Action 1: User1Connect
         act.setCurActionText("Action 1: User1Connect");
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User1Connect");
         // Action 2: User2Connect
@@ -779,7 +779,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2Connect");
         act.setCurActionText("Action 3: User1InviteUser2");
         P2PActions.afterWaitConnect();
-        P2PActions.invite(actorUser, actorUserName, targetUserName);
+        P2PActions.invite(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterInvite();
         notifyLock("User1InviteUser2");
         // Action 4: User2AcceptUser1
@@ -798,7 +798,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2CreateLocalStream");
         act.setCurActionText("Action 7: User1PublishToUser2");
         P2PActions.afterWaitCreateLocalCameraStream();
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User1PublishToUser2");
         // Action 8: User2PublishToUser1
@@ -809,7 +809,7 @@ public class TestDevice1 extends AndroidTestDevice {
         act.attachRender2(rslist.get(0));
         act.setCurActionText("Action 9: User1UnpublishToUser2");
         P2PActions.afterWaitPublish(actorUserName, pcObserver, 1);
-        P2PActions.unpublish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.unpublish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterUnpublish();
         notifyLock("User1UnpublishToUser2");
         // Action 10: User2UnpublishToUser1
@@ -820,9 +820,9 @@ public class TestDevice1 extends AndroidTestDevice {
         Log.d(TAG, "OBSERVER:" + pcObserver);
         P2PActions.afterWaitUnpublish(actorUserName, pcObserver, 1);
         P2PActions.send(actorUser, actorUserName, targetUserName,
-                actorUserName + " send message1 to " + targetUserName);
+                actorUserName + " send message1 to " + targetUserName,true);
         P2PActions.send(actorUser, actorUserName, targetUserName,
-                actorUserName + " send message2 to " + targetUserName);
+                actorUserName + " send message2 to " + targetUserName,true);
         P2PActions.afterSend();
         notifyLock("User1SendTwoMessagesToUser2");
         // Action 12: User2SendTwoMessagesToUser1
@@ -869,7 +869,7 @@ public class TestDevice1 extends AndroidTestDevice {
 
         // Action 1: User1Connect
         act.setCurActionText("Action 1: User1Connect");
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User1Connect");
         // Action 2: User2Connect
@@ -878,7 +878,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2Connect");
         act.setCurActionText("Action 3: User1InviteUser2");
         P2PActions.afterWaitConnect();
-        P2PActions.invite(actorUser, actorUserName, targetUserName);
+        P2PActions.invite(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterInvite();
         notifyLock("User1InviteUser2");
         // Action 4: User2AcceptUser1
@@ -897,7 +897,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2CreateLocalStream");
         act.setCurActionText("Action 7: User1PublishToUser2");
         P2PActions.afterWaitCreateLocalCameraStream();
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User1PublishToUser2");
         // Action 8: User2PublishToUser1
@@ -925,7 +925,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2CreateLocalStream");
         act.setCurActionText("Action 13: User1RepublishToUser2");
         P2PActions.afterWaitCreateLocalCameraStream();
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User1RepublishToUser2");
         // Action 14: User2RepublishToUser1
@@ -973,7 +973,7 @@ public class TestDevice1 extends AndroidTestDevice {
 
         // Action 1: User1Connect
         act.setCurActionText("Action 1: User1Connect");
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User1Connect");
         // Action 2: User2Connect
@@ -982,7 +982,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2Connect");
         act.setCurActionText("Action 3: User1InviteUser2");
         P2PActions.afterWaitConnect();
-        P2PActions.invite(actorUser, actorUserName, targetUserName);
+        P2PActions.invite(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterInvite();
         notifyLock("User1InviteUser2");
         // Action 4: User2AcceptUser1
@@ -1001,7 +1001,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2CreateLocalStream");
         act.setCurActionText("Action 7: User1PublishToUser2");
         P2PActions.afterWaitCreateLocalCameraStream();
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User1PublishToUser2");
         // Action 8: User2PublishToUser1
@@ -1020,9 +1020,9 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2CloseLocalStream");
         act.setCurActionText("Action 11: User1CreateLocalStream");
         P2PActions.send(actorUser, actorUserName, targetUserName,
-                actorUserName + " send message1 to " + targetUserName);
+                actorUserName + " send message1 to " + targetUserName,true);
         P2PActions.send(actorUser, actorUserName, targetUserName,
-                actorUserName + " send message2 to " + targetUserName);
+                actorUserName + " send message2 to " + targetUserName,true);
         P2PActions.afterSend();
         notifyLock("User1SendTwoMessagesToUser2");
         // Action 12: User2SendTwoMessagesToUser1
@@ -1070,7 +1070,7 @@ public class TestDevice1 extends AndroidTestDevice {
 
         // Action 1: User1Connect
         act.setCurActionText("Action 1: User1Connect");
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User1Connect");
         // Action 2: User2Connect
@@ -1079,7 +1079,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2Connect");
         act.setCurActionText("Action 3: User1InviteUser2");
         P2PActions.afterWaitConnect();
-        P2PActions.invite(actorUser, actorUserName, targetUserName);
+        P2PActions.invite(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterInvite();
         notifyLock("User1InviteUser2");
         // Action 4: User2AcceptUser1
@@ -1098,7 +1098,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2CreateLocalStream");
         act.setCurActionText("Action 7: User1PublishToUser2");
         P2PActions.afterWaitCreateLocalCameraStream();
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User1PublishToUser2");
         // Action 8: User2PublishToUser1
@@ -1108,7 +1108,7 @@ public class TestDevice1 extends AndroidTestDevice {
         List<RemoteStream> rslist = pcObserver.addedStream;
         act.attachRender2(rslist.get(0));
         P2PActions.afterWaitPublish(actorUserName, pcObserver, 1);
-        P2PActions.stop(actorUser, actorUserName, targetUserName);
+        P2PActions.stop(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterStop(actorUserName, pcObserver, 1);
         notifyLock("User1StopChatWithUser2");
         // Action 10: User2InviteUser1
@@ -1117,7 +1117,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2InviteUser1");
         act.setCurActionText("Action 11: User1AcceptUser2");
         P2PActions.afterWaitInvite(actorUserName, pcObserver, 1);
-        P2PActions.accept(actorUser, actorUserName, targetUserName);
+        P2PActions.accept(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterAccept(actorUserName, pcObserver, 2);
         notifyLock("User1AcceptUser2");
         // Action 12: User2PublishToUser1
@@ -1127,7 +1127,7 @@ public class TestDevice1 extends AndroidTestDevice {
         P2PActions.afterWaitPublish(actorUserName, pcObserver, 2);
         rslist = pcObserver.addedStream;
         act.attachRender2(rslist.get(1));
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         notifyLock("User1PublishToUser2");
         SystemClock.sleep(waitingTime);
         P2PActions.endStory();
@@ -1171,7 +1171,7 @@ public class TestDevice1 extends AndroidTestDevice {
 
         // Action 1: User1Connect
         act.setCurActionText("Action 1: User1Connect");
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User1Connect");
         // Action 2: User2Connect
@@ -1180,7 +1180,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2Connect");
         act.setCurActionText("Action 3: User1InviteUser2");
         P2PActions.afterWaitConnect();
-        P2PActions.invite(actorUser, actorUserName, targetUserName);
+        P2PActions.invite(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterInvite();
         notifyLock("User1InviteUser2");
         // Action 4: User2AcceptUser1
@@ -1199,7 +1199,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2CreateLocalStream");
         act.setCurActionText("Action 7: User1PublishToUser2");
         P2PActions.afterWaitCreateLocalCameraStream();
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User1PublishToUser2");
         // Action 8: User2PublishToUser1
@@ -1210,7 +1210,7 @@ public class TestDevice1 extends AndroidTestDevice {
         act.attachRender2(rslist.get(0));
         act.setCurActionText("Action 9: User1Disconnect");
         P2PActions.afterWaitPublish(actorUserName, pcObserver, 1);
-        P2PActions.disconnect(actorUser, actorUserName);
+        P2PActions.disconnect(actorUser, actorUserName,true);
         P2PActions.afterStop(actorUserName, pcObserver, 1);
         P2PActions.afterDisconnect(actorUserName, pcObserver, 1);
         notifyLock("User1Disconnect");
@@ -1219,8 +1219,8 @@ public class TestDevice1 extends AndroidTestDevice {
         // Action 11: User1LoginAndInviteUser2
         waitLock("User2CheckChatStopped");
         act.setCurActionText("Action 11: User1LoginAndInviteUser2");
-        P2PActions.connect(actorUser, actorUserName, serverIP);
-        P2PActions.invite(actorUser, actorUserName, targetUserName);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
+        P2PActions.invite(actorUser, actorUserName, targetUserName,true);
         notifyLock("User1LoginAndInviteUser2");
         // Action 12: User2AcceptUser1
         act.setCurActionText("Action 12: User2AcceptUser1");
@@ -1228,7 +1228,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2AcceptUser1");
         act.setCurActionText("Action 13: User1PublishToUser2");
         P2PActions.afterWaitAccept(actorUserName, pcObserver, 2, 2);
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         notifyLock("User1PublishToUser2");
         // Action 14: User2PublishToUser1
         waitLock("User2PublishToUser1");
@@ -1279,7 +1279,7 @@ public class TestDevice1 extends AndroidTestDevice {
 
         // Action 1: User1Connect
         act.setCurActionText("Action 1: User1Connect");
-        P2PActions.connect(actorUser, actorUserName, serverIP);
+        P2PActions.connect(actorUser, actorUserName, serverIP,true);
         P2PActions.afterConnect();
         notifyLock("User1Connect");
         // Action 2: User2Connect
@@ -1288,7 +1288,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2Connect");
         act.setCurActionText("Action 3: User1InviteUser2");
         P2PActions.afterWaitConnect();
-        P2PActions.invite(actorUser, actorUserName, targetUserName);
+        P2PActions.invite(actorUser, actorUserName, targetUserName,true);
         P2PActions.afterInvite();
         notifyLock("User1InviteUser2");
         // Action 4: User2AcceptUser1
@@ -1307,7 +1307,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2CreateLocalStream");
         act.setCurActionText("Action 7: User1PublishToUser2");
         P2PActions.afterWaitCreateLocalCameraStream();
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         P2PActions.afterPublish();
         notifyLock("User1PublishToUser2");
         // Action 8: User2PublishToUser1
@@ -1330,7 +1330,7 @@ public class TestDevice1 extends AndroidTestDevice {
         // Action 13:User1InviteUser2
         waitLock("User2Connect");
         act.setCurActionText("Action 13:User1InviteUser2");
-        P2PActions.invite(actorUser, actorUserName, targetUserName);
+        P2PActions.invite(actorUser, actorUserName, targetUserName,true);
         notifyLock("User1InviteUser2");
         // Action 14: User2AcceptUser1
         act.setCurActionText("Action 14: User2AcceptUser1");
@@ -1338,7 +1338,7 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User2AcceptUser1");
         act.setCurActionText("Action 15: User1PublishToUser2");
         P2PActions.afterWaitAccept(actorUserName, pcObserver, 2, 2);
-        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs);
+        P2PActions.publish(actorUser, actorUserName, targetUserName, lcs,true);
         notifyLock("User1PublishToUser2");
         // Action 16: User2PublishToUser1
         act.setCurActionText("Action 16: User2PublishToUser1");
@@ -1395,7 +1395,7 @@ public class TestDevice1 extends AndroidTestDevice {
         act.makeToast("Test start, actor:" + actorUser1Name);
         act.setTitle("Actor:" + actorUser1Name);
         // Action 1. User1ConnectAndCreateLocalStream
-        P2PActions.connect(actorUser1, actorUser1Name, serverIP);
+        P2PActions.connect(actorUser1, actorUser1Name, serverIP,true);
         LocalCameraStream lcs = P2PActions.createLocalCameraStream(actorUser1Name, true, true);
         act.attachRender1(lcs);
         notifyLock("User1ConnectAndCreateLocalStream");
@@ -1403,7 +1403,7 @@ public class TestDevice1 extends AndroidTestDevice {
         // Action 3. User3ConnectAndCreateLocalStream
         // Action 4. User1InviteUser2
         waitLock("User3ConnectAndCreateLocalStream");
-        P2PActions.invite(actorUser1, actorUser1Name, targetUser2Name);
+        P2PActions.invite(actorUser1, actorUser1Name, targetUser2Name,true);
         notifyLock("User1InviteUser2");
         // Action 5. User2AcceptUser1
         // Action 6. User3InviteUser1
@@ -1411,15 +1411,15 @@ public class TestDevice1 extends AndroidTestDevice {
         waitLock("User3InviteUser1");
         P2PActions.afterWaitAccept(actorUser1Name, pcObserver, 1, 1);
         P2PActions.afterWaitInvite(actorUser1Name, pcObserver, 1);
-        P2PActions.accept(actorUser1, actorUser1Name, targetUser3Name);
+        P2PActions.accept(actorUser1, actorUser1Name, targetUser3Name,true);
         P2PActions.afterAccept(actorUser1Name, pcObserver, 2);
         notifyLock("User1AcceptUser3");
         // Action 8. User2InivteUser3
         // Action 9. User3AcceptUser2
         // Action 10. User1PublishToUser2AndUser3
         waitLock("User3AcceptUser2");
-        P2PActions.publish(actorUser1, actorUser1Name, targetUser2Name, lcs);
-        P2PActions.publish(actorUser1, actorUser1Name, targetUser3Name, lcs);
+        P2PActions.publish(actorUser1, actorUser1Name, targetUser2Name, lcs,true);
+        P2PActions.publish(actorUser1, actorUser1Name, targetUser3Name, lcs,true);
         notifyLock("User1PublishToUser2AndUser3");
         // Action 11. User2PublishToUser1AndUser3
         // Action 12. User3PublishToUser1AndUser2
@@ -1429,23 +1429,23 @@ public class TestDevice1 extends AndroidTestDevice {
         List<RemoteStream> rslist = pcObserver.addedStream;
         act.attachRender2(rslist.get(rslist.size() - 2));
         act.attachRender3(rslist.get(rslist.size() - 1));
-        P2PActions.send(actorUser1, actorUser1Name, targetUser2Name, "Message:User1ToUser2");
-        P2PActions.send(actorUser1, actorUser1Name, targetUser3Name, "Message:User1ToUser3");
+        P2PActions.send(actorUser1, actorUser1Name, targetUser2Name, "Message:User1ToUser2",true);
+        P2PActions.send(actorUser1, actorUser1Name, targetUser3Name, "Message:User1ToUser3",true);
         notifyLock("User1SendMessageToUser2AndUser3");
         // Action 14. User2SendMessageToUser1AndUser3
         // Action 15. User3SendMessageToUser1AndUser2
         // Action 16. User1UnpublishToUser2AndUser3
         waitLock("User3SendMessageToUser1AndUser2");
         P2PActions.afterWaitSend(actorUser1Name, pcObserver, 2, 2);
-        P2PActions.unpublish(actorUser1, actorUser1Name, targetUser2Name, lcs);
-        P2PActions.unpublish(actorUser1, actorUser1Name, targetUser3Name, lcs);
+        P2PActions.unpublish(actorUser1, actorUser1Name, targetUser2Name, lcs,true);
+        P2PActions.unpublish(actorUser1, actorUser1Name, targetUser3Name, lcs,true);
         notifyLock("User1UnpublishToUser2AndUser3");
         // Action 17. User2UnpublishToUser1AndUser3
         // Action 18. User3UnpublishToUser1AndUser2
         // Action 19. User1StopChatWithUser2
         waitLock("User3UnpublishToUser1AndUser2");
         P2PActions.afterWaitUnpublish(actorUser1Name, pcObserver, 2);
-        P2PActions.stop(actorUser1, actorUser1Name, targetUser2Name);
+        P2PActions.stop(actorUser1, actorUser1Name, targetUser2Name,true);
         P2PActions.afterStop(actorUser1Name, pcObserver, 1);
         notifyLock("User1StopChatWithUser2");
         // Action 20. User2StopChatWithUser3
@@ -1453,7 +1453,7 @@ public class TestDevice1 extends AndroidTestDevice {
         // Action 22. User1Disconnect
         waitLock("User3StopChatWithUser1");
         P2PActions.afterWaitStop(actorUser1Name, pcObserver, 2);
-        P2PActions.disconnect(actorUser1, actorUser1Name);
+        P2PActions.disconnect(actorUser1, actorUser1Name,true);
         P2PActions.afterDisconnect(actorUser1Name, pcObserver, 1);
         notifyLock("User1Disconnect");
         // sleep to make sure the notify message is sent out

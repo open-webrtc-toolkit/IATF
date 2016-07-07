@@ -1,8 +1,18 @@
 package com.intel.webrtc.test.android;
 
 import android.app.Activity;
+import android.os.SystemClock;
+import android.os.DropBoxManager.Entry;
+import android.util.Log;
+
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Hashtable;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
 import org.junit.Assert;
 
 import com.intel.webrtc.test.ClientTestController;
@@ -17,11 +27,12 @@ import com.intel.webrtc.test.WaitNotifyLocalSupporter;
  * It is the base class for users to write their own test cases.
  * AndroidTestDevice is a subclass of org.junit.Assert, so users can use
  * assertions in this class.<br>
- * For android, it contains the test cases.
- * Note: the test function name should start with prefix "test"
+ * For android, it contains the test cases. Note: the test function name should
+ * start with prefix "test"
  * @author xianglai
  */
-public class AndroidTestDevice extends Assert implements TestDevice, WaitNotifyLocalSupporter {
+public class AndroidTestDevice extends Assert implements TestDevice,
+        WaitNotifyLocalSupporter {
     // Debug TAG
     private final static String TAG = "Woogeen-AndroidTestDevice";
 
@@ -51,21 +62,20 @@ public class AndroidTestDevice extends Assert implements TestDevice, WaitNotifyL
     /**
      * Set the TestEntry, in order to enable AndroidTestDevice to use
      * Instrumentation.
-     *
-     * @param entry AndroidTestEntry
+     * @param entry
+     *            AndroidTestEntry
      */
     public void setTestEntry(InstrumentationWrapper entry) {
         testEntry = entry;
     }
 
     /**
-     * Get the test activity set in the configuration.<p>
-     *
-     * If the test activity has not been launched, it will be launched by
-     *  the Instrumentation.<br>
-     *  Because of the dependency issue, the activity will be assigned to the
-     *   filed 'testActivity', rather than returned by this method.<br>
-     *
+     * Get the test activity set in the configuration.
+     * <p>
+     * If the test activity has not been launched, it will be launched by the
+     * Instrumentation.<br>
+     * Because of the dependency issue, the activity will be assigned to the
+     * filed 'testActivity', rather than returned by this method.<br>
      */
     public void getActivity() {
         // call android test entry to start the test activity
@@ -91,7 +101,8 @@ public class AndroidTestDevice extends Assert implements TestDevice, WaitNotifyL
     }
 
     /**
-     * Set the AndroidTestController to enable the communication with the server.
+     * Set the AndroidTestController to enable the communication with the
+     * server.
      * @param controller
      */
     // TODO: this should move to TestDevice
@@ -146,15 +157,15 @@ public class AndroidTestDevice extends Assert implements TestDevice, WaitNotifyL
     }
 
     /**
-     * Add an android logic test device to testSuite.
-     * It will register all the methods that starts with 'test' as a case.
-     * testSuite will conbine all the devices under same testCase.
+     * Add an android logic test device to testSuite. It will register all the
+     * methods that starts with 'test' as a case. testSuite will conbine all the
+     * devices under same testCase.
      */
     @Override
     public void addDeviceToSuite(TestSuite testSuite) {
         Method[] methods = this.getClass().getMethods();
         int methodNum = methods.length;
-        Hashtable<String, TestCase> testCases = testSuite.getTestCases();
+        TreeMap<String, TestCase> testCases = testSuite.getTestCases();
         for (int i = 0; i < methodNum; i++) {
             // If the method is a test method, add the device into
             // related TestCase
@@ -169,6 +180,19 @@ public class AndroidTestDevice extends Assert implements TestDevice, WaitNotifyL
                     testCases.put(methodName, newTestCase);
                 }
             }
+        }
+    }
+
+    @Override
+    public void addDeviceToSuite(TestSuite testSuite, String caseName) {
+        TreeMap<String, TestCase> testCases = testSuite.getTestCases();
+        // If the TestCase already exists, add the device in.
+        if (testCases.containsKey(caseName)) {
+            testCases.get(caseName).addDevice(this);
+        } else {
+            TestCase newTestCase = new TestCase(caseName);
+            newTestCase.addDevice(this);
+            testCases.put(caseName, newTestCase);
         }
     }
 }
