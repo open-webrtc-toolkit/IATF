@@ -24,6 +24,7 @@ class getAndroidDevice(object):
         if len(output) == 0:
            return 1
         else:
+            devicesArray=[];
             results=output.split("\n");
             for index in range(len(results)):
                 #print 'Current results :', results[index]
@@ -46,4 +47,19 @@ class getAndroidDevice(object):
     					print "detail[2]", detail[2];
     					devicesIPDic[androidDevices[index]]=detail[2];
     	return devicesIPDic;
+    @staticmethod
+    def read_caselist(devices, casename):
+        result = 1;
+        AndroidPath=Config.getConfig(Keys.ANDROID_CONFIG_FOLDER)
+        filename_base = "p2p-android-test-result--com.intel.webrtc.test."+devices+'-'+casename+'.txt';
+        filename = AndroidPath+'/log'+'/'+filename_base;
+        print "filename is :" + filename;
+        arrays = [line.rstrip('\n') for line in open(filename)]
+        for index in range(len(arrays)):
+            searchString = "OK: 1";
+            if (searchString in arrays[index]):
+                print "get OK number"
+                result = 0;
+        print "get ok number is ", result;
+        return result;
 #for test

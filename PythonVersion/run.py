@@ -62,6 +62,7 @@ def start_test(filename, mode):
       print "classname is", caseinfo[1];
       ######clean enviroment befor start test suits#########
       CleanEnv.kill_karmaStart()
+      CleanEnv.kill_Firefox()
       time.sleep(20)
       socket_connect()
       if int(mode) == 0:
@@ -94,6 +95,8 @@ def start_test(filename, mode):
           case2result=JSResultParse.parseJSResult("test-results-client2.xml")
           print "case1result is ", case1result;
           print "case2result is ", case2result;
+          JSResultParse.copyJSResult("test-results-client1.xml", caseinfo[0]+'_1')
+          JSResultParse.copyJSResult("test-results-client2.xml", caseinfo[0]+'_2')
           if (case1result == 0) and (case2result == 0):
             target.write("JS-JS case: "+caseinfo[0]+": pass");
             target.write('\n');
@@ -139,6 +142,7 @@ def start_test(filename, mode):
               break
             number=number+1
           case1result=JSResultParse.parseJSResult("test-results-client1.xml")
+          JSResultParse.copyJSResult("test-results-client1.xml", caseinfo[0])
           if (case1result == 0) and (startAndorid == 0):
             target.write("JS-Android case:: "+caseinfo[0]+": pass");
             target.write('\n');
@@ -161,8 +165,8 @@ def start_test(filename, mode):
         if (deployAndroid1 == 0) and (deployAndroid2 == 0):
           emitmessage("lockevent",{"lock":"STARTTEST"})
 
-          startAndorid1=Deploy.start_android_sync(androidTestDevices[1],caseinfo[0],caseinfo[1]);
-          startAndorid2=Deploy.start_android_withResult(androidTestDevices[0],caseinfo[0],caseinfo[2]);
+          startAndroid1=Deploy.start_android_sync(androidTestDevices[1],caseinfo[0],caseinfo[1]);
+          startAndroid2=Deploy.start_android_sync(androidTestDevices[0],caseinfo[0],caseinfo[2]);
           # following code is used to check js job is finished or not. Currently it is implement at main process.
           # ToDo: multi-process implementation should be added. waiting And check function should be wrapper.
           while number < 10:
@@ -173,15 +177,21 @@ def start_test(filename, mode):
             print_ts("Starting command.")
             p=psutil.pids();
             print p
-            androidPID = startAndorid1+1;
-            if androidPID in p:
+            androidPID1 = startAndroid1;
+            androidPID2 = startAndroid2;
+            if (androidPID1 in p) or (androidPID2 in p):
               print_ts("-"*100)
-              print("process ",androidPID ," still running");
-              print("process status is ", psutil.Process(androidPID ).status());
+              print("process ",androidPID1,',',androidPID2," still running");
+              print("process ",androidPID1,"status is, ",psutil.Process(androidPID1).status());
+              print("process ",androidPID2,"status is, ",psutil.Process(androidPID2).status());
+              if (psutil.Process(androidPID1).status() == 'zombie') and (psutil.Process(androidPID2).status() == 'zombie'):
+                break
             else:
               break
             number=number+1
-          if (startAndorid2 == 0):
+          Android1Result = getAndroidDevice.read_caselist(caseinfo[1],caseinfo[0]);
+          Android2Result = getAndroidDevice.read_caselist(caseinfo[2],caseinfo[0]);
+          if (Android1Result == 0) and (Android2Result == 0):
             target.write("Android-Android case:: "+caseinfo[0]+": pass");
             target.write('\n');
             print "Android-Andorid case: ",caseinfo[0],": pass"
