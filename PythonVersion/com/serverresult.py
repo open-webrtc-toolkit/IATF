@@ -15,7 +15,8 @@ from xml.dom import minidom
 from xml.dom.minidom import Document
 from config.config import Config
 from config.config import ConfigKeys as Keys
-
+import subprocess
+import commands
 import cStringIO
 class JSResultParse:
 
@@ -23,6 +24,14 @@ class JSResultParse:
     delta = datetime.timedelta(days=1)
     codeDate=currentDate-delta
     formatCodeDate = codeDate.strftime('%Y%m%d')
+    @staticmethod
+    def copyJSResult(testResultFile,casename):
+        BasePath=Config.getConfig(Keys.JS_CONFIG_FOLDER) 
+        print BasePath
+        JSTestResultPath=BasePath+"/report/"+testResultFile
+        ResultPath=BasePath+"/report/"+casename+".xml"
+        print JSTestResultPath
+        RenameCase=subprocess.Popen("cp "+ JSTestResultPath + " " + ResultPath, shell=True)
     @staticmethod
     def parseJSResult(testResultFile):
         BasePath=Config.getConfig(Keys.JS_CONFIG_FOLDER) 

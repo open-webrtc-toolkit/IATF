@@ -19,6 +19,10 @@ class CleanEnv:
         kill_karmaStart=subprocess.Popen('ps aux | grep chrome | grep -v \'grep\' | awk \'{print $2}\' |xargs kill -9 >/dev/null 2>&1', shell=True)
         kill_karmaStart.wait()
     @staticmethod
+    def kill_Firefox():
+        kill_karmaStart=subprocess.Popen('ps aux | grep firefox | grep -v \'grep\' | awk \'{print $2}\' |xargs kill -9 >/dev/null 2>&1', shell=True)
+        kill_karmaStart.wait()
+    @staticmethod
     def kill_lockServer():
         kill_karmaStart=subprocess.Popen('ps aux | grep \'lockserver.jar\' | grep -v \'grep\' | awk \'{print $2}\'|xargs kill -9 >/dev/null 2>&1', shell=True)
         kill_karmaStart.wait()
