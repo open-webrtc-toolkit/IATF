@@ -47,7 +47,7 @@ if caselistfile == ''or mode == '':
 print 'caselistfile is:', caselistfile
 print 'mode is:', mode
 
-socketIO = SocketIO('10.239.10.122', 9092)
+socketIO = SocketIO('192.168.1.4', 9092)
 def start_test(filename, mode):
     target = open("TestResult.txt", 'w');
     lines = [line.rstrip('\n') for line in open(filename)]
@@ -117,7 +117,8 @@ def start_test(filename, mode):
         deployjs1=Deploy.deploy_js("testclient1.conf.js")
         androidTestDevices=getAndroidDevice.getDevices();
         print androidTestDevices
-        deployAndroid=Deploy.deploy_android(androidTestDevices[0])
+#        deployAndroid=Deploy.deploy_android(androidTestDevices[0])
+        deployAndroid=0
         if (deployjs1 == 0) and (deployAndroid == 0):
           emitmessage("lockevent",{"lock":"STARTTEST"})
           startjs1=Deploy.start_js("testclient1.conf.js",caseinfo[0])
