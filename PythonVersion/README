@@ -23,7 +23,7 @@ ConfigKeys.ADB:r"adb",
 ConfigKeys.JS_CONFIG_FOLDER:r"/home/yanbin/workspace/project/webrtc-javascript-sdk/test/p2pInteractionTest",
 ConfigKeys.ANDROID_CONFIG_FOLDER:r"/home/yanbin/workspace/project/webrtc-android-sdk/test/p2pFrameworkTest",
 
-4.Set socket.io server address and p2p server address in Android test code and JS test code.
+4.Set socket.io server address and p2p server address in Android test code-Test Activity and JS test code-waitnotifyserver.js .
 
 5.Start p2p server
 
