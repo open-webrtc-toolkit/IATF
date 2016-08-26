@@ -25,19 +25,24 @@ print 'Argument List:', str(sys.argv)
 
 caselistfile = ''
 mode = ''
+install = ''
 try:
-   opts, args = getopt.getopt(sys.argv[1:],"hc:m:",["help", "caselistfile=","mode="])
+   opts, args = getopt.getopt(sys.argv[1:],"h:c:m:i",["help", "caselistfile=","mode=","install"])
 except getopt.GetoptError:
    print 'error : run.py -c <caselistfile> -m <mode>'
    sys.exit(2)
 for opt, arg in opts:
    if opt in ("-h", "--help"):
-      print 'run.py -c <caselistfile> -m <mode> \n mode 0: JS to JS \n mode 1: JS to Android \n mode 2: Android to Android'
+      print 'run.py -c <caselistfile> -m <mode> -i\n mode 0: JS to JS \n mode 1: JS to Android \n mode 2: Android to Android \n install:will re-install test application use the latest one, without this tag , we will not install package.'
       sys.exit()
    elif opt == "-c":
       caselistfile = arg
+      print"getcaselist"
    elif opt == '-m':
       mode = arg
+      print "getmode"
+   elif opt == '-i':
+      install = 'true'
    else:
       assert False, "unhandled option"
 if caselistfile == ''or mode == '':
@@ -117,8 +122,10 @@ def start_test(filename, mode):
         deployjs1=Deploy.deploy_js("testclient1.conf.js")
         androidTestDevices=getAndroidDevice.getDevices();
         print androidTestDevices
-#        deployAndroid=Deploy.deploy_android(androidTestDevices[0])
-        deployAndroid=0
+        if install == 'true':
+          deployAndroid=Deploy.deploy_android(androidTestDevices[0])
+        else:
+          deployAndroid=0
         if (deployjs1 == 0) and (deployAndroid == 0):
           emitmessage("lockevent",{"lock":"STARTTEST"})
           startjs1=Deploy.start_js("testclient1.conf.js",caseinfo[0])
@@ -161,8 +168,12 @@ def start_test(filename, mode):
         print "start Android to Android"
         androidTestDevices=getAndroidDevice.getDevices();
         print androidTestDevices
-        deployAndroid1=Deploy.deploy_android(androidTestDevices[0])
-        deployAndroid2=Deploy.deploy_android(androidTestDevices[1])
+        if install == 'true':
+          deployAndroid1=Deploy.deploy_android(androidTestDevices[0])
+          deployAndroid2=Deploy.deploy_android(androidTestDevices[1])
+        else:
+          deployAndroid1 = 0;
+          deployAndroid2 = 0;
         if (deployAndroid1 == 0) and (deployAndroid2 == 0):
           emitmessage("lockevent",{"lock":"STARTTEST"})
 
