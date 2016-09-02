@@ -13,6 +13,8 @@ import datetime
 import sys
 import getopt
 import subprocess
+from config.config import Config
+from config.config import ConfigKeys as Keys
 devicesArray=[]
 devicesIPDic={}
 

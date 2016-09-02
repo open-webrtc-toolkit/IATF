@@ -19,7 +19,8 @@ from com.cleanEnv import CleanEnv
 from com.getAndroidDevicesInfo import getAndroidDevice
 import psutil
 import commands
-
+import pxssh
+import re
 print 'Number of arguments:', len(sys.argv), 'arguments.'
 print 'Argument List:', str(sys.argv)
 
@@ -177,8 +178,8 @@ def start_test(filename, mode):
         if (deployAndroid1 == 0) and (deployAndroid2 == 0):
           emitmessage("lockevent",{"lock":"STARTTEST"})
 
-          startAndroid1=Deploy.start_android_sync(androidTestDevices[1],caseinfo[0],caseinfo[1]);
-          startAndroid2=Deploy.start_android_sync(androidTestDevices[0],caseinfo[0],caseinfo[2]);
+          startAndroid1=Deploy.start_android_sync(androidTestDevices[0],caseinfo[0],caseinfo[1]);
+          startAndroid2=Deploy.start_android_sync(androidTestDevices[1],caseinfo[0],caseinfo[2]);
           # following code is used to check js job is finished or not. Currently it is implement at main process.
           # ToDo: multi-process implementation should be added. waiting And check function should be wrapper.
           while number < 10:
@@ -213,8 +214,89 @@ def start_test(filename, mode):
             target.write('\n');
         CleanEnv.kill_karmaStart() # only need make sure karma start command is killed.
         emitmessage("lockevent",{"lock":"InitLock"})
-    target.close()
 
+    ########################################################################################
+    # Android to iOS #
+    ########################################################################################
+      elif int(mode) == 3:
+        print "start Android to iOS"
+        androidTestDevices=getAndroidDevice.getDevices();
+        print androidTestDevices
+        if install == 'true':
+          deployAndroid1=Deploy.deploy_android(androidTestDevices[0])
+          deployiOS=Deploy.deploy_iOS('WoogeenChatTest.xcodeproj','WoogeenChatTest')
+          deployiOS.prompt()
+          print deployiOS.before
+          deployiOS.sendline('echo $?')
+          deployiOS.prompt()
+          deployiOS_result=deployiOS.before.strip()
+          print "$? ......"
+          print deployiOS_result
+          print "deployiOS pid is"
+          print deployiOS.pid
+          #close ssh connection
+          deployiOS.close
+        else:
+          deployAndroid1 = 0;
+          deployiOS_result = 0;
+        if (deployAndroid1 == 0) and (deployiOS_result == 0):
+          iOSResultFile = open("iOSResult/"+caseinfo[0]+'_'+caseinfo[2]+'.txt', 'w');
+          print "start testing "
+          emitmessage("lockevent",{"lock":"STARTTEST"})
+          startAndroid1=Deploy.start_android_sync(androidTestDevices[0],caseinfo[0],caseinfo[1]);
+          startiOS=Deploy.start_iOS('WoogeenChatTest.xcodeproj','WoogeenChatTest','WoogeenChatTestTests',caseinfo[0],caseinfo[2]);
+          print startiOS.pid;
+          # following code only use to check the android running process
+          #############################################################################
+          while number < 10:
+            print "number is:", number
+            time_remaining = interval-time.time()%interval
+            print_ts("Sleeping until %s (%s seconds)..."%((time.ctime(time.time()+time_remaining)), time_remaining))
+            time.sleep(time_remaining)
+            print_ts("Starting command.")
+            p=psutil.pids();
+            print p
+            androidPID1 = startAndroid1;
+            if (androidPID1 in p):
+              print_ts("-"*100)
+              print("process ",androidPID1," still running");
+              print("process ",androidPID1,"status is, ",psutil.Process(androidPID1).status());
+              if (psutil.Process(androidPID1).status() == 'zombie'):
+                break
+            else:
+              break
+            number=number+1
+          ##################################################################################
+          # check iOS process
+          startiOS.prompt()
+          deployiOS_result=startiOS.before
+          print deployiOS_result
+          iOSResultFile.write(deployiOS_result);
+          iOSResultFile.close()
+          if(re.search("1 failed",deployiOS_result) and re.search("1 total",deployiOS_result)):
+            print "match failed"
+            iOSResult = 1
+          elif(re.search("1 passed",deployiOS_result) and re.search("1 total",deployiOS_result)):
+            print "match passed"
+            iOSResult = 0
+          #####################################################################################
+          # compare result
+          Android1Result = getAndroidDevice.read_caselist(caseinfo[1],caseinfo[0]);
+          if (Android1Result == 0) and (iOSResult == 0):
+            target.write("Android-iOS case:: "+caseinfo[0]+": pass");
+            target.write('\n');
+            print "Android-iOS case: ",caseinfo[0],": pass"
+          else:
+            print "Android-iOS case: ",caseinfo[0],": fail"
+            target.write("Android-iOS case: "+caseinfo[0]+" : fail");
+            target.write('\n');
+          #########close ssh process ###########
+          startiOS.close
+          emitmessage("lockevent",{"lock":"InitLock"})
+    ###########################################################################################
+    # close result file #
+    ###########################################################################################
+    target.close()
 
 def split_line(text):
     casenumber, casename = text.split("=")
