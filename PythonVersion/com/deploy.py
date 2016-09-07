@@ -34,8 +34,8 @@ class Deploy(object):
     @staticmethod
     def deploy_android(androidDevice):
         AndroidPath=Config.getConfig(Keys.ANDROID_CONFIG_FOLDER)
-        print "run command to install android apk "+ AndroidPath + '/runTest.sh --install -s ' + androidDevice;
-        (status, output) = commands.getstatusoutput(AndroidPath + '/runTest.sh --install -s ' + androidDevice)
+        print "run command to install android apk "+ AndroidPath + '/runTest.sh --buildlib --install -s ' + androidDevice;
+        (status, output) = commands.getstatusoutput(AndroidPath + '/runTest.sh --buildlib --install -s ' + androidDevice)
         print 'status is: ',status;        
         print "output is :",output;
         if status == 0 :
