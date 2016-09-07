@@ -21,6 +21,7 @@ import psutil
 import commands
 import pxssh
 import re
+import os
 print 'Number of arguments:', len(sys.argv), 'arguments.'
 print 'Argument List:', str(sys.argv)
 
@@ -53,7 +54,7 @@ if caselistfile == ''or mode == '':
 print 'caselistfile is:', caselistfile
 print 'mode is:', mode
 
-socketIO = SocketIO('192.168.1.4', 9092)
+socketIO = SocketIO('10.239.44.234', 9092)
 def start_test(filename, mode):
     target = open("TestResult.txt", 'w');
     lines = [line.rstrip('\n') for line in open(filename)]
@@ -240,6 +241,9 @@ def start_test(filename, mode):
           deployAndroid1 = 0;
           deployiOS_result = 0;
         if (deployAndroid1 == 0) and (deployiOS_result == 0):
+          path="iOSResult"
+          if not os.path.exists(path):
+             os.mkdir(path)
           iOSResultFile = open("iOSResult/"+caseinfo[0]+'_'+caseinfo[2]+'.txt', 'w');
           print "start testing "
           emitmessage("lockevent",{"lock":"STARTTEST"})
