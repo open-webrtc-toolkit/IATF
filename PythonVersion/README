@@ -3,13 +3,19 @@ Please use python version 2.7.*
 python 3.0 do not support module commands
 
 modes need be installed:
-subprocess
-https://pypi.python.org/pypi/pyutilib.subprocess/3.2
-Download package and go to package folder
-$ python setup.py install
+#subprocess
+#https://pypi.python.org/pypi/pyutilib.subprocess/3.2
+#Download package and go to package folder
+#$ python setup.py install
+
+socket.io client
+https://pypi.python.org/pypi/socketIO-client/0.6.5
+socketIO_client-0.6.5
+$python setup.py install
 
 psutil
 $ sudo apt-get install gcc python-dev
+$ sudo apt-get install python-pip
 $ pip install psutil
 
 2. start socket.io server
@@ -22,13 +28,23 @@ ConfigKeys.KARMA: r"/usr/lib/node_modules/karma/bin/karma",
 ConfigKeys.ADB:r"adb",
 ConfigKeys.JS_CONFIG_FOLDER:r"/home/yanbin/workspace/project/webrtc-javascript-sdk/test/p2pInteractionTest",
 ConfigKeys.ANDROID_CONFIG_FOLDER:r"/home/yanbin/workspace/project/webrtc-android-sdk/test/p2pFrameworkTest",
+ConfigKeys.MAC_ADD:r"webrtctest25.sh.intel.com", ConfigKeys.MAC_USER:r"webrtctest25",
+ConfigKeys.MAC_PASSD:r"intel123",
+ConfigKeys.MAC_FOLDER:r"/Users/neilyou/Documents/webrtc-ios-sdk/test/p2p_interactiveTest"
 
-4.Set socket.io server address and p2p server address in Android test code-Test Activity and JS test code-waitnotifyserver.js .
+4.Set socket.io server address and p2p server address in Android test code-Test Activity and JS test code-waitnotifyserver.js . Change socket.io server address at run.py
 
-5.Start p2p server
+5.Change chrome start file path at configuation file for js if you need run js test case
+
+6.Start p2p server
 
 6.Run test
-please use: run.py -c <caselistfile> -m <mode>
+please use: run.py -c <caselistfile> -m <mode> 
  mode 0: JS to JS
  mode 1: JS to Android
  mode 2: Android to Android
+ mode 3: ANdroid to iOS
+ mode 4: JS to iOS
+
+ python run.py -c <caselistfile> -m <mode> -i which will used for Android and iOS test scenario.
+ Increase -i means it need install android test apk and build iOS test application before run test .
