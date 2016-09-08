@@ -297,6 +297,83 @@ def start_test(filename, mode):
           #########close ssh process ###########
           startiOS.close
           emitmessage("lockevent",{"lock":"InitLock"})
+    ########################################################################################
+    # JS to iOS #
+    ########################################################################################
+      elif int(mode) == 4:
+        print "start JS to iOS"
+        androidTestDevices=getAndroidDevice.getDevices();
+        print androidTestDevices
+        if install == 'true':
+          deployAndroid1=Deploy.deploy_android(androidTestDevices[0])
+          deployiOS=Deploy.deploy_iOS('WoogeenChatTest.xcodeproj','WoogeenChatTest')
+          deployiOS.prompt()
+          print deployiOS.before
+          deployiOS.sendline('echo $?')
+          deployiOS.prompt()
+          deployiOS_result=deployiOS.before.strip()
+          print "$? ......"
+          print deployiOS_result
+          print "deployiOS pid is"
+          print deployiOS.pid
+          #close ssh connection
+          deployiOS.close
+        else:
+          deployiOS_result = 0;
+        if (deployjs1 == 0) and (deployiOS_result == 0):
+          iOSResultFile = open("iOSResult/"+caseinfo[0]+'_'+caseinfo[2]+'.txt', 'w');
+          print "start testing "
+          emitmessage("lockevent",{"lock":"STARTTEST"})
+          startjs1=Deploy.start_js("testclient1.conf.js",caseinfo[0])
+          print "startjs1 PID is: ", startjs1; 
+          startiOS=Deploy.start_iOS('WoogeenChatTest.xcodeproj','WoogeenChatTest','WoogeenChatTestTests',caseinfo[0],caseinfo[2]);
+          print startiOS.pid;
+          # following code only use to check the JS running process
+          #############################################################################
+          while number < 8:
+            print "number is:", number
+            time_remaining = interval-time.time()%interval
+            print_ts("Sleeping until %s (%s seconds)..."%((time.ctime(time.time()+time_remaining)), time_remaining))
+            time.sleep(time_remaining)
+            print_ts("Starting command.")
+            p=psutil.pids();
+            print p
+            jsPID = startjs1+1;
+            if jsPID in p:
+              print_ts("-"*100)
+              print("process ",jsPID," still running");
+              print("process status is ", psutil.Process(jsPID).status());
+            else:
+              break
+            number=number+1
+          ##################################################################################
+          # check iOS process
+          startiOS.prompt()
+          deployiOS_result=startiOS.before
+          print deployiOS_result
+          iOSResultFile.write(deployiOS_result);
+          iOSResultFile.close()
+          if(re.search("1 failed",deployiOS_result) and re.search("1 total",deployiOS_result)):
+            print "match failed"
+            iOSResult = 1
+          elif(re.search("1 passed",deployiOS_result) and re.search("1 total",deployiOS_result)):
+            print "match passed"
+            iOSResult = 0
+          #####################################################################################
+          # compare result
+          case1result=JSResultParse.parseJSResult("test-results-client1.xml")
+          JSResultParse.copyJSResult("test-results-client1.xml", caseinfo[0])
+          if (case1result == 0) and (iOSResult == 0):
+            target.write("JS-iOS case:: "+caseinfo[0]+": pass");
+            target.write('\n');
+            print "JS-iOS case: ",caseinfo[0],": pass"
+          else:
+            print "JS-iOS case: ",caseinfo[0],": fail"
+            target.write("JS-iOS case: "+caseinfo[0]+" : fail");
+            target.write('\n');
+          #########close ssh process ###########
+          startiOS.close
+          emitmessage("lockevent",{"lock":"InitLock"})
     ###########################################################################################
     # close result file #
     ###########################################################################################
