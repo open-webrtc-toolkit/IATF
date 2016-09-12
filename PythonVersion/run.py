@@ -224,8 +224,8 @@ def start_test(filename, mode):
         androidTestDevices=getAndroidDevice.getDevices();
         print androidTestDevices
         if install == 'true':
-          deployAndroid1=Deploy.deploy_android(androidTestDevices[0])
           deployiOS=Deploy.deploy_iOS('WoogeenChatTest.xcodeproj','WoogeenChatTest')
+          deployAndroid1=Deploy.deploy_android(androidTestDevices[0])
           deployiOS.prompt()
           print deployiOS.before
           deployiOS.sendline('echo $?')
@@ -302,10 +302,8 @@ def start_test(filename, mode):
     ########################################################################################
       elif int(mode) == 4:
         print "start JS to iOS"
-        androidTestDevices=getAndroidDevice.getDevices();
-        print androidTestDevices
+        deployjs1=Deploy.deploy_js("testclient1.conf.js")
         if install == 'true':
-          deployAndroid1=Deploy.deploy_android(androidTestDevices[0])
           deployiOS=Deploy.deploy_iOS('WoogeenChatTest.xcodeproj','WoogeenChatTest')
           deployiOS.prompt()
           print deployiOS.before
@@ -324,10 +322,10 @@ def start_test(filename, mode):
           iOSResultFile = open("iOSResult/"+caseinfo[0]+'_'+caseinfo[2]+'.txt', 'w');
           print "start testing "
           emitmessage("lockevent",{"lock":"STARTTEST"})
-          startjs1=Deploy.start_js("testclient1.conf.js",caseinfo[0])
-          print "startjs1 PID is: ", startjs1; 
           startiOS=Deploy.start_iOS('WoogeenChatTest.xcodeproj','WoogeenChatTest','WoogeenChatTestTests',caseinfo[0],caseinfo[2]);
           print startiOS.pid;
+          startjs1=Deploy.start_js("testclient1.conf.js",caseinfo[0])
+          print "startjs1 PID is: ", startjs1;
           # following code only use to check the JS running process
           #############################################################################
           while number < 8:
