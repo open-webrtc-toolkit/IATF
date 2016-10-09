@@ -7,23 +7,19 @@ from config.config import Config
 from config.config import ConfigKeys as Keys
 import subprocess
 
-class CleanEnv:
-    @staticmethod
-    def kill_karmaRun():
+class CleanEnv(object):
+    def kill_karmaRun(self):
         kill_karmaRun=subprocess.Popen(' ps aux | grep \'karma run\' | grep -v \'grep\' | awk \'{print $2}\'|xargs kill -9 >/dev/null 2>&1 ', shell=True)
         kill_karmaRun.wait()
-    @staticmethod
-    def kill_karmaStart():
+    def kill_karmaStart(self):
     	kill_karmaStart=subprocess.Popen('ps aux | grep \'karma start\' | grep -v \'grep\' | awk \'{print $2}\'|xargs kill -9 >/dev/null 2>&1', shell=True)
         kill_karmaStart.wait()
         kill_karmaStart=subprocess.Popen('ps aux | grep chrome | grep -v \'grep\' | awk \'{print $2}\' |xargs kill -9 >/dev/null 2>&1', shell=True)
         kill_karmaStart.wait()
-    @staticmethod
-    def kill_Firefox():
+    def kill_Firefox(self):
         kill_karmaStart=subprocess.Popen('ps aux | grep firefox | grep -v \'grep\' | awk \'{print $2}\' |xargs kill -9 >/dev/null 2>&1', shell=True)
         kill_karmaStart.wait()
-    @staticmethod
-    def kill_lockServer():
+    def kill_lockServer(self):
         kill_karmaStart=subprocess.Popen('ps aux | grep \'lockserver.jar\' | grep -v \'grep\' | awk \'{print $2}\'|xargs kill -9 >/dev/null 2>&1', shell=True)
         kill_karmaStart.wait()
 

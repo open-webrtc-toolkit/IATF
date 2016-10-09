@@ -95,7 +95,7 @@ class Deploy(object):
            s.prompt()
            s.sendline('intel123')
            s.prompt()
-           s.sendline('xctool -project ' + YourWorkspace + ' -scheme ' + YourScheme + ' build-tests -sdk iphonesimulator9.3 -destination \'platform=iOS Simulator,name=iPhone 5s\'')
+           s.sendline('xctool -project ' + YourWorkspace + ' -scheme ' + YourScheme + ' build-tests -sdk iphonesimulator9.2 -destination \'platform=iOS Simulator,name=iPhone 6s Plus\'')
            #s.sendline('xctool -project WoogeenChatTest.xcodeproj -scheme WoogeenChatTest build-tests')
           # s.prompt()
            #print s.before
@@ -114,6 +114,7 @@ class Deploy(object):
            return 1
         else:
            print "SSH session login successful"
+           print "cd " + projectFolder;
            s.sendline('cd ' + projectFolder)
            #s.sendline ('cd /Users/neilyou/Documents/webrtc-ios-sdk/test/p2psample')
            s.prompt()
@@ -121,8 +122,8 @@ class Deploy(object):
            s.sendline('security unlock-keychain -p intel123 ~/Library/Keychains/login.keychain')
            s.prompt()
            print s.before
-           print 'xctool -project ' + YourWorkspace + ' -scheme ' + YourScheme + ' run-tests -only '+TestTarget+':'+classname+'/'+casename +' -sdk iphonesimulator9.3 -destination \'platform=iOS Simulator,name=iPhone 5s\''
-           s.sendline('xctool -project ' + YourWorkspace + ' -scheme ' + YourScheme + ' run-tests -only '+TestTarget+':'+classname+'/'+casename +' -sdk iphonesimulator9.3 -destination \'platform=iOS Simulator,name=iPhone 5s\'')
+           print 'xctool -project ' + YourWorkspace + ' -scheme ' + YourScheme + ' run-tests -only '+TestTarget+':'+classname+'/'+casename +' -sdk iphonesimulator9.2 -destination \'platform=iOS Simulator,name=iPhone 6s Plus\''
+           s.sendline('xctool -project ' + YourWorkspace + ' -scheme ' + YourScheme + ' run-tests -only '+TestTarget+':'+classname+'/'+casename +' -sdk iphonesimulator9.2 -destination \'platform=iOS Simulator,name=iPhone 6s Plus\'')
            #s.sendline('xctool -project WoogeenChatTest.xcodeproj -scheme WoogeenChatTest build-tests')
            # xctool -project WoogeenChatTest.xcodeproj -scheme WoogeenChatTest run-tests -only WoogeenChatTestTests:TestDevice2/test04_Peer1InviteAndPeer2Accept -sdk iphonesimulator9.3 -destination 'platform=iOS Simulator,name=iPhone 5s'
            #s.prompt()
