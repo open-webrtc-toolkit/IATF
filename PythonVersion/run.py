@@ -16,6 +16,7 @@ import sys, getopt, time
 from socketIO_client import SocketIO, LoggingNamespace
 import subprocess
 from com.deploy import Deploy
+from com.deploy_node import DeployNode
 from com.serverresult import JSResultParse
 from com.cleanEnv import CleanEnv
 from com.getAndroidDevicesInfo import getAndroidDevice
@@ -26,6 +27,7 @@ import commands
 import pxssh
 import re
 import os
+import json
 print 'Number of arguments:', len(sys.argv), 'arguments.'
 print 'Argument List:', str(sys.argv)
 
@@ -33,6 +35,8 @@ caselistfile = ''
 mode = ''
 install = ''
 number=1
+connectedNode = False
+connectedNodeNumber = 0;
 try:
    opts, args = getopt.getopt(sys.argv[1:],"h:c:m:i",["help", "caselistfile=","mode=","install"])
 except getopt.GetoptError:
@@ -67,7 +71,7 @@ def start_test(filename, mode):
     target = open("TestResult.txt", 'w');
     lines = [line.rstrip('\n') for line in open(filename)]
     cleanEnv = CleanEnv();
-    cleanEnv.kill_karmaRun()
+    #cleanEnv.kill_karmaRun()
     emitmessage("lockevent",{"lock":"InitLock"})
 
     for index in range(len(lines)):
@@ -82,21 +86,21 @@ def start_test(filename, mode):
       socket_connect()
       if int(mode) == 0:
         print "start test js to js "  #  begining js to js test
-        deployjs1=Deploy.deploy_js("testclient1.conf.js")
-        deployjs2=Deploy.deploy_js("testclient2.conf.js")
+        deployjs1=Deploy.deploy_js("testclient1.conf.js","P2P")
+        deployjs2=Deploy.deploy_js("testclient2.conf.js","P2P")
         if (deployjs1 == 0) and (deployjs2 == 0):
           emitmessage("lockevent",{"lock":"STARTTEST"})
-          startjs1=Deploy.start_js("testclient1.conf.js",caseinfo[0])
-          startjs2=Deploy.start_js("testclient2.conf.js",caseinfo[0])
+          startjs1=Deploy.start_js("testclient1.conf.js",caseinfo[0],"P2P")
+          startjs2=Deploy.start_js("testclient2.conf.js",caseinfo[0],"P2P")
           print "startjs1 PID is: ", startjs1
           print "startjs2 PID is: ", startjs2
           waitProcess(10, startjs1,startjs2)
-          case1result=JSResultParse.parseJSResult("test-results-client1.xml")
-          case2result=JSResultParse.parseJSResult("test-results-client2.xml")
+          case1result=JSResultParse.parseJSResult("test-results-client1.xml","P2P")
+          case2result=JSResultParse.parseJSResult("test-results-client2.xml","P2P")
           print "case1result is ", case1result;
           print "case2result is ", case2result;
-          JSResultParse.copyJSResult("test-results-client1.xml", caseinfo[0]+'_1')
-          JSResultParse.copyJSResult("test-results-client2.xml", caseinfo[0]+'_2')
+          JSResultParse.copyJSResult("test-results-client1.xml", caseinfo[0]+'_1',"P2P")
+          JSResultParse.copyJSResult("test-results-client2.xml", caseinfo[0]+'_2',"P2P")
           if (case1result == 0) and (case2result == 0):
             target.write("JS-JS case: "+caseinfo[0]+": pass");
             target.write('\n');
@@ -110,26 +114,26 @@ def start_test(filename, mode):
         else:
           print("startBrowser error: ");
     ########################################################################################
-    # JS to Android #
+    # mode 1: JS to Android #
     ########################################################################################
       elif int(mode) == 1:
         print "start test JS to Android"
-        deployjs1=Deploy.deploy_js("testclient1.conf.js")
+        deployjs1=Deploy.deploy_js("testclient1.conf.js","P2P")
         androidTestDevices=getAndroidDevice.getDevices();
         print androidTestDevices
         if install == 'true':
-          deployAndroid=Deploy.deploy_android(androidTestDevices[0])
+          deployAndroid=Deploy.deploy_android(androidTestDevices[0],"P2P")
         else:
           deployAndroid=0
         if (deployjs1 == 0) and (deployAndroid == 0):
           emitmessage("lockevent",{"lock":"STARTTEST"})
-          startjs=Deploy.start_js("testclient1.conf.js",caseinfo[0])
+          startjs=Deploy.start_js("testclient1.conf.js",caseinfo[0],"P2P")
           print "startjs PID is: ", startjs;
-          startAndorid=Deploy.start_android_sync(androidTestDevices[0],caseinfo[0],caseinfo[2])
+          startAndorid=Deploy.start_android_sync(androidTestDevices[0],caseinfo[0],caseinfo[2],"P2P")
           waitProcess(10, startjs,startAndorid)
-          case1result=JSResultParse.parseJSResult("test-results-client1.xml")
-          JSResultParse.copyJSResult("test-results-client1.xml", caseinfo[0])
-          AndroidResult = getAndroidDevice.read_caselist(caseinfo[2],caseinfo[0]);
+          case1result=JSResultParse.parseJSResult("test-results-client1.xml","P2P")
+          JSResultParse.copyJSResult("test-results-client1.xml", caseinfo[0],"P2P")
+          AndroidResult = getAndroidDevice.read_caselist(caseinfo[2],caseinfo[0],"P2P");
           if (case1result == 0) and (AndroidResult == 0):
             target.write("JS-Android case:: "+caseinfo[0]+": pass");
             target.write('\n');
@@ -141,25 +145,25 @@ def start_test(filename, mode):
         cleanEnv.kill_karmaStart() # only need make sure karma start command is killed.
         emitmessage("lockevent",{"lock":"InitLock"})
     ########################################################################################
-    # Android to Android #
+    # mode 2 : Android to Android #
     ########################################################################################
       elif int(mode) == 2:
         print "start Android to Android"
         androidTestDevices=getAndroidDevice.getDevices();
         print androidTestDevices
         if install == 'true':
-          deployAndroid1=Deploy.deploy_android(androidTestDevices[0])
-          deployAndroid2=Deploy.deploy_android(androidTestDevices[1])
+          deployAndroid1=Deploy.deploy_android(androidTestDevices[0],"P2P")
+          deployAndroid2=Deploy.deploy_android(androidTestDevices[1],"P2P")
         else:
           deployAndroid1 = 0;
           deployAndroid2 = 0;
         if (deployAndroid1 == 0) and (deployAndroid2 == 0):
           emitmessage("lockevent",{"lock":"STARTTEST"})
-          startAndroid1=Deploy.start_android_sync(androidTestDevices[0],caseinfo[0],caseinfo[1]);
-          startAndroid2=Deploy.start_android_sync(androidTestDevices[1],caseinfo[0],caseinfo[2]);
+          startAndroid1=Deploy.start_android_sync(androidTestDevices[0],caseinfo[0],caseinfo[1],"P2P");
+          startAndroid2=Deploy.start_android_sync(androidTestDevices[1],caseinfo[0],caseinfo[2],"P2P");
           waitProcess(10, startAndroid1,startAndroid2)
-          Android1Result = getAndroidDevice.read_caselist(caseinfo[1],caseinfo[0]);
-          Android2Result = getAndroidDevice.read_caselist(caseinfo[2],caseinfo[0]);
+          Android1Result = getAndroidDevice.read_caselist(caseinfo[1],caseinfo[0],"P2P");
+          Android2Result = getAndroidDevice.read_caselist(caseinfo[2],caseinfo[0],"P2P");
           if (Android1Result == 0) and (Android2Result == 0):
             target.write("Android-Android case:: "+caseinfo[0]+": pass");
             target.write('\n');
@@ -171,7 +175,7 @@ def start_test(filename, mode):
         emitmessage("lockevent",{"lock":"InitLock"})
 
     ########################################################################################
-    # Android to iOS #
+    # mode 3: Android to iOS #
     ########################################################################################
       elif int(mode) == 3:
         print "start Android to iOS"
@@ -179,7 +183,7 @@ def start_test(filename, mode):
         print androidTestDevices
         if install == 'true':
           deployiOS=Deploy.deploy_iOS('WoogeenChatTest.xcodeproj','WoogeenChatTest')
-          deployAndroid1=Deploy.deploy_android(androidTestDevices[0])
+          deployAndroid1=Deploy.deploy_android(androidTestDevices[0],"P2P")
           deployiOS.prompt()
           print deployiOS.before
           deployiOS.sendline('echo $?')
@@ -201,7 +205,7 @@ def start_test(filename, mode):
           iOSResultFile = open("iOSResult/"+caseinfo[0]+'_'+caseinfo[2]+'.txt', 'w');
           print "start testing "
           emitmessage("lockevent",{"lock":"STARTTEST"})
-          startAndroid1=Deploy.start_android_sync(androidTestDevices[0],caseinfo[0],caseinfo[1]);
+          startAndroid1=Deploy.start_android_sync(androidTestDevices[0],caseinfo[0],caseinfo[1],"P2P");
           startiOS=Deploy.start_iOS('WoogeenChatTest.xcodeproj','WoogeenChatTest','WoogeenChatTestTests',caseinfo[0],caseinfo[2]);
           print startiOS.pid;
           # following code only use to check the android running process
@@ -221,7 +225,7 @@ def start_test(filename, mode):
             iOSResult = 0
           #####################################################################################
           # compare result
-          Android1Result = getAndroidDevice.read_caselist(caseinfo[1],caseinfo[0]);
+          Android1Result = getAndroidDevice.read_caselist(caseinfo[1],caseinfo[0],"P2P");
           if (Android1Result == 0) and (iOSResult == 0):
             target.write("Android-iOS case:: "+caseinfo[0]+": pass");
             target.write('\n');
@@ -234,11 +238,11 @@ def start_test(filename, mode):
           startiOS.close
           emitmessage("lockevent",{"lock":"InitLock"})
     ########################################################################################
-    # JS to iOS #
+    # mode 4: JS to iOS #
     ########################################################################################
       elif int(mode) == 4:
         print "start JS to iOS"
-        deployjs1=Deploy.deploy_js("testclient1.conf.js")
+        deployjs1=Deploy.deploy_js("testclient1.conf.js","P2P")
         if install == 'true':
           deployiOS=Deploy.deploy_iOS('WoogeenChatTest.xcodeproj','WoogeenChatTest')
           deployiOS.prompt()
@@ -269,7 +273,7 @@ def start_test(filename, mode):
           # check iOS process
           startiOS.prompt()
           deployiOS_result=startiOS.before
-          print deployiOS_result
+          #print deployiOS_result
           iOSResultFile.write(deployiOS_result);
           iOSResultFile.close()
           if(re.search("1 failed",deployiOS_result) and re.search("1 total",deployiOS_result)):
@@ -280,8 +284,8 @@ def start_test(filename, mode):
             iOSResult = 0
           #####################################################################################
           # compare result
-          case1result=JSResultParse.parseJSResult("test-results-client1.xml")
-          JSResultParse.copyJSResult("test-results-client1.xml", caseinfo[0])
+          case1result=JSResultParse.parseJSResult("test-results-client1.xml","P2P")
+          JSResultParse.copyJSResult("test-results-client1.xml", caseinfo[0],"P2P")
           if (case1result == 0) and (iOSResult == 0):
             target.write("JS-iOS case:: "+caseinfo[0]+": pass");
             target.write('\n');
@@ -294,6 +298,57 @@ def start_test(filename, mode):
           startiOS.close
           cleanEnv.kill_karmaStart() # only need make sure karma start command is killed.
           emitmessage("lockevent",{"lock":"InitLock"})
+    ########################################################################################
+    # mode 5 : JS , Android conference mode#
+    ########################################################################################
+      elif int(mode) == 5:
+        ### at this sample , all test clients run at same machine. This only for GTAC sample 
+        print "start conference test"
+        deployjs2=Deploy.deploy_js("testacular.conf2.js","CONFERENCE")
+        deployjs1=Deploy.deploy_js("testacular.conf1.js","CONFERENCE")
+        androidTestDevices=getAndroidDevice.getDevices();
+        print androidTestDevices
+        if install == 'true':
+          deployAndroid=Deploy.deploy_android(androidTestDevices[0],"CONFERENCE")
+          deployAndroid=Deploy.deploy_android(androidTestDevices[1],"CONFERENCE")
+          deployAndroid=Deploy.deploy_android(androidTestDevices[2],"CONFERENCE")
+        else:
+          deployAndroid=0
+        #if (deployjs1 == 0) and (deployjs2 == 0) and (deployAndroid == 0):
+        if (deployAndroid == 0):
+          emitmessage("lockevent",{"lock":"STARTTEST"})
+          startAndorid1=Deploy.start_android_sync(androidTestDevices[0],caseinfo[0],caseinfo[1],"CONFERENCE")
+          startAndorid2=Deploy.start_android_sync(androidTestDevices[1],caseinfo[0],caseinfo[1],"CONFERENCE")
+          startAndorid3=Deploy.start_android_sync(androidTestDevices[2],caseinfo[0],caseinfo[1],"CONFERENCE")
+          time.sleep(4)
+          startjs1=Deploy.start_js("testacular.conf1.js",caseinfo[0],"CONFERENCE")
+          startjs2=Deploy.start_js("testacular.conf2.js",caseinfo[0],"CONFERENCE")
+          print "startjs1 PID is: ", startjs1;
+           waitProcess(10, startjs1,startjs2)
+        #  waitProcess(10, startAndorid1,"")
+          startjs1.prompt()
+          print startjs1.before
+          startjs1.close
+          startjs2.close
+          #case1result=JSResultParse.parseJSResult("test-results-client1.xml","CONFERENCE")
+          #case1result=JSResultParse.parseJSResult("test-results-client2.xml","CONFERENCE")
+          #JSResultParse.copyJSResult("test-results-client1.xml", caseinfo[0],"CONFERENCE")
+          #JSResultParse.copyJSResult("test-results-client2.xml", caseinfo[0],"CONFERENCE")
+         # AndroidResult = getAndroidDevice.read_caselist(caseinfo[1],caseinfo[0],"CONFERENCE");
+
+          #if (case1result == 0) and (AndroidResult == 0):
+          #  target.write("JS-Android case:: "+caseinfo[0]+": pass");
+          #  target.write('\n');
+          #  print "JS-Andorid case: ",caseinfo[0],": pass"
+          #else:
+          #  print "JS-Android case: ",caseinfo[0],": fail"
+          #  target.write("JS-Android case: "+caseinfo[0]+" : fail");
+          #  target.write('\n');
+        cleanEnv.kill_karmaStart() # only need make sure karma start command is killed.
+        cleanEnv.kill_Firefox()
+        emitmessage("lockevent",{"lock":"InitLock"})
+    ###########################################################################################
+
     ###########################################################################################
     # close result file #
     ###########################################################################################
@@ -317,7 +372,21 @@ def socket_connect():
     socketIO.emit("lockevent",{"lock":"STARTTEST"})
 def emitmessage(message,data):
     socketIO.emit(message,data)
-    
+
+def waitMessageCallback(*args):
+    print('nodeStarted',args)
+    print "value is _____________________***********"
+    print args[0]['lock']
+
+    global connectedNode 
+    if args[0]['lock'] == 'nodeConnected':
+      connectedNode = True;
+    print('connectedNode number is ', connectedNode);
+    return 0 
+def waitmessage(message):
+    socketIO.on('lockevent', waitMessageCallback);
+    socketIO.wait(seconds=5);
+
 def print_ts(message):
     print "[%s] %s"%(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), message)
 def waitProcess(interval, processnumber1,processnumber2):

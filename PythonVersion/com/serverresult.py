@@ -25,16 +25,22 @@ class JSResultParse:
     codeDate=currentDate-delta
     formatCodeDate = codeDate.strftime('%Y%m%d')
     @staticmethod
-    def copyJSResult(testResultFile,casename):
-        BasePath=Config.getConfig(Keys.JS_CONFIG_FOLDER) 
+    def copyJSResult(testResultFile,casename,mode):
+        if mode == "P2P":
+            BasePath=Config.getConfig(Keys.JS_P2P_CONFIG_FOLDER)
+        else:
+            BasePath=Config.getConfig(Keys.JS_CONFERENCE_CONFIG_FOLDER)
         print BasePath
         JSTestResultPath=BasePath+"/report/"+testResultFile
         ResultPath=BasePath+"/report/"+casename+".xml"
         print JSTestResultPath
         RenameCase=subprocess.Popen("cp "+ JSTestResultPath + " " + ResultPath, shell=True)
     @staticmethod
-    def parseJSResult(testResultFile):
-        BasePath=Config.getConfig(Keys.JS_CONFIG_FOLDER) 
+    def parseJSResult(testResultFile,mode):
+        if mode == "P2P":
+            BasePath=Config.getConfig(Keys.JS_P2P_CONFIG_FOLDER)
+        else:
+            BasePath=Config.getConfig(Keys.JS_CONFERENCE_CONFIG_FOLDER)
         print BasePath
         JSTestResultPaths=[BasePath+"/report/"+testResultFile]
         print JSTestResultPaths

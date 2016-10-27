@@ -17,8 +17,11 @@ import pxssh
 class Deploy(object):
 
     @staticmethod
-    def deploy_js(testResultFile):
-        BasePath=Config.getConfig(Keys.JS_CONFIG_FOLDER)
+    def deploy_js(testResultFile,mode):
+        if mode == 'P2P':
+          BasePath=Config.getConfig(Keys.JS_P2P_CONFIG_FOLDER)
+        else:
+          BasePath=Config.getConfig(Keys.JS_CONFERENCE_CONFIG_FOLDER)
         #print BasePath
         JSTestFileConfig=[BasePath+"/"+testResultFile]
         KarmaPath=Config.getConfig(Keys.KARMA)
@@ -32,11 +35,14 @@ class Deploy(object):
             else:
                 return 0
     @staticmethod
-    def deploy_android(androidDevice):
-        AndroidPath=Config.getConfig(Keys.ANDROID_CONFIG_FOLDER)
+    def deploy_android(androidDevice,mode):
+        if mode == 'P2P':
+          AndroidPath=Config.getConfig(Keys.ANDROID_P2P_CONFIG_FOLDER)
+        else:
+          AndroidPath=Config.getConfig(Keys.ANDROID_CONFERENCE_CONFIG_FOLDER)
         print "run command to install android apk "+ AndroidPath + '/runTest.sh --buildlib --install -s ' + androidDevice;
         (status, output) = commands.getstatusoutput(AndroidPath + '/runTest.sh --buildlib --install -s ' + androidDevice)
-        print 'status is: ',status;        
+        print 'status is: ',status;
         print "output is :",output;
         if status == 0 :
            return 0
@@ -45,18 +51,24 @@ class Deploy(object):
            return 1 
 
     @staticmethod
-    def start_js(testResultFile, caseName):
-        BasePath=Config.getConfig(Keys.JS_CONFIG_FOLDER)
+    def start_js(testResultFile, caseName, mode):
+        if mode == 'P2P':
+          BasePath=Config.getConfig(Keys.JS_P2P_CONFIG_FOLDER)
+        else:
+          BasePath=Config.getConfig(Keys.JS_CONFERENCE_CONFIG_FOLDER)
         #print BasePath
         JSTestFileConfig=[BasePath+"/"+testResultFile]
         KarmaPath=Config.getConfig(Keys.KARMA)
         print "startJSTestIs: "+KarmaPath + ' run ' + JSTestFileConfig[0] + " -- --grep " + caseName ;
         runJSCase=subprocess.Popen(KarmaPath + ' run ' + JSTestFileConfig[0] + " -- --grep " + caseName,  shell=True)
         return runJSCase.pid
-        #print "stdout is", runJSCase.stdout.read()
+
     @staticmethod
-    def start_android_withResult(androidDevice, casename, classname):
-        AndroidPath=Config.getConfig(Keys.ANDROID_CONFIG_FOLDER)
+    def start_android_withResult(androidDevice, casename, classname,mode):
+        if mode == 'P2P':
+          AndroidPath=Config.getConfig(Keys.ANDROID_P2P_CONFIG_FOLDER)
+        else:
+           AndroidPath=Config.getConfig(Keys.ANDROID_CONFERENCE_CONFIG_FOLDER)
         #print AndroidPath
         print "run command to run test case "+ AndroidPath + '/runTest.sh --runcase -s ' + androidDevice + ' -n ' + casename + ' -c ' + classname;
         (status, output) = commands.getstatusoutput( AndroidPath + '/runTest.sh --runcase -s ' + androidDevice + ' -n ' + casename + ' -c ' + classname)
@@ -68,8 +80,11 @@ class Deploy(object):
            print "Run test case failed"
            return 1 
     @staticmethod
-    def start_android_sync(androidDevice, casename, classname):
-        AndroidPath=Config.getConfig(Keys.ANDROID_CONFIG_FOLDER)
+    def start_android_sync(androidDevice, casename, classname, mode):
+        if mode == 'P2P':
+          AndroidPath=Config.getConfig(Keys.ANDROID_P2P_CONFIG_FOLDER)
+        else:
+           AndroidPath=Config.getConfig(Keys.ANDROID_CONFERENCE_CONFIG_FOLDER)
         #print AndroidPath
         print "run command to run test case "+ AndroidPath + '/runTest.sh --runcase -s ' + androidDevice + ' -n ' + casename + ' -c ' + classname;
         runAndriodCase=subprocess.Popen(AndroidPath + '/runTest.sh --runcase -s ' + androidDevice + ' -n ' + casename + ' -c ' + classname, shell=True)
@@ -96,6 +111,8 @@ class Deploy(object):
            s.sendline('intel123')
            s.prompt()
            s.sendline('xctool -project ' + YourWorkspace + ' -scheme ' + YourScheme + ' build-tests -sdk iphonesimulator9.2 -destination \'platform=iOS Simulator,name=iPhone 6s Plus\'')
+           s.logfile = sys.stdout
+           print s.logfile
            #s.sendline('xctool -project WoogeenChatTest.xcodeproj -scheme WoogeenChatTest build-tests')
           # s.prompt()
            #print s.before
@@ -124,6 +141,8 @@ class Deploy(object):
            print s.before
            print 'xctool -project ' + YourWorkspace + ' -scheme ' + YourScheme + ' run-tests -only '+TestTarget+':'+classname+'/'+casename +' -sdk iphonesimulator9.2 -destination \'platform=iOS Simulator,name=iPhone 6s Plus\''
            s.sendline('xctool -project ' + YourWorkspace + ' -scheme ' + YourScheme + ' run-tests -only '+TestTarget+':'+classname+'/'+casename +' -sdk iphonesimulator9.2 -destination \'platform=iOS Simulator,name=iPhone 6s Plus\'')
+           s.logfile = sys.stdout
+           print s.logfile
            #s.sendline('xctool -project WoogeenChatTest.xcodeproj -scheme WoogeenChatTest build-tests')
            # xctool -project WoogeenChatTest.xcodeproj -scheme WoogeenChatTest run-tests -only WoogeenChatTestTests:TestDevice2/test04_Peer1InviteAndPeer2Accept -sdk iphonesimulator9.3 -destination 'platform=iOS Simulator,name=iPhone 5s'
            #s.prompt()

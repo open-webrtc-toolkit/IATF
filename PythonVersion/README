@@ -17,6 +17,7 @@ psutil
 $ sudo apt-get install gcc python-dev
 $ sudo apt-get install python-pip
 $ pip install psutil
+$ pip install psutil --upgrade
 
 2. start socket.io server
 java -jar lockServer.jar <IP_ADDRESS> <PORT>

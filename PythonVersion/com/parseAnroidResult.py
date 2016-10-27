@@ -11,8 +11,11 @@ from config.config import Config
 from config.config import ConfigKeys as Keys
 class parseResult(object):
 	@staticmethod
-	def read_caselist(devices, casename):
-		AndroidPath=Config.getConfig(Keys.ANDROID_CONFIG_FOLDER)
+	def read_caselist(devices, casename,mode):
+		if mode == "P2P":
+			AndroidPath=Config.getConfig(Keys.ANDROID_P2P_CONFIG_FOLDER)
+		else:
+			AndroidPath=Config.getConfig(Keys.ANDROID_CONFERENCE_CONFIG_FOLDER)
 		filename_base = "p2p-android-test-result--com.intel.webrtc.test."+device+'-'+casename+text;
 		filename = AndroidPath+'\log'+'\\'+filename_base;
 		print "filename is :" + filename;
