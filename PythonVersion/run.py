@@ -71,7 +71,7 @@ def start_test(filename, mode):
     target = open("TestResult.txt", 'w');
     lines = [line.rstrip('\n') for line in open(filename)]
     cleanEnv = CleanEnv();
-    #cleanEnv.kill_karmaRun()
+    cleanEnv.kill_karmaRun()
     emitmessage("lockevent",{"lock":"InitLock"})
 
     for index in range(len(lines)):
@@ -372,20 +372,6 @@ def socket_connect():
     socketIO.emit("lockevent",{"lock":"STARTTEST"})
 def emitmessage(message,data):
     socketIO.emit(message,data)
-
-def waitMessageCallback(*args):
-    print('nodeStarted',args)
-    print "value is _____________________***********"
-    print args[0]['lock']
-
-    global connectedNode 
-    if args[0]['lock'] == 'nodeConnected':
-      connectedNode = True;
-    print('connectedNode number is ', connectedNode);
-    return 0 
-def waitmessage(message):
-    socketIO.on('lockevent', waitMessageCallback);
-    socketIO.wait(seconds=5);
 
 def print_ts(message):
     print "[%s] %s"%(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), message)
