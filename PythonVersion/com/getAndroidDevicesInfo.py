@@ -50,9 +50,12 @@ class getAndroidDevice(object):
     					devicesIPDic[androidDevices[index]]=detail[2];
     	return devicesIPDic;
     @staticmethod
-    def read_caselist(devices, casename):
+    def read_caselist(devices, casename, mode):
         result = 1;
-        AndroidPath=Config.getConfig(Keys.ANDROID_CONFIG_FOLDER)
+        if mode == 'P2P':
+          AndroidPath=Config.getConfig(Keys.ANDROID_P2P_CONFIG_FOLDER)
+        else:
+        AndroidPath=Config.getConfig(Keys.ANDROID_CONFERENCE_CONFIG_FOLDER)
         filename_base = "p2p-android-test-result--com.intel.webrtc.test."+devices+'-'+casename+'.txt';
         filename = AndroidPath+'/log'+'/'+filename_base;
         print "filename is :" + filename;
