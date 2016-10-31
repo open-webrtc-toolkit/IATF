@@ -55,7 +55,7 @@ class getAndroidDevice(object):
         if mode == 'P2P':
           AndroidPath=Config.getConfig(Keys.ANDROID_P2P_CONFIG_FOLDER)
         else:
-        AndroidPath=Config.getConfig(Keys.ANDROID_CONFERENCE_CONFIG_FOLDER)
+         AndroidPath=Config.getConfig(Keys.ANDROID_CONFERENCE_CONFIG_FOLDER)
         filename_base = "p2p-android-test-result--com.intel.webrtc.test."+devices+'-'+casename+'.txt';
         filename = AndroidPath+'/log'+'/'+filename_base;
         print "filename is :" + filename;

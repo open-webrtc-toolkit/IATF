@@ -197,7 +197,7 @@ def start_test(filename, mode):
         deployjs1=Deploy.deploy_js("testclient1.conf.js","P2P")
         global deployAndroid
         global androidTestDevices
-        if (deployjs1 == 0) and (deployAndroid1 == 0):
+        if (deployjs1 == 0) and (deployAndroid == 0):
           emitmessage("lockevent",{"lock":"STARTTEST"})
           startjs=Deploy.start_js("testclient1.conf.js",caseinfo[0],"P2P")
           print "startjs PID is: ", startjs;
@@ -356,7 +356,7 @@ def start_test(filename, mode):
           startjs1=Deploy.start_js("testacular.conf1.js",caseinfo[0],"CONFERENCE")
           startjs2=Deploy.start_js("testacular.conf2.js",caseinfo[0],"CONFERENCE")
           print "startjs1 PID is: ", startjs1;
-           waitProcess(10, startjs1,startjs2)
+          waitProcess(10, startjs1,startjs2)
         #  waitProcess(10, startAndorid1,"")
           startjs1.prompt()
           print startjs1.before
