@@ -37,6 +37,7 @@ install = ''
 number=1
 connectedNode = False
 connectedNodeNumber = 0
+deployAndroid = ''
 deployAndroid1 = ''
 deployAndroid2 = ''
 deployAndroid3 = ''
@@ -73,6 +74,12 @@ print "socketServer is " ,socketServer
 print "socketServerPort is ",socketServerPort
 socketIO = SocketIO(str(socketServer), int(socketServerPort))
 def start_test(filename, mode):
+    global androidTestDevices
+    global deployAndroid
+    global deployAndroid1
+    global deployAndroid2
+    global deployAndroid3
+    global deployiOS_result
     target = open("TestResult.txt", 'w');
     lines = [line.rstrip('\n') for line in open(filename)]
     cleanEnv = CleanEnv();
@@ -103,7 +110,7 @@ def start_test(filename, mode):
         androidTestDevices=getAndroidDevice.getDevices();
         print androidTestDevices
         if install == 'true':
-          deployiOS=Deploy.deploy_iOS('WoogeenChatTest.xcodeproj','WoogeenChatTest')
+          deployiOS=Deploy.deploy_iOS_remote('WoogeenChatTest.xcodeproj','WoogeenChatTest')
           deployAndroid1=Deploy.deploy_android(androidTestDevices[0],"P2P")
           deployiOS.prompt()
           print deployiOS.before
@@ -122,7 +129,7 @@ def start_test(filename, mode):
     elif int(mode) == 4:
         print "start JS to iOS"
         if install == 'true':
-          deployiOS=Deploy.deploy_iOS('WoogeenChatTest.xcodeproj','WoogeenChatTest')
+          deployiOS=Deploy.deploy_iOS_remote('WoogeenChatTest.xcodeproj','WoogeenChatTest')
           deployiOS.prompt()
           print deployiOS.before
           deployiOS.sendline('echo $?')
@@ -195,8 +202,6 @@ def start_test(filename, mode):
       elif int(mode) == 1:
         print "start test JS to Android"
         deployjs1=Deploy.deploy_js("testclient1.conf.js","P2P")
-        global deployAndroid
-        global androidTestDevices
         if (deployjs1 == 0) and (deployAndroid == 0):
           emitmessage("lockevent",{"lock":"STARTTEST"})
           startjs=Deploy.start_js("testclient1.conf.js",caseinfo[0],"P2P")
@@ -221,9 +226,6 @@ def start_test(filename, mode):
     ########################################################################################
       elif int(mode) == 2:
         print "start Android to Android"
-        global androidTestDevices
-        global deployAndroid1
-        global deployAndroid2
         if (deployAndroid1 == 0) and (deployAndroid2 == 0):
           emitmessage("lockevent",{"lock":"STARTTEST"})
           startAndroid1=Deploy.start_android_sync(androidTestDevices[0],caseinfo[0],caseinfo[1],"P2P");
@@ -246,9 +248,6 @@ def start_test(filename, mode):
     ########################################################################################
       elif int(mode) == 3:
         print "start Android to iOS"
-        global androidTestDevices
-        global deployAndroid1
-        global deployiOS_result
         if (deployAndroid1 == 0) and (deployiOS_result == 0):
           path="iOSResult"
           if not os.path.exists(path):
@@ -257,10 +256,10 @@ def start_test(filename, mode):
           print "start testing "
           emitmessage("lockevent",{"lock":"STARTTEST"})
           startAndroid1=Deploy.start_android_sync(androidTestDevices[0],caseinfo[0],caseinfo[1],"P2P");
-          startiOS=Deploy.start_iOS('WoogeenChatTest.xcodeproj','WoogeenChatTest','WoogeenChatTestTests',caseinfo[0],caseinfo[2]);
+          startiOS=Deploy.start_iOS_remote('WoogeenChatTest.xcodeproj','WoogeenChatTest','WoogeenChatTestTests',caseinfo[0],caseinfo[2]);
           print startiOS.pid;
           # following code only use to check the android running process
-          waitProcess(10,startAndroid1,"");         
+          waitProcess(10,startAndroid1,"");
           ##################################################################################
           # check iOS process
           startiOS.prompt()
@@ -294,12 +293,11 @@ def start_test(filename, mode):
       elif int(mode) == 4:
         print "start JS to iOS"
         deployjs1=Deploy.deploy_js("testclient1.conf.js","P2P")
-        global deployiOS_result
         if (deployjs1 == 0) and (deployiOS_result == 0):
           iOSResultFile = open("iOSResult/"+caseinfo[0]+'_'+caseinfo[2]+'.txt', 'w');
           print "start testing "
           emitmessage("lockevent",{"lock":"STARTTEST"})
-          startiOS=Deploy.start_iOS('WoogeenChatTest.xcodeproj','WoogeenChatTest','WoogeenChatTestTests',caseinfo[0],caseinfo[2]);
+          startiOS=Deploy.start_iOS_remote('WoogeenChatTest.xcodeproj','WoogeenChatTest','WoogeenChatTestTests',caseinfo[0],caseinfo[2]);
           print startiOS.pid;
           startjs1=Deploy.start_js("testclient1.conf.js",caseinfo[0])
           print "startjs1 PID is: ", startjs1;
@@ -343,10 +341,6 @@ def start_test(filename, mode):
         print "start conference test"
         deployjs2=Deploy.deploy_js("testacular.conf2.js","CONFERENCE")
         deployjs1=Deploy.deploy_js("testacular.conf1.js","CONFERENCE")
-        global deployAndroid1
-        global deployAndroid2
-        global deployAndroid3
-        global androidTestDevices
         if (deployjs1 == 0) and (deployjs2 == 0) and (deployAndroid1 == 0) and (deployAndroid2 == 0) and (deployAndroid3 == 0):
           emitmessage("lockevent",{"lock":"STARTTEST"})
           startAndorid1=Deploy.start_android_sync(androidTestDevices[0],caseinfo[0],caseinfo[1],"CONFERENCE")

@@ -26,7 +26,7 @@ class Deploy(object):
         JSTestFileConfig=[BasePath+"/"+testResultFile]
         KarmaPath=Config.getConfig(Keys.KARMA)
         print "startBrowserCommandIs: " + KarmaPath + ' start ' + JSTestFileConfig[0] ;
-        startBrowser=subprocess.Popen(KarmaPath + ' start ' + JSTestFileConfig[0] + ">"+JSTestFileConfig[0]+".log", shell=True)
+        startBrowser=subprocess.Popen("cd "+BasePath+"; " + KarmaPath + ' start ' + JSTestFileConfig[0] + ">"+JSTestFileConfig[0]+".log", shell=True)
         time.sleep(10);
         lines = [line.rstrip('\n') for line in open(JSTestFileConfig[0]+".log")]
         for index in range(len(lines)):
@@ -60,7 +60,7 @@ class Deploy(object):
         JSTestFileConfig=[BasePath+"/"+testResultFile]
         KarmaPath=Config.getConfig(Keys.KARMA)
         print "startJSTestIs: "+KarmaPath + ' run ' + JSTestFileConfig[0] + " -- --grep " + caseName ;
-        runJSCase=subprocess.Popen(KarmaPath + ' run ' + JSTestFileConfig[0] + " -- --grep " + caseName,  shell=True)
+        runJSCase=subprocess.Popen("cd "+BasePath+"; " + KarmaPath + ' run ' + JSTestFileConfig[0] + " -- --grep " + caseName,  shell=True)
         return runJSCase.pid
 
     @staticmethod
