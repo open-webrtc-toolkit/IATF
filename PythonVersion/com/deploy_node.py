@@ -33,7 +33,7 @@ class DeployNode(object):
            s.sendline('nohup python ./node.py -n ' + nodeMachine + " -m " + mode + " > log.txt &")
            s.prompt()
            print s.before
-           return s           
+           return s       
 
 
 #test

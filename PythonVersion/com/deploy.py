@@ -12,7 +12,7 @@ from config.config import Config
 from config.config import ConfigKeys as Keys
 import subprocess
 import commands
-import pxssh
+from pexpect import pxssh
 
 class Deploy(object):
 
@@ -90,7 +90,31 @@ class Deploy(object):
         runAndriodCase=subprocess.Popen(AndroidPath + '/runTest.sh --runcase -s ' + androidDevice + ' -n ' + casename + ' -c ' + classname, shell=True)
         return runAndriodCase.pid
     @staticmethod
-    def deploy_iOS(YourWorkspace,YourScheme):
+    def deploy_iOS(YourWorkspace,YourScheme,YourSimulator,YourPhone,mode):
+        if mode == 'P2P':
+          IOSPath=Config.getConfig(Keys.IOS_P2P_CONFIG_FOLDER)
+        else:
+          IOSPath=Config.getConfig(Keys.IOS_CONFERENCE_CONFIG_FOLDER)
+        iOSDeploy=subprocess.Popen('cd '+IOSPath+'; ' + 'xctool -project ' + YourWorkspace + ' -scheme ' + YourScheme + ' build-tests -sdk '+ YourSimulator +' -destination \'platform=iOS Simulator,name='+ YourPhone + '\''+ ">deployiOS.log", shell=True)
+        time.sleep(10);
+        lines = [line.rstrip('\n') for line in open(IOSPath+"/deployiOS.log")]
+        for index in range(len(lines)):
+            if ("FAILED" in lines[index]) or ("1 errored" in lines[index]):
+                return 1
+            else:
+                return 0
+    @staticmethod
+    def start_iOS_sync(YourWorkspace,YourScheme,TestTarget,YourSimulator,YourPhone,casename,classname,mode):
+        if mode == 'P2P':
+          IOSPath=Config.getConfig(Keys.IOS_P2P_CONFIG_FOLDER)
+        else:
+          IOSPath=Config.getConfig(Keys.IOS_CONFERENCE_CONFIG_FOLDER)
+        #print AndroidPath
+        print "run command to run test case "+ 'xctool -project ' + YourWorkspace + ' -scheme ' + YourScheme + ' run-tests -only '+TestTarget+':'+classname+'/'+casename +' -sdk '+ YourSimulator +' -destination \'platform=iOS Simulator,name='+ YourPhone + '\'';
+        runiOSCase=subprocess.Popen('cd '+IOSPath+'; ' + 'xctool -project ' + YourWorkspace + ' -scheme ' + YourScheme + ' run-tests -only '+TestTarget+':'+classname+'/'+casename +' -sdk '+ YourSimulator +' -destination \'platform=iOS Simulator,name='+ YourPhone + '\'' + '>result/'+classname+'-'+casename+'.log', shell=True)
+        return runiOSCase.pid
+    @staticmethod
+    def deploy_iOS_remote(YourWorkspace,YourScheme):
         iOSAddress=Config.getConfig(Keys.MAC_ADD)
         iOSUser=Config.getConfig(Keys.MAC_USER)
         iOSPassd=Config.getConfig(Keys.MAC_PASSD)
@@ -118,7 +142,7 @@ class Deploy(object):
            #print s.before
            return s
     @staticmethod
-    def start_iOS(YourWorkspace,YourScheme,TestTarget,casename,classname):
+    def start_iOS_remote(YourWorkspace,YourScheme,TestTarget,casename,classname):
         iOSAddress=Config.getConfig(Keys.MAC_ADD)
         iOSUser=Config.getConfig(Keys.MAC_USER)
         iOSPassd=Config.getConfig(Keys.MAC_PASSD)

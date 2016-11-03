@@ -26,6 +26,11 @@ class ConfigKeys(object):
   NODE3_USER = 19
   NODE3_PASSD = 20
   NODE1_WORKFOLDER1 = 21
+  IOS_P2P_CONFIG_FOLDER = 22
+  IOS_CONFERENCE_CONFIG_FOLDER = 23
+  IOS_SIMULATOR = 24
+  IOS_PHONE = 25
+  NODE2_WORKFOLDER1 = 26
 class Config(object):
   config = {
             ConfigKeys.KARMA: r"/usr/lib/node_modules/karma/bin/karma",
@@ -34,7 +39,11 @@ class Config(object):
             ConfigKeys.JS_CONFERENCE_CONFIG_FOLDER:r"/home/yanbin/workspace/project/webrtc-javascript-sdk/test/mcuJSTestCases/test-api",
             ConfigKeys.ANDROID_P2P_CONFIG_FOLDER:r"/home/yanbin/workspace/project/webrtc-android-sdk/test/p2pFrameworkTest",
             ConfigKeys.ANDROID_CONFERENCE_CONFIG_FOLDER:r"/home/yanbin/workspace/project/webrtc-android-sdk/test/conferenceframeworktest2",
-            ConfigKeys.MAC_ADD:r"10.239.158.149",
+            ConfigKeys.IOS_P2P_CONFIG_FOLDER:r"/Users/webrtc/workspace/yanbin_work/webrtc-ios-sdk/test/p2p_interactiveTest",
+            ConfigKeys.IOS_CONFERENCE_CONFIG_FOLDER:r"/Users/webrtc/workspace/yanbin_work/webrtc-ios-sdk/test/conference_interactiveTest",
+            ConfigKeys.IOS_SIMULATOR:r"iphonesimulator9.2",
+            ConfigKeys.IOS_PHONE:r"iPhone 6s Plus",
+            ConfigKeys.MAC_ADD:r"10.239.158.146",
             ConfigKeys.MAC_USER:r"yanbin",
             ConfigKeys.MAC_PASSD:r"yanbin",
             ConfigKeys.MAC_FOLDER:r"/Users/webrtc/workspace/yanbin_work/webrtc-ios-sdk/test/p2p_interactiveTest",
@@ -44,9 +53,10 @@ class Config(object):
             ConfigKeys.NODE1_USER:r"yanbin",
             ConfigKeys.NODE1_PASSD:r"yanbin",
             ConfigKeys.NODE1_WORKFOLDER1:r"~/workspace/webrtc-webrtc-qa_new/webrtc-webrtc-qa/InteractiveTestFramework/PythonVersion",
-            ConfigKeys.NODE2_ADDR:r"xxx",
-            ConfigKeys.NODE2_USER:r"XXX",
-            ConfigKeys.NODE2_PASSD:r"XXX",
+            ConfigKeys.NODE2_ADDR:r"10.239.158.146",
+            ConfigKeys.NODE2_USER:r"webrtc",
+            ConfigKeys.NODE2_PASSD:r"intel123",
+            ConfigKeys.NODE2_WORKFOLDER1:r"/Users/webrtc/workspace/yanbin_work/webrtc-webrtc-qa/InteractiveTestFramework/PythonVersion",
             ConfigKeys.NODE3_ADDR:r"xxx",
             ConfigKeys.NODE3_USER:r"XXX",
             ConfigKeys.NODE3_PASSD:r"XXX"

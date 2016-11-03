@@ -49,3 +49,20 @@ please use: run.py -c <caselistfile> -m <mode>
 
  python run.py -c <caselistfile> -m <mode> -i which will used for Android and iOS test scenario.
  Increase -i means it need install android test apk and build iOS test application before run test .
+
+
+
+###########################################################################################################
+###########################################################################################################
+How to test with node machine
+1. copy the code to node machine
+2. configure node machine address, username and password at deploy.js file 
+3. start socket.io server  
+4. run command at master machine
+ python runWithNode.py -c <caselistfile> -m <mode>
+ mode 0: local is js and remote is js
+ mode 1: local is android and remote is js
+ mode 2: local is android and remote is iOS
+ mode 3: local is js and remote is iOS
+
+
