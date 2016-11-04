@@ -170,7 +170,7 @@ def start_test(filename, mode):
         else:
           print('All node connected to Server')
           emitmessage("lockevent",{"lock":"beginTest/"+caseinfo[0]+"/"+caseinfo[2]})
-          androidTestDevices=getAndroidDevice.getDevices();
+          androidTestDevices=getAndroidDevice.get_devices();
           print androidTestDevices
           deployAndroid = 0
           if (deployAndroid != 0):
@@ -222,7 +222,7 @@ def start_test(filename, mode):
           nodeStatus={}
           print('All node connected to Server')
         emitmessage("lockevent",{"lock":"beginTest/"+caseinfo[0]+"/"+caseinfo[2]})
-        androidTestDevices=getAndroidDevice.getDevices();
+        androidTestDevices=getAndroidDevice.get_devices();
         print androidTestDevices
         deployAndroid = 0
         if (deployAndroid != 0):

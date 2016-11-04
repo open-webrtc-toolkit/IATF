@@ -19,7 +19,6 @@ class DeployNode(object):
 
     @staticmethod
     def connect_node(nodeAddress, nodeUser, nodePassd,projectFolder,nodeMachine, mode): 
-        #print AndroidPath
         s = pxssh.pxssh()
         if not s.login (nodeAddress, nodeUser, nodePassd):
            print "SSH session failed on login."
@@ -28,7 +27,6 @@ class DeployNode(object):
         else:
            print "SSH session login successful"
            s.sendline('cd ' + projectFolder)
-           #s.sendline ('cd /Users/neilyou/Documents/webrtc-ios-sdk/test/p2psample')
            s.prompt()
            s.sendline('nohup python ./node.py -n ' + nodeMachine + " -m " + mode + " > log.txt &")
            s.prompt()

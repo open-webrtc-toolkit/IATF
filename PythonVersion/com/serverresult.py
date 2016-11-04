@@ -19,11 +19,6 @@ import subprocess
 import commands
 import cStringIO
 class JSResultParse:
-
-    currentDate = datetime.datetime.now() 
-    delta = datetime.timedelta(days=1)
-    codeDate=currentDate-delta
-    formatCodeDate = codeDate.strftime('%Y%m%d')
     @staticmethod
     def copyJSResult(testResultFile,casename,mode):
         if mode == "P2P":
@@ -49,15 +44,12 @@ class JSResultParse:
         summaryError=0
         summaryDisabled=0
 
-
-   # Check results.
         for xmlTestResultPath in JSTestResultPaths:
             try:
                 xmlDoc=minidom.parse(xmlTestResultPath)
             except:
                 print "Error occured while reading woogeen server test result."
-                return 1
-        
+                return 1       
             testSuites=xmlDoc.documentElement
             testSuite=testSuites.getElementsByTagName('testsuite')[1]
             summaryTotal+=int(testSuite.attributes["tests"].value)
@@ -65,11 +57,9 @@ class JSResultParse:
             summaryError+=int(testSuite.attributes["errors"].value)
     
         if summaryTotal==0:
-           return 1
-    
+           return 1    
         elif summaryError > 0:
-           return 1
-    
+           return 1   
         elif summaryFailed > 0:
            return 1
         else:

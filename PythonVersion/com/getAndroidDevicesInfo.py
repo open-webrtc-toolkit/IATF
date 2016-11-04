@@ -20,7 +20,7 @@ devicesIPDic={}
 
 class getAndroidDevice(object):
     @staticmethod
-    def getDevices():
+    def get_devices():
         output = subprocess.check_output('adb devices', shell=True,)
         print '\tstdout:', output
         if len(output) == 0:
@@ -37,7 +37,7 @@ class getAndroidDevice(object):
         return devicesArray
     @staticmethod
     def getDevicesIp():
-    	androidDevices=getDevices()
+    	androidDevices=get_devices()
     	for index in range(len(androidDevices)):
     		command="adb -s " + androidDevices[index] + " shell netcfg"
     		commandOutput = subprocess.check_output(command, shell=True,)

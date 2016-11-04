@@ -89,7 +89,7 @@ def start_test(filename, mode):
     ##deploy test cases #################
     ######################################
     if int(mode) == 1:
-        androidTestDevices=getAndroidDevice.getDevices();
+        androidTestDevices=getAndroidDevice.get_devices();
         print androidTestDevices
         if install == 'true':
           deployAndroid=Deploy.deploy_android(androidTestDevices[0],"P2P")
@@ -97,7 +97,7 @@ def start_test(filename, mode):
           deployAndroid=0
     elif int(mode) == 2:
         print "start Android to Android"
-        androidTestDevices=getAndroidDevice.getDevices();
+        androidTestDevices=getAndroidDevice.get_devices();
         print androidTestDevices
         if install == 'true':
           deployAndroid1=Deploy.deploy_android(androidTestDevices[0],"P2P")
@@ -107,7 +107,7 @@ def start_test(filename, mode):
           deployAndroid2 = 0;
     elif int(mode) == 3:
         print "start Android to iOS"
-        androidTestDevices=getAndroidDevice.getDevices();
+        androidTestDevices=getAndroidDevice.get_devices();
         print androidTestDevices
         if install == 'true':
           deployiOS=Deploy.deploy_iOS_remote('WoogeenChatTest.xcodeproj','WoogeenChatTest')
@@ -144,7 +144,7 @@ def start_test(filename, mode):
         else:
           deployiOS_result = 0;
     elif int(mode) == 4:
-        androidTestDevices=getAndroidDevice.getDevices();
+        androidTestDevices=getAndroidDevice.get_devices();
         print androidTestDevices
         if install == 'true':
           deployAndroid1=Deploy.deploy_android(androidTestDevices[0],"CONFERENCE")
@@ -435,8 +435,8 @@ def waitProcess(interval, processnumber1,processnumber2):
         else:
           break
       number=number+1
-start_test(caselistfile,mode)
 #test#
 #if __name__ == "__main__":
 #    start_test(caselist,0)
-
+if __name__ == "__main__":
+   start_test(caselistfile,mode)

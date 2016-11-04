@@ -15,7 +15,6 @@ import commands
 from pexpect import pxssh
 
 class Deploy(object):
-
     @staticmethod
     def deploy_js(testResultFile,mode):
         if mode == 'P2P':
@@ -137,9 +136,6 @@ class Deploy(object):
            s.sendline('xctool -project ' + YourWorkspace + ' -scheme ' + YourScheme + ' build-tests -sdk iphonesimulator9.2 -destination \'platform=iOS Simulator,name=iPhone 6s Plus\'')
            s.logfile = sys.stdout
            print s.logfile
-           #s.sendline('xctool -project WoogeenChatTest.xcodeproj -scheme WoogeenChatTest build-tests')
-          # s.prompt()
-           #print s.before
            return s
     @staticmethod
     def start_iOS_remote(YourWorkspace,YourScheme,TestTarget,casename,classname):
