@@ -38,7 +38,7 @@ currentCase = ''
 number = 0
 currentClassname = ''
 deployiOS = ''
-
+install = False
 
 try:
    opts, args = getopt.getopt(sys.argv[1:],"h:m:n:i",["help", "m=","n=","install"])
@@ -56,6 +56,7 @@ for opt, arg in opts:
       mode = arg
       print "getmode"
    elif opt == '-i':
+      print "node will install apk first"
       install = 'true'
    else:
       assert False, "unhandled option"
@@ -64,7 +65,7 @@ if nodeName == '':
    sys.exit()
 
 socketServer = Config.getConfig(Keys.SOCKET_SERVER)
-socketServerPort = Config.getConfig(Keys.SOCKET_SERVER_PORT)
+socketServerPort = Config.getConfig(Keys.SOCKET_SERVER_PORT_control)
 print "socketServer is " ,socketServer
 print "socketServerPort is ",socketServerPort
 socketIO = SocketIO(str(socketServer), int(socketServerPort))
@@ -80,16 +81,19 @@ def start_node():
     global currentCase
     global currentClassname
     global deployiOS
+    global install
+    cleanEnv = CleanEnv();
+    jsresultParse = JSResultParse();
     socket_connect()
     socketIO.wait(seconds=5)
     print "connected is", connected;
     n=10
     if(connected == True):
       print "start test node"
-      emitmessage("lockevent",{"lock": nodeName+"_connected"})
+      emitmessage("controlevent",{"lock": nodeName+"_connected"})
       while n > 0:
         print('T-minus', n)    
-        socketIO.on('lockevent', waitMessageCallback);
+        socketIO.on('waitcontrollock', waitMessageCallback);
         print "waiting ...."  
         if begin == True :
           break;
@@ -105,36 +109,39 @@ def start_node():
               startjs=Deploy.start_js("testclient"+number+".conf.js",currentCase,"P2P")
               print "startjs PID is: ", startjs
               waitProcess(10, startjs,'')
-              caseresult=JSResultParse.parseJSResult("test-results-client"+number+".xml","P2P")
+              caseresult=jsresultParse.parseJSResult("test-results-client"+number+".xml","P2P")
               print "case"+number+"result is ", caseresult;
-              JSResultParse.copyJSResult("test-results-client"+number+".xml", currentCase+'_'+number,"P2P")
+              jsresultParse.copyJSResult("test-results-client"+number+".xml", currentCase+'_'+number,"P2P")
               if (caseresult == 0):
-                 emitmessage("lockevent",{"lock":nodeName+"_pass"})
+                 emitmessage("controlevent",{"lock":nodeName+"_pass"})
               else:
-                emitmessage("lockevent",{"lock":nodeName+"_fail"})
+                emitmessage("controlevent",{"lock":nodeName+"_fail"})
               cleanEnv.kill_karmaStart() # only need make sure karma start command is killed.
-              emitmessage("lockevent",{"lock":"node"+number+"_finished"})
+              #emitmessage("controlevent",{"lock":"node"+number+"_finished"})
             else:
               print("startBrowser error: ");
          if "androidp2p" in mode:
             print "start test js conference "
             case,number=mode.split("_")
-            androidTestDevices=getAndroidDevice.getDevices();
+            androidTestDevices=getAndroidDevice.get_devices();
             print androidTestDevices
+            if len(androidTestDevices) <1:
+              emitmessage("controlevent",{"lock":nodeName+"_fail"})
+              return
             if install == 'true':
               deployAndroid=Deploy.deploy_android(androidTestDevices[0],"P2P")
             else:
               deployAndroid=0
             if (deployAndroid == 0):
-              startAndorid=Deploy.start_android_sync(androidTestDevices[0],currentCase,currentClassName,"P2P")
+              startAndroid=Deploy.start_android_sync(androidTestDevices[0],currentCase,currentClassname,"P2P")
               waitProcess(10, startAndroid,'')
-              caseResult = getAndroidDevice.read_caselist(currentClassName,currentCase,"P2P");
-              if (caseresult == 0):
-                 emitmessage("lockevent",{"lock":nodeName+"_pass"})
+              caseResult = getAndroidDevice.read_caselist(currentClassname,currentCase,"P2P");
+              if (caseResult == 0):
+                 emitmessage("controlevent",{"lock":nodeName+"_pass"})
               else:
-                emitmessage("lockevent",{"lock":nodeName+"_fail"})
+                emitmessage("controlevent",{"lock":nodeName+"_fail"})
               cleanEnv.kill_karmaStart() # only need make sure karma start command is killed.
-              emitmessage("lockevent",{"lock":"node"+number+"_finished"})
+              #emitmessage("controlevent",{"lock":"node"+number+"_finished"})
             else:
                print("Deploy Android test code error: ");
          if "iosp2p" in mode:
@@ -161,10 +168,10 @@ def start_node():
                   caseresult = 1
 
               if (caseresult == 0):
-                 emitmessage("lockevent",{"lock":nodeName+"_pass"})
+                 emitmessage("controlevent",{"lock":nodeName+"_pass"})
               else:
-                emitmessage("lockevent",{"lock":nodeName+"_fail"})
-              emitmessage("lockevent",{"lock":"node"+number+"_finished"})
+                emitmessage("controlevent",{"lock":nodeName+"_fail"})
+              emitmessage("controlevent",{"lock":"node"+number+"_finished"})
             else:
                print("iosp2psc error: ");
          if "androidconference" in mode:
@@ -172,7 +179,7 @@ def start_node():
             case,number=mode.split("_")
             deployAndroid=Deploy.deploy_js("testacular.conf"+number+".js","CONFERENCE")       
             if (deployAndroid == 0):
-              emitmessage("lockevent",{"lock":"STARTTEST"})
+              emitmessage("controlevent",{"lock":"STARTTEST"})
               androidTestDevices=getAndroidDevice.getDevices();
               startAndorid=Deploy.start_android_sync(androidTestDevices[0],currentCase,currentClassname,"CONFERENCE")
               print "startAndorid PID is: ", startAndorid
@@ -180,11 +187,11 @@ def start_node():
               # TBD
               caseResult = getAndroidDevice.read_caselist(currentClassname,currentCase,"CONFERENCE");
               if (caseresult == 0):
-                 emitmessage("lockevent",{"lock":nodeName+"_pass"})
+                 emitmessage("controlevent",{"lock":nodeName+"_pass"})
               else:
-                emitmessage("lockevent",{"lock":nodeName+"_fail"})
+                emitmessage("controlevent",{"lock":nodeName+"_fail"})
               cleanEnv.kill_karmaStart() # only need make sure karma start command is killed.
-              emitmessage("lockevent",{"lock":"node"+number+"_finished"})
+              emitmessage("controlevent",{"lock":"node"+number+"_finished"})
             else:
               print("startBrowser error: ");          
 def socket_connect():

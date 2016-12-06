@@ -18,7 +18,7 @@ import pxssh
 class DeployNode(object):
 
     @staticmethod
-    def connect_node(nodeAddress, nodeUser, nodePassd,projectFolder,nodeMachine, mode): 
+    def connect_node(nodeAddress, nodeUser, nodePassd,projectFolder,nodeMachine, mode,testcase): 
         s = pxssh.pxssh()
         if not s.login (nodeAddress, nodeUser, nodePassd):
            print "SSH session failed on login."
@@ -26,12 +26,31 @@ class DeployNode(object):
            return 1
         else:
            print "SSH session login successful"
+           s.sendline('ps aux | grep \'node.py\' | grep -v \'grep\' | awk \'{print $2}\'|xargs kill -9 >/dev/null 2>&1')
+           s.prompt()
            s.sendline('cd ' + projectFolder)
            s.prompt()
-           s.sendline('nohup python ./node.py -n ' + nodeMachine + " -m " + mode + " > log.txt &")
+           # s.sendline('nohup python ./createnv_with_node.py '+ projectFolder +'/nodelog')
+           # s.prompt()
+           s.sendline('nohup python ./node.py -n ' + nodeMachine + ' -m ' + mode + ' > nodelog/'+ testcase +'.txt &')
            s.prompt()
            print s.before
            return s       
+    @staticmethod
+    def init_node(nodeAddress, nodeUser, nodePassd,projectFolder): 
+        s = pxssh.pxssh()
+        if not s.login (nodeAddress, nodeUser, nodePassd):
+           print "SSH session failed on login."
+           print str(s)
+        else:
+           print "SSH session login successful"
+           s.sendline('cd ' + projectFolder)
+           s.prompt()
+           s.sendline('python createnv_with_node.py '+ projectFolder +'/nodelog')
+           s.prompt()
+           print s.before
+           s.close
+                
 
 
 #test

@@ -33,6 +33,7 @@ class Deploy(object):
                 return 1
             else:
                 return 0
+
     @staticmethod
     def deploy_android(androidDevice,mode):
         if mode == 'P2P':
@@ -49,6 +50,11 @@ class Deploy(object):
            print "Install APK failed"
            return 1 
 
+    @staticmethod
+    def deploy_runtest(casetest,mode,log):  
+        webrtc_webrtc_qa=Config.getConfig(Keys.WEBRTC_WEBRTC_QA)
+        runtest=subprocess.Popen('python '+ webrtc_webrtc_qa +'/runTest.py -c ' + casetest + " -m " + mode + " >> "+log+".txt ", shell=True)
+        runtest.wait()
     @staticmethod
     def start_js(testResultFile, caseName, mode):
         if mode == 'P2P':

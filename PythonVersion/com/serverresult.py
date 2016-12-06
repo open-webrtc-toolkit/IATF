@@ -19,8 +19,7 @@ import subprocess
 import commands
 import cStringIO
 class JSResultParse:
-    @staticmethod
-    def copyJSResult(testResultFile,casename,mode):
+    def copyJSResult(self,testResultFile,casename,mode):
         if mode == "P2P":
             BasePath=Config.getConfig(Keys.JS_P2P_CONFIG_FOLDER)
         else:
@@ -29,9 +28,13 @@ class JSResultParse:
         JSTestResultPath=BasePath+"/report/"+testResultFile
         ResultPath=BasePath+"/report/"+casename+".xml"
         print JSTestResultPath
-        RenameCase=subprocess.Popen("cp "+ JSTestResultPath + " " + ResultPath, shell=True)
-    @staticmethod
-    def parseJSResult(testResultFile,mode):
+        if os.path.exists(JSTestResultPath):
+            RenameCase=subprocess.Popen("cp "+ JSTestResultPath + " " + ResultPath, shell=True)
+            return 0
+        else:
+            return 1
+
+    def parseJSResult(self,testResultFile,mode):
         if mode == "P2P":
             BasePath=Config.getConfig(Keys.JS_P2P_CONFIG_FOLDER)
         else:
@@ -39,31 +42,35 @@ class JSResultParse:
         print BasePath
         JSTestResultPaths=[BasePath+"/report/"+testResultFile]
         print JSTestResultPaths
-        summaryTotal=0
-        summaryFailed=0
-        summaryError=0
-        summaryDisabled=0
 
-        for xmlTestResultPath in JSTestResultPaths:
-            try:
-                xmlDoc=minidom.parse(xmlTestResultPath)
-            except:
-                print "Error occured while reading woogeen server test result."
-                return 1       
-            testSuites=xmlDoc.documentElement
-            testSuite=testSuites.getElementsByTagName('testsuite')[1]
-            summaryTotal+=int(testSuite.attributes["tests"].value)
-            summaryFailed+=int(testSuite.attributes["failures"].value)
-            summaryError+=int(testSuite.attributes["errors"].value)
+        if os.path.exists(JSTestResultPaths[0]):
+            summaryTotal=0
+            summaryFailed=0
+            summaryError=0
+            summaryDisabled=0
+
+            for xmlTestResultPath in JSTestResultPaths:
+                try:
+                    xmlDoc=minidom.parse(xmlTestResultPath)
+                except:
+                    print "Error occured while reading woogeen server test result."
+                    return 1       
+                testSuites=xmlDoc.documentElement
+                testSuite=testSuites.getElementsByTagName('testsuite')[1]
+                summaryTotal+=int(testSuite.attributes["tests"].value)
+                summaryFailed+=int(testSuite.attributes["failures"].value)
+                summaryError+=int(testSuite.attributes["errors"].value)
     
-        if summaryTotal==0:
-           return 1    
-        elif summaryError > 0:
-           return 1   
-        elif summaryFailed > 0:
-           return 1
+            if summaryTotal==0:
+                return 1    
+            elif summaryError > 0:
+                return 1   
+            elif summaryFailed > 0:
+                return 1
+            else:
+                return 0
         else:
-           return 0
+            return 2
 
 #test#
 #result=passResult("test-results-client1.xml")
