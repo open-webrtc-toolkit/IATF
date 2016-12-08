@@ -95,7 +95,7 @@ def ReadTxt(device_detial,mode_list):
 	if isrecord['CPUusage']:
 		CPUusage = ReadCPU(r'report/'+device_detial+'_CPU.txt')
 	if isrecord['Memoryusage']:
-		Memoryusage = ReadCPU(r'report/'+device_detial+'_CPU.txt')
+		Memoryusage = ReadMemory(r'report/'+device_detial+'_CPU.txt')
 	if len(fps) != 0:
 		dict_devices['video_fps'] = fps
 	if len(video_delay) != 0:
@@ -137,9 +137,9 @@ def ReadMemory(file):
 			lines = re.split('\\s+',line)
 			print lines
 			if lines[0] == '':
-				memory.append(lines[7])
+				memory.append(str(int(lines[7].strip('K'))/1024))
 			else:
-				memory.append(lines[6])
+				memory.append(str(int(lines[6].strip('K'))/1024))
 	return memory
 
 if __name__ =='__main__':
