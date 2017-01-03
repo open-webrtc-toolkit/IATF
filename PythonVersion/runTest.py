@@ -75,6 +75,7 @@ socketServerPort_control = Config.getConfig(Keys.SOCKET_SERVER_PORT_control)
 print "socketServer is " ,socketServer
 print "socketServerPort is ",socketServerPort
 socketIO_control = SocketIO(str(socketServer), int(socketServerPort_control))
+socketIO_action = SocketIO(str(socketServer), int(socketServerPort))
 #emitmessagetocontrolserver("controlevent",{"lock":"connect_server"})
 def start_test(casetest, mode):
     global deployAndroid
@@ -122,6 +123,7 @@ def start_test(casetest, mode):
         deployjs2=Deploy.deploy_js("testclient2.conf.js","P2P")
         if (deployjs2 == 0):
           emitmessagetocontrolserver("controlevent",{"lock":"STARTTEST"})
+          emitmessage("lockevent",{"lock":"STARTTEST"})
           t2 = Thread(target=WaitingPeerResult,args=(100,))
           t2.daemon = True
           t2.start()
@@ -500,14 +502,14 @@ def on_aaa_response(*args):
     print('connected', args)
     return 0;
 def socket_connect():
-    socketIO.on('connect', on_aaa_response)
-    socketIO.wait(seconds=3)
+    socketIO_action.on('connect', on_aaa_response)
+    socketIO_action.wait(seconds=3)
     socketIO_control.on('connect', on_aaa_response)
     socketIO_control.wait(seconds=3)
     
 
 def emitmessage(message,data):
-    socketIO.emit(message,data)
+    socketIO_action.emit(message,data)
 
 def emitmessagetocontrolserver(message,data):
     socketIO_control.emit(message,data)
