@@ -48,13 +48,14 @@ class Deploy(object):
            return 0
         else:
            print "Install APK failed"
-           return 1 
+           return 1
 
     @staticmethod
-    def deploy_runtest(casetest,mode,log):  
+    def deploy_runtest(casetest,mode,install,log):
         webrtc_webrtc_qa=Config.getConfig(Keys.WEBRTC_WEBRTC_QA)
-        runtest=subprocess.Popen('python '+ webrtc_webrtc_qa +'/runTest.py -c ' + casetest + " -m " + mode + " >> "+log+".txt ", shell=True)
-        runtest.wait()
+        runtest=subprocess.Popen('python '+ webrtc_webrtc_qa +'/runTest.py -c ' + casetest + " -m " + mode + " -i "+ install +" >> "+log+".txt ", shell=True)
+        #runtest.wait()
+        return runtest
     @staticmethod
     def start_js(testResultFile, caseName, mode):
         if mode == 'P2P':
@@ -100,10 +101,13 @@ class Deploy(object):
           IOSPath=Config.getConfig(Keys.IOS_P2P_CONFIG_FOLDER)
         else:
           IOSPath=Config.getConfig(Keys.IOS_CONFERENCE_CONFIG_FOLDER)
-        iOSDeploy=subprocess.Popen('cd '+IOSPath+'; ' + 'xctool -project ' + YourWorkspace + ' -scheme ' + YourScheme + ' build-tests -sdk '+ YourSimulator +' -destination \'platform=iOS Simulator,name='+ YourPhone + '\''+ ">deployiOS.log", shell=True)
-        time.sleep(10);
+        print 'xcodebuild  -project ' + YourWorkspace + ' -scheme ' + YourScheme + ' -sdk '+ YourSimulator +' clean build-for-testing -destination \'platform=iOS Simulator,name='+ YourPhone + '\'' 
+        iOSDeploy=subprocess.Popen('cd '+IOSPath+'; ' + 'xcodebuild  -project ' + YourWorkspace + ' -scheme ' + YourScheme + ' -sdk '+ YourSimulator +' clean build-for-testing -destination \'platform=iOS Simulator,name='+ YourPhone + '\''+ ">deployiOS.log", shell=True)
+        #time.sleep(10);
+        iOSDeploy.wait();
         lines = [line.rstrip('\n') for line in open(IOSPath+"/deployiOS.log")]
         for index in range(len(lines)):
+            print lines[index]
             if ("FAILED" in lines[index]) or ("1 errored" in lines[index]):
                 return 1
             else:
@@ -187,7 +191,7 @@ class Deploy(object):
 #    print result.before
 #    print result.pid
 #    result.sendline('xctool -project WoogeenChatTest.xcodeproj -scheme WoogeenChatTest test')
-#    time.sleep(10); 
+#    time.sleep(10);
 #    result.prompt()
 #    result.expect (pexpect.EOF)
 #    print result.before

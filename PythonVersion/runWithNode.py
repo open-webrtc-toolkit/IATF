@@ -34,8 +34,10 @@ print 'Argument List:', str(sys.argv)
 
 caselistfile = ''
 mode = ''
-install = ''
+install = 'false'
 number=1
+isfinish = False
+istimeout = True
 
 try:
    opts, args = getopt.getopt(sys.argv[1:],"h:c:m:i",["help", "caselistfile=","mode=","install"])
@@ -67,13 +69,25 @@ socketServerPort = Config.getConfig(Keys.SOCKET_SERVER_PORT)
 socketServerPort_control = Config.getConfig(Keys.SOCKET_SERVER_PORT_control)
 print "socketServer is " ,socketServer
 print "socketServerPort is ",socketServerPort
-socketIO = SocketIO(str(socketServer), int(socketServerPort))
-socketIO_control = SocketIO(str(socketServer), int(socketServerPort_control))
+socketIO = SocketIO(str(socketServer), int(socketServerPort),wait_for_connection=False)
+socketIO_control = SocketIO(str(socketServer), int(socketServerPort_control),wait_for_connection=False)
 def start_test(filename, mode):
-
+    global isfinish
+    global istimeout
+    tag = ""
+    if mode == 0:
+      tag = "JS-JS"
+    elif mode == 1:
+      tag = "Android-js"
+    elif mode == 2:
+      tag = "Android-Android"
+    elif mode == 3:
+      tag = "JS-IOS"
+    elif mode == 4:
+      tag = "Android-IOS"
     lines = [line.rstrip('\n') for line in open(filename)]
-    cleanEnv = CleanEnv();
-    cleanEnv.kill_karmaRun()
+    #cleanEnv = CleanEnv();
+    CleanEnv.kill_karmaRun()
     basepath = os.path.join(os.getcwd(),os.path.split(sys.argv[0])[0])
     logpath = os.path.join(basepath,'log')
     resultpath = os.path.join(basepath,"TestResult.txt")
@@ -82,42 +96,53 @@ def start_test(filename, mode):
     if not os.path.exists(logpath):
       os.mkdir(logpath)
     else:
-      cleanEnv.rm_log(logpath)
+      CleanEnv.rm_log(logpath)
     if os.path.exists(resultpath):
-      cleanEnv.rm_TestResult(resultpath)
-    runshell("touch " + resultpath)  
+      CleanEnv.rm_TestResult(resultpath)
+    runshell("touch " + resultpath)
     DeployNode.init_node(Config.getConfig(Keys.NODE1_ADDR),Config.getConfig(Keys.NODE1_USER),Config.getConfig(Keys.NODE1_PASSD),Config.getConfig(Keys.NODE1_WORKFOLDER1))
-    socket_connect
+    #socket_connect
     print len(lines)
     for index in range(len(lines)):
+      isfinish = False
+      istimeout = True
       print "start_test"
-      cleanEnv.rm_JsTestResult('test-results-client2.xml','P2P')
-      cleanEnv.rm_JsTestResult('test-results-client1.xml','P2P')
+      emitmessage("lockevent",{"lock":"Init_action_Lock"})
+      emitmessagetocontrolserver("controlevent",{"lock":"Init_control_Lock"})
+      ######clean enviroment befor start test suits#########
+      CleanEnv.kill_karmaStart()
+      CleanEnv.kill_Firefox()
+      CleanEnv.rm_JsTestResult('test-results-client2.xml','P2P')
+      CleanEnv.rm_JsTestResult('test-results-client1.xml','P2P')
       interval=10
       caseinfo=split_line(lines[index]);
       print "case is", caseinfo[0];
       print "classname is", caseinfo[1];
       casetest = caseinfo[0] +"/"+caseinfo[1]+"/"+caseinfo[2]
-
-      ######clean enviroment befor start test suits#########
-      cleanEnv.kill_karmaStart()
-      cleanEnv.kill_Firefox()
-      emitmessage("lockevent",{"lock":"start_test_"+caseinfo[0]})
-      emitmessagetocontrolserver("controlevent",{"lock":"start_test_"+caseinfo[0]})
-      time.sleep(5)
       testlogpath = os.path.join(logpath,caseinfo[0])
-      Deploy.deploy_runtest(casetest,mode,testlogpath)
+      if install == 'true' and index == 0:
+        pid = Deploy.deploy_runtest(casetest,mode,'true',testlogpath)
+      else:
+        pid = Deploy.deploy_runtest(casetest,mode,'false',testlogpath)
+      print "runtest :" +caseinfo[0]
+      if runtesttimeout(pid,200):
+        print "test is timeout "
+        target = open("TestResult.txt", 'a');
+        target.write(tag+": "+caseinfo[0] +" : test is timeout");
+        target.write('\n');
+        target.close()
+      else:
+        print "test run is finish"
       print "cleanEnv"
-      cleanEnv.kill_runTest()
-      cleanEnv.kill_karmaStart()
-      cleanEnv.kill_Firefox()
-      # emitmessage("lockevent",{"lock":"Init_action_Lock"})
-      # emitmessagetocontrolserver("controlevent",{"lock":"Init_control_Lock"})
-    emitmessagetocontrolserver("controlevent",{"lock":"endtest"})
-    if not os.path.exists(reportpath):
-        os.mkdir(reportpath)
-    test=subprocess.Popen(basepath+"/lib/testscp.sh "+Config.getConfig(Keys.NODE1_USER)+" " + Config.getConfig(Keys.NODE1_ADDR) +" " +Config.getConfig(Keys.NODE1_WORKFOLDER1)+"/node.py " + reportpath +" "+ Config.getConfig(Keys.NODE1_PASSD) ,shell=True)
-    test.wait()
+      CleanEnv.kill_runTest()
+      CleanEnv.kill_karmaStart()
+      CleanEnv.kill_Firefox()
+      time.sleep(2)
+
+    #if not os.path.exists(reportpath):
+    #    os.mkdir(reportpath)
+    #test=subprocess.Popen(basepath+"/lib/testscp.sh "+Config.getConfig(Keys.NODE1_USER)+" " + Config.getConfig(Keys.NODE1_ADDR) +" " +Config.getConfig(Keys.NODE1_WORKFOLDER1)+"/node.py " + reportpath +" "+ Config.getConfig(Keys.NODE1_PASSD) ,shell=True)
+    #test.wait()
 
 
 def runshell(cmd):
@@ -140,7 +165,7 @@ def socket_connect():
     socketIO.wait(seconds=3)
     socketIO_control.on('connect', on_aaa_response)
     socketIO_control.wait(seconds=3)
-    
+
 
 def emitmessage(message,data):
     socketIO.emit(message,data)
@@ -148,12 +173,38 @@ def emitmessage(message,data):
 def emitmessagetocontrolserver(message,data):
     socketIO_control.emit(message,data)
 
+
+def runtesttimeout(runTest,n):
+    global isfinish
+    global istimeout
+    print runTest.pid
+    t = Thread(target=threadwaittestrun,args=(n,))
+    t.daemon = True
+    t.start()
+    runTest.wait()
+    isfinish = True
+    time.sleep(1)
+    return istimeout
+
+def threadwaittestrun(n):
+    global isfinish
+    global istimeout
+    while n > 0:
+      if isfinish:
+        istimeout = False
+        break;
+      n-=1
+      time.sleep(1)
+    CleanEnv.kill_runTest()
+
+
+
 # def waitMessageCallback(*args):
 #     #print('nodeStarted',args)
 #     #print "value is _____________________***********"
 #     #print args[0]['lock']
 #     lockValue = args[0]['lock']
-#     global connectedNode 
+#     global connectedNode
 #     if re.search("connected",lockValue) != None:
 #       print "lockValue is ", lockValue;
 #       nodeName, nodeAction = lockValue.split("_");

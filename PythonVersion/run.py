@@ -69,7 +69,7 @@ if caselistfile == ''or mode == '':
 print 'caselistfile is:', caselistfile
 print 'mode is:', mode
 socketServer = Config.getConfig(Keys.SOCKET_SERVER)
-socketServerPort = Config.getConfig(Keys.SOCKET_SERVER_PORT)
+socketServerPort = Config.getConfig(Keys.SOCKET_SERVER_PORT_control)
 print "socketServer is " ,socketServer
 print "socketServerPort is ",socketServerPort
 socketIO = SocketIO(str(socketServer), int(socketServerPort))
@@ -80,11 +80,12 @@ def start_test(filename, mode):
     global deployAndroid2
     global deployAndroid3
     global deployiOS_result
+    jsresultparse = JSResultParse()
     target = open("TestResult.txt", 'w');
     lines = [line.rstrip('\n') for line in open(filename)]
     cleanEnv = CleanEnv();
     cleanEnv.kill_karmaRun()
-    emitmessage("lockevent",{"lock":"InitLock"})
+    emitmessage("controlevent",{"lock":"InitLock"})
     #####################################
     ##deploy test cases #################
     ######################################
@@ -172,18 +173,18 @@ def start_test(filename, mode):
         deployjs1=Deploy.deploy_js("testclient1.conf.js","P2P")
         deployjs2=Deploy.deploy_js("testclient2.conf.js","P2P")
         if (deployjs1 == 0) and (deployjs2 == 0):
-          emitmessage("lockevent",{"lock":"STARTTEST"})
+          emitmessage("controlevent",{"lock":"STARTTEST"})
           startjs1=Deploy.start_js("testclient1.conf.js",caseinfo[0],"P2P")
           startjs2=Deploy.start_js("testclient2.conf.js",caseinfo[0],"P2P")
           print "startjs1 PID is: ", startjs1
           print "startjs2 PID is: ", startjs2
           waitProcess(10, startjs1,startjs2)
-          case1result=JSResultParse.parseJSResult("test-results-client1.xml","P2P")
-          case2result=JSResultParse.parseJSResult("test-results-client2.xml","P2P")
+          case1result=jsresultparse.parseJSResult("test-results-client1.xml","P2P")
+          case2result=jsresultparse.parseJSResult("test-results-client2.xml","P2P")
           print "case1result is ", case1result;
           print "case2result is ", case2result;
-          JSResultParse.copyJSResult("test-results-client1.xml", caseinfo[0]+'_1',"P2P")
-          JSResultParse.copyJSResult("test-results-client2.xml", caseinfo[0]+'_2',"P2P")
+          jsresultparse.copyJSResult("test-results-client1.xml", caseinfo[0]+'_1',"P2P")
+          jsresultparse.copyJSResult("test-results-client2.xml", caseinfo[0]+'_2',"P2P")
           if (case1result == 0) and (case2result == 0):
             target.write("JS-JS case: "+caseinfo[0]+": pass");
             target.write('\n');
@@ -193,7 +194,7 @@ def start_test(filename, mode):
             target.write('\n');
             print "JS-JS case: ",caseinfo[0],": fail"
           cleanEnv.kill_karmaStart() # only need make sure karma start command is killed.
-          emitmessage("lockevent",{"lock":"InitLock"})
+          emitmessage("controlevent",{"lock":"InitLock"})
         else:
           print("startBrowser error: ");
     ########################################################################################
@@ -203,13 +204,13 @@ def start_test(filename, mode):
         print "start test JS to Android"
         deployjs1=Deploy.deploy_js("testclient1.conf.js","P2P")
         if (deployjs1 == 0) and (deployAndroid == 0):
-          emitmessage("lockevent",{"lock":"STARTTEST"})
+          emitmessage("controlevent",{"lock":"STARTTEST"})
           startjs=Deploy.start_js("testclient1.conf.js",caseinfo[0],"P2P")
           print "startjs PID is: ", startjs;
           startAndorid=Deploy.start_android_sync(androidTestDevices[0],caseinfo[0],caseinfo[2],"P2P")
           waitProcess(10, startjs,startAndorid)
-          case1result=JSResultParse.parseJSResult("test-results-client1.xml","P2P")
-          JSResultParse.copyJSResult("test-results-client1.xml", caseinfo[0],"P2P")
+          case1result=jsresultparse.parseJSResult("test-results-client1.xml","P2P")
+          jsresultparse.copyJSResult("test-results-client1.xml", caseinfo[0],"P2P")
           AndroidResult = getAndroidDevice.read_caselist(caseinfo[2],caseinfo[0],"P2P");
           if (case1result == 0) and (AndroidResult == 0):
             target.write("JS-Android case:: "+caseinfo[0]+": pass");
@@ -220,14 +221,14 @@ def start_test(filename, mode):
             target.write("JS-Android case: "+caseinfo[0]+" : fail");
             target.write('\n');
         cleanEnv.kill_karmaStart() # only need make sure karma start command is killed.
-        emitmessage("lockevent",{"lock":"InitLock"})
+        emitmessage("controlevent",{"lock":"InitLock"})
     ########################################################################################
     # mode 2 : Android to Android #
     ########################################################################################
       elif int(mode) == 2:
         print "start Android to Android"
         if (deployAndroid1 == 0) and (deployAndroid2 == 0):
-          emitmessage("lockevent",{"lock":"STARTTEST"})
+          emitmessage("controlevent",{"lock":"STARTTEST"})
           startAndroid1=Deploy.start_android_sync(androidTestDevices[0],caseinfo[0],caseinfo[1],"P2P");
           startAndroid2=Deploy.start_android_sync(androidTestDevices[1],caseinfo[0],caseinfo[2],"P2P");
           waitProcess(10, startAndroid1,startAndroid2)
@@ -241,7 +242,7 @@ def start_test(filename, mode):
             print "Android-Android case: ",caseinfo[0],": fail"
             target.write("Android-Android case: "+caseinfo[0]+" : fail");
             target.write('\n');
-        emitmessage("lockevent",{"lock":"InitLock"})
+        emitmessage("controlevent",{"lock":"InitLock"})
 
     ########################################################################################
     # mode 3: Android to iOS #
@@ -254,7 +255,7 @@ def start_test(filename, mode):
              os.mkdir(path)
           iOSResultFile = open("iOSResult/"+caseinfo[0]+'_'+caseinfo[2]+'.txt', 'w');
           print "start testing "
-          emitmessage("lockevent",{"lock":"STARTTEST"})
+          emitmessage("controlevent",{"lock":"STARTTEST"})
           startAndroid1=Deploy.start_android_sync(androidTestDevices[0],caseinfo[0],caseinfo[1],"P2P");
           startiOS=Deploy.start_iOS_remote('WoogeenChatTest.xcodeproj','WoogeenChatTest','WoogeenChatTestTests',caseinfo[0],caseinfo[2]);
           print startiOS.pid;
@@ -286,7 +287,7 @@ def start_test(filename, mode):
             target.write('\n');
           #########close ssh process ###########
           startiOS.close
-          emitmessage("lockevent",{"lock":"InitLock"})
+          emitmessage("controlevent",{"lock":"InitLock"})
     ########################################################################################
     # mode 4: JS to iOS #
     ########################################################################################
@@ -296,7 +297,7 @@ def start_test(filename, mode):
         if (deployjs1 == 0) and (deployiOS_result == 0):
           iOSResultFile = open("iOSResult/"+caseinfo[0]+'_'+caseinfo[2]+'.txt', 'w');
           print "start testing "
-          emitmessage("lockevent",{"lock":"STARTTEST"})
+          emitmessage("controlevent",{"lock":"STARTTEST"})
           startiOS=Deploy.start_iOS_remote('WoogeenChatTest.xcodeproj','WoogeenChatTest','WoogeenChatTestTests',caseinfo[0],caseinfo[2]);
           print startiOS.pid;
           startjs1=Deploy.start_js("testclient1.conf.js",caseinfo[0])
@@ -332,7 +333,7 @@ def start_test(filename, mode):
           #########close ssh process ###########
           startiOS.close
           cleanEnv.kill_karmaStart() # only need make sure karma start command is killed.
-          emitmessage("lockevent",{"lock":"InitLock"})
+          emitmessage("controlevent",{"lock":"InitLock"})
     ########################################################################################
     # mode 5 : JS , Android conference mode#
     ########################################################################################
@@ -342,7 +343,7 @@ def start_test(filename, mode):
         deployjs2=Deploy.deploy_js("testacular.conf2.js","CONFERENCE")
         deployjs1=Deploy.deploy_js("testacular.conf1.js","CONFERENCE")
         if (deployjs1 == 0) and (deployjs2 == 0) and (deployAndroid1 == 0) and (deployAndroid2 == 0) and (deployAndroid3 == 0):
-          emitmessage("lockevent",{"lock":"STARTTEST"})
+          emitmessage("controlevent",{"lock":"STARTTEST"})
           startAndorid1=Deploy.start_android_sync(androidTestDevices[0],caseinfo[0],caseinfo[1],"CONFERENCE")
           startAndorid2=Deploy.start_android_sync(androidTestDevices[1],caseinfo[0],caseinfo[1],"CONFERENCE")
           startAndorid3=Deploy.start_android_sync(androidTestDevices[2],caseinfo[0],caseinfo[1],"CONFERENCE")
@@ -372,7 +373,7 @@ def start_test(filename, mode):
           #  target.write('\n');
         cleanEnv.kill_karmaStart() # only need make sure karma start command is killed.
         cleanEnv.kill_Firefox()
-        emitmessage("lockevent",{"lock":"InitLock"})
+        emitmessage("controlevent",{"lock":"InitLock"})
     ###########################################################################################
 
     ###########################################################################################
@@ -395,7 +396,7 @@ def socket_connect():
     socketIO.on('connect', on_aaa_response)
     socketIO.wait(seconds=3)
     return socketIO;
-    socketIO.emit("lockevent",{"lock":"STARTTEST"})
+    socketIO.emit("controlevent",{"lock":"STARTTEST"})
 def emitmessage(message,data):
     socketIO.emit(message,data)
 
@@ -413,7 +414,7 @@ def waitProcess(interval, processnumber1,processnumber2):
       time.sleep(time_remaining)
       print_ts("Starting command.")
       p=psutil.pids();
-      print p
+      #print p
       if processnumber2:
         if (processnumber1 in p) or (processnumber2 in p):
           print_ts("-"*100)

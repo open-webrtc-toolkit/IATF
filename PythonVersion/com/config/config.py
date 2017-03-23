@@ -33,37 +33,41 @@ class ConfigKeys(object):
   IOS_PHONE = 26
   NODE2_WORKFOLDER1 = 27
   WEBRTC_WEBRTC_QA = 28
+  WAITNODERESULTTIME = 29
+  WAITNODECONNECTTIME = 30
 class Config(object):
   config = {
             ConfigKeys.KARMA: r"/usr/lib/node_modules/karma/bin/karma",
             ConfigKeys.ADB:r"adb",
-            ConfigKeys.WEBRTC_WEBRTC_QA:r"/home/fengwei/zyh/PythonVersion",
-            ConfigKeys.JS_P2P_CONFIG_FOLDER:r"/home/fengwei/zyh/webrtc-javascript-sdk/test/p2pInteractionTest",
-            ConfigKeys.JS_CONFERENCE_CONFIG_FOLDER:r"//home/fengwei/zyh/webrtc-javascript-sdk/test/mcuJSTestCases/test-api",
-            ConfigKeys.ANDROID_P2P_CONFIG_FOLDER:r"/home/fengwei/zyh/webrtc-android-sdk/test/p2pFrameworkTest",
-            ConfigKeys.ANDROID_CONFERENCE_CONFIG_FOLDER:r"/home/fengwei/zyh/webrtc-android-sdk/test/conferenceframeworktest2",
-            ConfigKeys.IOS_P2P_CONFIG_FOLDER:r"/Users/webrtc/workspace/yanbin_work/webrtc-ios-sdk/test/p2p_interactiveTest",
+            ConfigKeys.WEBRTC_WEBRTC_QA:r"/home/fengwei/zyh_qa/0322/webrtc-webrtc-qa/InteractiveTestFramework/PythonVersion",
+            ConfigKeys.JS_P2P_CONFIG_FOLDER:r"/home/fengwei/zyh_js/webrtc-javascript-sdk/test/p2pInteractionTest",
+            ConfigKeys.JS_CONFERENCE_CONFIG_FOLDER:r"//home/fengwei/zyh_js/webrtc-javascript-sdk/test/mcuJSTestCases/test-api",
+            ConfigKeys.ANDROID_P2P_CONFIG_FOLDER:r"/home/fengwei/zyh_android/0317/webrtc-android-sdk/test/p2pFrameworkTest",
+            ConfigKeys.ANDROID_CONFERENCE_CONFIG_FOLDER:r"/home/fengwei/zyh_android/0216/webrtc-android-sdk/test/conferenceframeworktest2",
+            ConfigKeys.IOS_P2P_CONFIG_FOLDER:r"/Users/webrtctest25/Documents/shijincheng/webrtc-ios-sdk/test/p2p_interactiveTest",
             ConfigKeys.IOS_CONFERENCE_CONFIG_FOLDER:r"/Users/webrtc/workspace/yanbin_work/webrtc-ios-sdk/test/conference_interactiveTest",
             ConfigKeys.IOS_SIMULATOR:r"iphonesimulator9.2",
             ConfigKeys.IOS_PHONE:r"iPhone 6s Plus",
-            ConfigKeys.MAC_ADD:r"10.239.158.146",
-            ConfigKeys.MAC_USER:r"yanbin",
-            ConfigKeys.MAC_PASSD:r"yanbin",
-            ConfigKeys.MAC_FOLDER:r"/Users/webrtc/workspace/yanbin_work/webrtc-ios-sdk/test/p2p_interactiveTest",
-            ConfigKeys.SOCKET_SERVER:r"10.239.44.86",
+            ConfigKeys.MAC_ADD:r"webrtctest25.sh.intel.com",
+            ConfigKeys.MAC_USER:r"webrtctest25",
+            ConfigKeys.MAC_PASSD:r"intel123",
+            ConfigKeys.MAC_FOLDER:r"/Users/webrtctest25/Documents/shijincheng/webrtc-ios-sdk/test/p2p_interactiveTest",
+            ConfigKeys.SOCKET_SERVER:r"10.239.44.74",
             ConfigKeys.SOCKET_SERVER_PORT:r"9092",
             ConfigKeys.SOCKET_SERVER_PORT_control:r"9091",
-            ConfigKeys.NODE1_ADDR:r"10.239.44.86",
+            ConfigKeys.NODE1_ADDR:r"10.239.44.74",
             ConfigKeys.NODE1_USER:r"fengwei",
             ConfigKeys.NODE1_PASSD:r"intel@123",
-            ConfigKeys.NODE1_WORKFOLDER1:r"/home/fengwei/zyh/PythonVersion",
-            ConfigKeys.NODE2_ADDR:r"10.239.158.146",
-            ConfigKeys.NODE2_USER:r"webrtc",
+            ConfigKeys.NODE1_WORKFOLDER1:r"/home/fengwei/zyh_qa/0322/webrtc-webrtc-qa/InteractiveTestFramework/PythonVersion",
+            ConfigKeys.NODE2_ADDR:r"webrtctest25.sh.intel.com",
+            ConfigKeys.NODE2_USER:r"webrtctest25",
             ConfigKeys.NODE2_PASSD:r"intel123",
-            ConfigKeys.NODE2_WORKFOLDER1:r"/Users/webrtc/workspace/yanbin_work/webrtc-webrtc-qa/InteractiveTestFramework/PythonVersion",
+            ConfigKeys.NODE2_WORKFOLDER1:r"/Users/webrtctest25/Documents/shijincheng/webrtc-webrtc-qa/InteractiveTestFramework/PythonVersion",
             ConfigKeys.NODE3_ADDR:r"xxx",
             ConfigKeys.NODE3_USER:r"XXX",
-            ConfigKeys.NODE3_PASSD:r"XXX"
+            ConfigKeys.NODE3_PASSD:r"XXX",
+            ConfigKeys.WAITNODERESULTTIME: r"40",
+            ConfigKeys.WAITNODECONNECTTIME: r"40"
             }
   @staticmethod
   def getConfig(key):
