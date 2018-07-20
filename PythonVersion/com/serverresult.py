@@ -56,7 +56,8 @@ class JSResultParse:
                     print "Error occured while reading woogeen server test result."
                     return 1       
                 testSuites=xmlDoc.documentElement
-                testSuite=testSuites.getElementsByTagName('testsuite')[1]
+                testSuiteList=testSuites.getElementsByTagName('testsuite')
+                testSuite=testSuiteList[len(testSuiteList)-1]
                 summaryTotal+=int(testSuite.attributes["tests"].value)
                 summaryFailed+=int(testSuite.attributes["failures"].value)
                 summaryError+=int(testSuite.attributes["errors"].value)
@@ -73,5 +74,5 @@ class JSResultParse:
             return 2
 
 #test#
-#result=passResult("test-results-client1.xml")
+#result=passResult("test-results-client2.xml")
 #print result

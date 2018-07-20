@@ -11,7 +11,7 @@ def createEnv():
 		#util.runcmd("rm ")
 
 def kill_node():
-	kill_node=subprocess.Popen('ps aux | grep \'node.py\' | grep -v \'grep\' | awk \'{print $2}\'|xargs kill -9 >/dev/null 2>&1', shell=True)
+    kill_node=subprocess.Popen('ps aux | grep \'node.py\' | grep -v \'grep\' | awk \'{print $2}\'|xargs kill -9 >/dev/null 2>&1', shell=True)
     kill_node.wait()
     print "clean success"
 

@@ -25,7 +25,7 @@ from com.config.config import Config
 from com.config.config import ConfigKeys as Keys
 import psutil
 import commands
-import pxssh
+from pexpect import pxssh
 import re
 import os
 import com.util as util
@@ -81,6 +81,7 @@ socketIO_action = SocketIO(str(socketServer), int(socketServerPort),wait_for_con
 
 #emitmessagetocontrolserver("controlevent",{"lock":"connect_server"})
 def start_test(casetest, mode):
+    JS_P2P_CONFIG_FOLDER = Config.getConfig(Keys.JS_P2P_CONFIG_FOLDER)
     target = open("TestResult.txt", 'a');
     jsresultParse = JSResultParse();
     caseinfo=split_line(casetest);
@@ -96,7 +97,7 @@ def start_test(casetest, mode):
       print "start test js to js "  #  begining js to js test
       print "node connection start"
       #ssh connect to difference node and start node.py
-      deployNode=DeployNode.connect_node(Config.getConfig(Keys.NODE1_ADDR),Config.getConfig(Keys.NODE1_USER),Config.getConfig(Keys.NODE1_PASSD),Config.getConfig(Keys.NODE1_WORKFOLDER1),"node1", "jsp2p_1",caseinfo[0])
+      deployNode=DeployNode.connect_node(Config.getConfig(Keys.NODE1_ADDR),Config.getConfig(Keys.NODE1_USER),Config.getConfig(Keys.NODE1_PASSD),Config.getConfig(Keys.NODE1_WORKFOLDER1),"node1", "jsp2p_2",caseinfo[0])
       #wait node is connect
       isconnect = waitnodeconnect(int(Config.getConfig(Keys.WAITNODECONNECTTIME)))
       if not isconnect:
@@ -108,7 +109,7 @@ def start_test(casetest, mode):
         emitmessagetocontrolserver("controlevent",{"lock":"beginTest/"+caseinfo[0]+"/"+caseinfo[2]})
         # should adjust beginTest is resolved
         # start local testing or new node #
-        deployjs2=Deploy.deploy_js("testclient2.conf.js","P2P")
+        deployjs2=Deploy.deploy_js("testclient1.conf.js","P2P")
         #listen node result
         if (deployjs2 == 0):
           isready = waitnodeready(30)
@@ -118,14 +119,15 @@ def start_test(casetest, mode):
             return
           emitmessagetocontrolserver("controlevent",{"lock":"STARTTEST"})
           emitmessage("lockevent",{"lock":"STARTTEST"})
-          startjs2=Deploy.start_js("testclient2.conf.js",caseinfo[0],"P2P")
+          startjs2=Deploy.start_js("testclient1.conf.js",caseinfo[0],"P2P")
           print "startjs2 PID is: ", startjs2      
           waitProcess(10,startjs2,False)
+          waitreport(100,os.path.join(JS_P2P_CONFIG_FOLDER,"report/test-results-client1.xml"))
           print_ts("test end")
           #check and wait node result
           waitnoderesult(int(Config.getConfig(Keys.WAITNODERESULTTIME)))
           #chack result and write to test
-          case2result=jsresultParse.parseJSResult("test-results-client2.xml","P2P")
+          case2result=jsresultParse.parseJSResult("test-results-client1.xml","P2P")
           print "case2result is ", case2result;
           jsresultParse.copyJSResult("test-results-client2.xml", caseinfo[0]+'_2',"P2P")
           #write reslut
@@ -247,30 +249,35 @@ def start_test(casetest, mode):
         print "start test js to iOS"  #  begining js to js test
         print "node connection start"
         #ssh connect to difference node and start node.py
-        deployNode=DeployNode.connect_node(Config.getConfig(Keys.NODE2_ADDR),Config.getConfig(Keys.NODE2_USER),Config.getConfig(Keys.NODE2_PASSD),Config.getConfig(Keys.NODE2_WORKFOLDER1),"node1", "iosp2p_1",caseinfo[0])
+        deployNode=DeployNode.connect_node(Config.getConfig(Keys.NODE1_ADDR),Config.getConfig(Keys.NODE1_USER),Config.getConfig(Keys.NODE1_PASSD),Config.getConfig(Keys.NODE1_WORKFOLDER1),"node1", "iosp2p_1",caseinfo[0])
         isconnect = waitnodeconnect(int(Config.getConfig(Keys.WAITNODECONNECTTIME)))
         if not isconnect:
           target.write("JS-IOS case: "+caseinfo[0]+": fail , failreason is: can not receive node1 is not connect");
           target.write('\n');
         else:
           print 'All node connected to Server'
-          emitmessagetocontrolserver("controlevent",{"lock":"beginTest/"+caseinfo[0]+"/"+caseinfo[2]})
+          emitmessagetocontrolserver("controlevent",{"lock":"beginTest/"+caseinfo[0]+"/"+caseinfo[1]})
           # start local testing or new node #
-          deployjs2=Deploy.deploy_js("testclient1.conf.js","P2P")
+          deployjs2=Deploy.deploy_js("testclient2.conf.js","P2P")
           if (deployjs2 == 0):
-            time.sleep(25)
+            #time.sleep(25)
+            isready = waitnodeready(30)
+            if not isready:
+              target.write("IOS-JS case: "+caseinfo[0]+": fail , failreason is: node is not ready");
+              target.write('\n');
+              return
+            time.sleep(10)
             emitmessagetocontrolserver("controlevent",{"lock":"STARTTEST"})
             emitmessage("lockevent",{"lock":"STARTTEST"})
-            startjs2=Deploy.start_js("testclient1.conf.js",caseinfo[0],"P2P")
+            startjs2=Deploy.start_js("testclient2.conf.js",caseinfo[0],"P2P")
 
             print "startjs2 PID is: ", startjs2
             waitProcess(10,startjs2,False)
-
             waitnoderesult(int(Config.getConfig(Keys.WAITNODERESULTTIME)))
-
-            case2result=jsresultParse.parseJSResult("test-results-client1.xml","P2P")
+            waitreport(100,os.path.join(JS_P2P_CONFIG_FOLDER,"report/test-results-client2.xml"))
+            case2result=jsresultParse.parseJSResult("test-results-client2.xml","P2P")
             print "case2result is ", case2result;
-            jsresultParse.copyJSResult("test-results-client1.xml", caseinfo[0]+'_1',"P2P")
+            jsresultParse.copyJSResult("test-results-client2.xml", caseinfo[0]+'_2',"P2P")
             # write result
             writeResult("JS-IOS",target,case2result,caseinfo[0])
           else:
@@ -295,34 +302,60 @@ def start_test(casetest, mode):
           deployAndroid=Deploy.deploy_android(androidTestDevices[0],"P2P")
         print "node connection start"
         #ssh connect to difference node and start node.py
-        deployNode=DeployNode.connect_node(Config.getConfig(Keys.NODE2_ADDR),Config.getConfig(Keys.NODE2_USER),Config.getConfig(Keys.NODE2_PASSD),Config.getConfig(Keys.NODE2_WORKFOLDER1),"node1", "iosp2p_1",caseinfo[0])
+        deployNode=DeployNode.connect_node(Config.getConfig(Keys.NODE1_ADDR),Config.getConfig(Keys.NODE1_USER),Config.getConfig(Keys.NODE1_PASSD),Config.getConfig(Keys.NODE1_WORKFOLDER1),"node1", "iosp2p_1",caseinfo[0])
         isconnect = waitnodeconnect(int(Config.getConfig(Keys.WAITNODECONNECTTIME)))
         if not isconnect:
           target.write("Android-IOS case: "+caseinfo[0]+": fail , failreason is: can not receive node1 is not connect");
           target.write('\n');
         else:
           print 'All node connected to Server'
-          emitmessagetocontrolserver("controlevent",{"lock":"beginTest/"+caseinfo[0]+"/"+caseinfo[2]})
+          emitmessagetocontrolserver("controlevent",{"lock":"beginTest/"+caseinfo[0]+"/"+caseinfo[1]})
           # start local testing or new node #
-          time.sleep(25)
+          isready = waitnodeready(30)
+          if not isready:
+            target.write("Android-IOS case: "+caseinfo[0]+": fail , failreason is: node is not ready");
+            target.write('\n');
+            return
+          time.sleep(10)
           emitmessagetocontrolserver("controlevent",{"lock":"STARTTEST"})
           emitmessage("lockevent",{"lock":"STARTTEST"})
-          startAndorid=Deploy.start_android_sync(androidTestDevices[0],caseinfo[0],caseinfo[1],"P2P")
+          startAndorid=Deploy.start_android_sync(androidTestDevices[0],caseinfo[0],caseinfo[2],"P2P")
 
           waitProcess(10,startAndorid,False)
 
           waitnoderesult(int(Config.getConfig(Keys.WAITNODERESULTTIME)))
 
-          AndroidResult = getAndroidDevice.read_caselist(caseinfo[1],caseinfo[0],"P2P");
+          AndroidResult = getAndroidDevice.read_caselist(caseinfo[2],caseinfo[0],"P2P");
 
           #write result
           writeResult("Android-IOS",target,AndroidResult,caseinfo[0])
         deployNode.close
-    ########################################################################################
-    # Conference mode #
-    ########################################################################################
 
     elif int(mode) == 5:
+        print "start test IOS to iOS" 
+        #ssh connect to difference node and start node.py
+        deployNode=DeployNode.connect_node(Config.getConfig(Keys.NODE1_ADDR),Config.getConfig(Keys.NODE1_USER),Config.getConfig(Keys.NODE1_PASSD),Config.getConfig(Keys.NODE1_WORKFOLDER1),"node1", "iosp2p_1",caseinfo[0])
+        deployNode=DeployNode.connect_node(Config.getConfig(Keys.NODE2_ADDR),Config.getConfig(Keys.NODE2_USER),Config.getConfig(Keys.NODE2_PASSD),Config.getConfig(Keys.NODE2_WORKFOLDER1),"node2", "iosp2p_2",caseinfo[0])
+        node_isconnect = waitnodeconnect(int(Config.getConfig(Keys.WAITNODECONNECTTIME)))
+        if not node_isconnect:
+          target.write("IOS-IOS case: "+caseinfo[0]+": fail , failreason is: can not receive nodes is not connect");
+          target.write('\n');
+        else:
+          print 'All node connected to Server'
+          emitmessagetocontrolserver("controlevent",{"lock":"beginTest/"+caseinfo[0]+"/"+caseinfo[2]})
+          # start local testing or new node #
+          isready = waitnodeready(30)
+          if not isready:
+            target.write("IOS-IOS case: "+caseinfo[0]+": fail , failreason is: node is not ready");
+            target.write('\n');
+            return
+          emitmessagetocontrolserver("controlevent",{"lock":"STARTTEST"})
+          emitmessage("lockevent",{"lock":"STARTTEST"})
+          waitnoderesult(int(Config.getConfig(Keys.WAITNODERESULTTIME)))
+          #write result
+          writeNodeResult("IOS-IOS",caseinfo[0])
+        deployNode.close
+      elif int(mode) == 6:
         print "start conference test"
         #deployjs2=Deploy.deploy_js("testacular.conf2.js","CONFERENCE")
         #deployjs1=Deploy.deploy_js("testacular.conf1.js","CONFERENCE")
@@ -424,11 +457,11 @@ def waitingLockCallBack(*args):
       print "nodeReady is ", nodeReady[nodeName]
     return 0
 
-def waitnodeconnect(n):
+def waitnodeconnect(n,node_count=1):
     global nodeStatus
     flag = False
     while n>0:
-      if len(nodeStatus.keys()) == 1:
+      if len(nodeStatus.keys()) == node_count:
           print "node is connect"
           flag = True
           break
@@ -436,20 +469,20 @@ def waitnodeconnect(n):
       n-=1
     return flag
 
-def waitnoderesult(n):
+def waitnoderesult(n,node_count=1):
     global nodeResult
     while n>0:
-      if len(nodeResult.keys()) == 1:
+      if len(nodeResult.keys()) == node_count:
         break
       time.sleep(1)
       n-=1
 
 
-def waitnodeready(n):
+def waitnodeready(n,node_count=1):
     global nodeReady
     flag = False
     while n>0:
-      if len(nodeReady.keys()) == 1:
+      if len(nodeReady.keys()) == node_count:
         print "node is ready"
         flag = True
         break
@@ -538,7 +571,31 @@ def writeResult(tag,target,localresult,casename):
       target.write(tag+": "+casename+" : fail");
       target.write('\n');
 
+def writeNodeResult(tag,casename):
+  global nodeResult
+  length_dict = len(nodeResult.keys())
+  print "-------------------:" + str(length_dict)
+  if nodeResult["node1"] == "pass" and nodeResult["node2"] == "pass":
+     target.write(tag+": "+casename+": pass");
+     target.write('\n');
+     print tag+": ",casename,": pass";
+  else:
+      print tag+": ",casename,": fail"
+      print "node1 result:"+nodeResult["node1"]
+      print "node2 result:"+nodeResult["node2"]
+      target.write(tag+": "+casename+" : fail");
+      target.write('\n');
 
+def waitreport(n,filename):
+  flag = False
+  while n >0:
+    if os.path.exists(filename):
+      flag = True  
+      break
+    else:
+      time.sleep(1)
+    n -=1
+  return flag
 
 t = Thread(target=ThreadWaitLock,args=(300,))
 t.daemon = True

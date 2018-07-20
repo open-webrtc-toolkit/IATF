@@ -2,7 +2,7 @@
 import subprocess
 def getcomputerIp(ipaddress):
 	   ip=subprocess.Popen('ifconfig',stdout=subprocess.PIPE,shell=True)
-	   ip.wait()
+	   ip.communicate()
 	   out,err = ip.communicate()
 	   if ipaddress in out:
 	   		return True
@@ -11,7 +11,7 @@ def getcomputerIp(ipaddress):
 
 def runcmd(cmd):
 	   pid=subprocess.Popen(cmd,shell=True)
-	   pid.wait()
+	   pid.communicate()
 
 # if __name__ == '__main__':
 # 	getcomputerIp("10.239.44.86")

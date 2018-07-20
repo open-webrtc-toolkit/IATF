@@ -94,7 +94,7 @@ class Deploy(object):
         #print AndroidPath
         print "run command to run test case "+ AndroidPath + '/runTest.sh --runcase -s ' + androidDevice + ' -n ' + casename + ' -c ' + classname;
         runAndriodCase=subprocess.Popen(AndroidPath + '/runTest.sh --runcase -s ' + androidDevice + ' -n ' + casename + ' -c ' + classname, shell=True)
-        return runAndriodCase.pid
+        return runAndriodCase
     @staticmethod
     def deploy_iOS(YourWorkspace,YourScheme,YourSimulator,YourPhone,mode):
         if mode == 'P2P':
@@ -104,7 +104,7 @@ class Deploy(object):
         print 'xcodebuild  -project ' + YourWorkspace + ' -scheme ' + YourScheme + ' -sdk '+ YourSimulator +' clean build-for-testing -destination \'platform=iOS Simulator,name='+ YourPhone + '\'' 
         iOSDeploy=subprocess.Popen('cd '+IOSPath+'; ' + 'xcodebuild  -project ' + YourWorkspace + ' -scheme ' + YourScheme + ' -sdk '+ YourSimulator +' clean build-for-testing -destination \'platform=iOS Simulator,name='+ YourPhone + '\''+ ">deployiOS.log", shell=True)
         #time.sleep(10);
-        iOSDeploy.wait();
+        iOSDeploy.communicate();
         lines = [line.rstrip('\n') for line in open(IOSPath+"/deployiOS.log")]
         for index in range(len(lines)):
             print lines[index]

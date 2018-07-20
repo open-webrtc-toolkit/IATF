@@ -24,7 +24,7 @@ from com.config.config import Config
 from com.config.config import ConfigKeys as Keys
 import psutil
 import commands
-import pxssh
+from pexpect import pxssh
 import re
 import os
 from threading import Thread
@@ -85,6 +85,8 @@ def start_test(filename, mode):
       tag = "JS-IOS"
     elif mode == 4:
       tag = "Android-IOS"
+    elif mode == 5:
+      tag = "IOS-IOS"
     lines = [line.rstrip('\n') for line in open(filename)]
     #cleanEnv = CleanEnv();
     CleanEnv.kill_karmaRun()
@@ -101,6 +103,8 @@ def start_test(filename, mode):
       CleanEnv.rm_TestResult(resultpath)
     runshell("touch " + resultpath)
     DeployNode.init_node(Config.getConfig(Keys.NODE1_ADDR),Config.getConfig(Keys.NODE1_USER),Config.getConfig(Keys.NODE1_PASSD),Config.getConfig(Keys.NODE1_WORKFOLDER1))
+    if mode ==  5:
+       DeployNode.init_node(Config.getConfig(Keys.NODE2_ADDR),Config.getConfig(Keys.NODE2_USER),Config.getConfig(Keys.NODE2_PASSD),Config.getConfig(Keys.NODE2_WORKFOLDER1))
     #socket_connect
     print len(lines)
     for index in range(len(lines)):

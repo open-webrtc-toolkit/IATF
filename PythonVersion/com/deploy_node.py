@@ -13,7 +13,7 @@ from config.config import Config
 from config.config import ConfigKeys as Keys
 import subprocess
 import commands
-import pxssh
+from pexpect import pxssh
 
 class DeployNode(object):
 
@@ -37,7 +37,11 @@ class DeployNode(object):
            print s.before
            return s       
     @staticmethod
-    def init_node(nodeAddress, nodeUser, nodePassd,projectFolder): 
+    def init_node(nodeAddress, nodeUser, nodePassd,projectFolder):
+        print "nodeAddress:"+nodeAddress
+        print "nodeUser:"+nodeUser
+        print "nodePassd:"+nodePassd
+        print "projectFolder:"+projectFolder
         s = pxssh.pxssh()
         if not s.login (nodeAddress, nodeUser, nodePassd):
            print "SSH session failed on login."

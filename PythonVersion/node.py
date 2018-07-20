@@ -90,6 +90,7 @@ def start_node(nodeName,mode,install,devices):
     global currentClassname
     global deployiOS
     global begin
+    JS_P2P_CONFIG_FOLDER = Config.getConfig(Keys.JS_P2P_CONFIG_FOLDER)
     #cleanEnv = CleanEnv();
     jsresultParse = JSResultParse();
     socket_connect()
@@ -112,12 +113,15 @@ def start_node(nodeName,mode,install,devices):
          if "jsp2p" in mode:
             print "start test JS p2p "
             case,number=mode.split("_")
+            print "number:"+number
             deployjs=Deploy.deploy_js("testclient"+number+".conf.js","P2P")
             if (deployjs == 0):
+              time.sleep(3)
               emitmessage("controlevent",{"lock":nodeName+"_ready"})
               startjs=Deploy.start_js("testclient"+number+".conf.js",currentCase,"P2P")
               print "startjs PID is: ", startjs
               waitProcess(10, startjs,False)
+              waitreport(100,os.path.join(JS_P2P_CONFIG_FOLDER,"report/test-results-client"+number+".xml"))
               print "test is end"
               caseresult=jsresultParse.parseJSResult("test-results-client"+number+".xml","P2P")
               print "case"+number+"result is ", caseresult;
@@ -294,6 +298,16 @@ def waitProcess(interval, processnumber1,processnumber2):
           break
       number=number+1
 
+def waitreport(n,filename):
+  flag = False
+  while n >0:
+    if os.path.exists(filename):
+      flag = True  
+      break
+    else:
+      time.sleep(1)
+    n -=1
+  return flag
 
 start_node(nodeName,mode,install,devices)
 #test#
