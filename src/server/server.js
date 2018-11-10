@@ -14,5 +14,9 @@ const httpsOptions = {
   cert: fs.readFileSync(commander.certificate_file).toString()
 };
 
-const socketio = require('socket.io').listen(require('https').createServer(
+const io = require('socket.io').listen(require('https').createServer(
   httpsOptions, require('express')()).listen(9000));
+
+io.on('connection', socket=>{
+  console.log('A new user connected.');
+});
