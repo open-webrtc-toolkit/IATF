@@ -85,13 +85,15 @@ io.on('connection', socket => {
   if (!tasks.get(taskId)) {
     console.warn('Invalid test ID.');
     socket.disconnect(true);
+    return;
   }
   if (!tasks.get(taskId).roles.has(role)) {
     console.warn('Invalid role.');
     socket.disconnect(true);
+    return;
   }
-  const test = tasks.get(taskId);
-  const roleInfo = tasks.get(role);
+  const task = tasks.get(taskId);
+  const roleInfo = task.roles.get(role);
   roleInfo.socket = socket;
   roleInfo.type = type;
 
@@ -105,6 +107,7 @@ io.on('connection', socket => {
 });
 
 // Create a new test.
+// Example: {"roles":[{"name": "r1","type":"javascript"},{"name": "r2","type":"javascript"}]}
 webapp.put('/rest/tasks', (req, res) => {
   // req.body is expected to be [{name: string for role name, type: string for device type}].
   console.log(req);

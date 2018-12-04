@@ -54,3 +54,27 @@ The following figure shows the architecture of this framework.
     + Intermediate communication component between test server and test devices
 3. **Test Client**
     + Executing devices of TestCases.
+
+## Sample
+
+1. Start IATF server.
+```
+node src/server/server.js --certificate_file <cert> --key_file <key>
+```
+
+2. Add a test to IATF server with a post request. An example could be
+```
+{
+    "roles": [{
+        "name": "role1",
+        "type": "iOS"
+    },{
+        "name": "role2",
+        "type": "JavaScript"
+    }]
+}
+```
+ 3. Start client controller.
+ ```
+ python src/controller/controller.py --server https://localhost:8080 --no_ssl_verification --task <taskId>
+ ```
