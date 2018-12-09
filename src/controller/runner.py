@@ -4,6 +4,7 @@ It's the base class for all test runners on different platforms.
 
 '''
 
+from threading import Thread
 
 class Runner:
     def __init__(self):
@@ -14,7 +15,7 @@ class Runner:
         '''Setup testing environment.'''
         pass
 
-    def run(self):
+    async def run(self):
         '''Start to run tests.'''
         pass
 

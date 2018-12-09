@@ -62,7 +62,7 @@ The following figure shows the architecture of this framework.
 node src/server/server.js --certificate_file <cert> --key_file <key>
 ```
 
-2. Add a test to IATF server with a post request. An example could be
+2. Add a task to IATF server with a post request. An example could be
 ```
 {
     "roles": [{
