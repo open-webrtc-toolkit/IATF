@@ -6,6 +6,13 @@ It's the base class for all test runners on different platforms.
 
 from threading import Thread
 
+def create_runner(type, config):
+    if type.lower() != 'javascript':
+        raise TypeError('Only JavaScript runner is supported.')
+    from runners import javascriptrunner
+    return javascriptrunner.JavaScriptRunner(config)
+
+
 class Runner:
     def __init__(self):
         raise Exception(

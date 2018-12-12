@@ -9,20 +9,17 @@ import sys
 import requests
 import runner
 import asyncio
-from runners import javascriptrunner
+import json
 
 
-def _requestConfig(server, task_id, verify):
+def _request_task_info(server, task_id, verify):
     '''Request configuration from IATF server.'''
     response = requests.get(server+'/rest/tasks/'+task_id, verify=verify)
-    print(response.json())
+    return response.json()
 
-async def _startRunner(type, config):
-    js_runner=javascriptrunner.JavaScriptRunner(None)
-    js_runner.run()
+async def _start_runners(runners):
+    await asyncio.gather(runner.run() for runner in runners)
 
-async def _startRunners():
-    await asyncio.gather(_startRunner(None, None), _startRunner(None, None))
 
 def main():
     parser = argparse.ArgumentParser(description='IATF controller.')
@@ -33,10 +30,10 @@ def main():
         '--server', help='IATF server address.', required=True)
     required_arguments.add_argument('--task', help='Task ID.', required=True)
     opts = parser.parse_args()
-    #requestConfig(opts.server, opts.task, opts.verify)
-    js_runner1 = javascriptrunner.JavaScriptRunner(None)
-    js_runner2 = javascriptrunner.JavaScriptRunner(None)
-    asyncio.run(_startRunners())
+    task_info=_request_task_info(opts.server, opts.task, opts.verify)
+    runners=(runner.create_runner(task['type'], None) for task in task_info['roles'])
+    asyncio.run(_start_runners(runners))
+
 
 if __name__ == '__main__':
     sys.exit(main())
