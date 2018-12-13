@@ -22,6 +22,10 @@ describe('Interactivity tests', () => {
       socket.emit('test');
     });
   });
+
+  after(()=>{
+    document.getElementById('state').innerText = 'Finished';
+  });
 });
 
 mocha.checkLeaks();

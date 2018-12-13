@@ -18,7 +18,7 @@ def _request_task_info(server, task_id, verify):
     return response.json()
 
 async def _start_runners(runners):
-    await asyncio.gather(runner.run() for runner in runners)
+    await asyncio.gather(*[runner.run() for runner in runners])
 
 
 def main():
