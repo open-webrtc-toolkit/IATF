@@ -41,7 +41,6 @@ const addTask = function(roles) {
   };
   for (const role of roles) {
     task.roles.set(role.name, {
-      name: role.name,
       type: role.type
     });
   }
@@ -123,7 +122,7 @@ const rolesMapToResponse = function(roles) {
   };
   for (const [roleId, roleInfo] of roles.roles) {
     response.roles.push({
-      name: roleInfo.name,
+      name: roleId,
       type: roleInfo.type
     });
   }
