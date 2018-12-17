@@ -41,7 +41,8 @@ const addTask = function(roles) {
   };
   for (const role of roles) {
     task.roles.set(role.name, {
-      type: role.type
+      type: role.type,
+      config: role.config
     });
   }
   tasks.set(id, task);
@@ -52,15 +53,15 @@ const addTask = function(roles) {
 const sendUserMessage = function(currentRoleName, roleInfoList, message) {
   for (const role of roleInfoList) {
     if (role.name !== currentRoleName) {
-      role.socket.emit(message);
+      role.socket.emit('iatf-workflow', message);
     }
   }
 }
 
 // Emit a message to all clients in current test. Message type is 'iatf-control'.
-const sendSystemMessage = function(test, message) {
-  for (const role of test.roles.values()) {
-    role.socket.emit(message);
+const sendSystemMessage = function(task, message) {
+  for (const role of task.roles.values()) {
+    role.socket.emit('iatf-control', message);
   }
 }
 
@@ -82,7 +83,7 @@ io.on('connection', socket => {
   const type = socket.handshake.query.type;
 
   if (!tasks.get(taskId)) {
-    console.warn('Invalid test ID.');
+    console.warn('Invalid task ID.');
     socket.disconnect(true);
     return;
   }
@@ -96,11 +97,11 @@ io.on('connection', socket => {
   roleInfo.socket = socket;
   roleInfo.type = type;
 
-  console.log('A new client connected. Test ID: ' + taskId + ', role: ' +
+  console.log('A new client connected. Task ID: ' + taskId + ', role: ' +
     role + ', type: ' + type);
 
   if (areAllRolesReady(tasks.get(taskId))) {
-    sendSystemMessage(test, 'start');
+    sendSystemMessage(task, 'start');
     // Record start time.
   }
 });
@@ -112,7 +113,7 @@ webapp.put('/rest/tasks', (req, res) => {
   console.log(req);
   const taskId = addTask(req.body.roles);
   if (taskId) {
-    return res.send(200, taskId);
+    return res.status(200).send(taskId);
   }
 });
 
@@ -123,7 +124,8 @@ const rolesMapToResponse = function(roles) {
   for (const [roleId, roleInfo] of roles.roles) {
     response.roles.push({
       name: roleId,
-      type: roleInfo.type
+      type: roleInfo.type,
+      config: roleInfo.config
     });
   }
   return response;
