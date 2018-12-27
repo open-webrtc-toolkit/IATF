@@ -11,6 +11,13 @@ const webapp = express();
 webapp.use(express.json()); // to support JSON-encoded bodies
 webapp.use(express.urlencoded()); // to support URL-encoded bodies
 
+const RoleState = Object.freeze({
+  unknown: 0,
+  ready: 1,
+  testing: 2,
+  ended: 3
+});
+
 // Map{taskId, {roles: map{roleName, {name: string, socket: socket, type: string}}}}.
 const tasks = new Map();
 
@@ -41,8 +48,10 @@ const addTask = function(roles) {
   };
   for (const role of roles) {
     task.roles.set(role.name, {
+      name: role.name,
       type: role.type,
-      config: role.config
+      config: role.config,
+      currentCase: 0
     });
   }
   tasks.set(id, task);
@@ -51,8 +60,12 @@ const addTask = function(roles) {
 
 // Emit a message to all other clients in current test. Message type is 'iatf-workflow'.
 const sendUserMessage = function(currentRoleName, roleInfoList, message) {
+  console.log('Send user message: ' + JSON.stringify(message));
   for (const role of roleInfoList) {
     if (role.name !== currentRoleName) {
+      if (!role.socket) {
+        return;
+      }
       role.socket.emit('iatf-workflow', message);
     }
   }
@@ -60,14 +73,31 @@ const sendUserMessage = function(currentRoleName, roleInfoList, message) {
 
 // Emit a message to all clients in current test. Message type is 'iatf-control'.
 const sendSystemMessage = function(task, message) {
+  console.log('Send system message: ' + JSON.stringify(message));
   for (const role of task.roles.values()) {
+    if (!role.socket) {
+      return;
+    }
     role.socket.emit('iatf-control', message);
   }
 }
 
-const areAllRolesReady = function(test) {
-  for (const role of test.roles.values()) {
+// Are all roles ready for start a task.
+const isTaskReady = function(task) {
+  for (const role of task.roles.values()) {
     if (!role.socket) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// Are all roles ready for a specific case.
+const isCaseReady = function(roleInfoList) {
+  let caseNumber;
+  for (const role of roleInfoList) {
+    caseNumber = caseNumber || role.currentCase;
+    if (role.state !== RoleState.ready || caseNumber !== role.currentCase) {
       return false;
     }
   }
@@ -100,9 +130,38 @@ io.on('connection', socket => {
   console.log('A new client connected. Task ID: ' + taskId + ', role: ' +
     role + ', type: ' + type);
 
-  if (areAllRolesReady(tasks.get(taskId))) {
-    sendSystemMessage(task, 'start');
-    // Record start time.
+  socket.on('iatf-workflow', (message) => {
+    // Add sender info and forward this message to all other participants.
+    message.sender = role;
+    sendUserMessage(role, task.roles.values(), message);
+  });
+
+  socket.on('iatf-control', (message) => {
+    switch (message.type) {
+      case 'case-ready':
+        roleInfo.currentCase++;
+        roleInfo.state = RoleState.ready;
+        if (isCaseReady) {
+          sendSystemMessage(task, {
+            type: 'case-start',
+            data: {
+              caseNumber: roleInfo.currentCase
+            }
+          });
+        }
+        break;
+      case 'case-end':
+        break;
+      default:
+        console.warn('Unrecognized control message from ' + role + '.');
+    }
+  });
+
+  if (isTaskReady(task)) {
+    sendSystemMessage(task, {
+      type: 'task-start'
+    });
+    console.log('Task is started.');
   }
 });
 
@@ -125,7 +184,9 @@ const rolesMapToResponse = function(roles) {
     response.roles.push({
       name: roleId,
       type: roleInfo.type,
-      config: roleInfo.config
+      config: roleInfo.config,
+      state: RoleState.unknown,
+      currentCase: 0
     });
   }
   return response;

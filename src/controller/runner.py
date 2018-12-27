@@ -22,7 +22,7 @@ class Runner:
         '''Setup testing environment.'''
         pass
 
-    async def run(self):
+    def run(self):
         '''Start to run tests.'''
         pass
 

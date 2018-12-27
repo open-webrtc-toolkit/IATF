@@ -1,32 +1,49 @@
+import {
+  Task
+} from "../../sdk/javascript/task.js";
+
 const expect = chai.expect;
-const socket = io('https://localhost:8080/?taskId=1f26d0b1-a76b-448c-82e0-ca45fffed938&role=role2&type=JavaScript');
+const url = window.location.href;
+const task = new Task({
+  taskId: (new URL(document.location)).searchParams.get("taskId"),
+  role: (new URL(document.location)).searchParams.get('role'),
+  socketIoUrl: 'https://' + document.domain + ':8080/'
+});
 
 describe('Interactivity tests', () => {
-  document.getElementById('state').innerText = 'Preparing';
+  document.getElementById('iatf-state').innerText = 'Preparing';
   before(() => {
-    return new Promise((resolve) => {
-      socket.on('iatf-control', (data) => {
-        switch (data) {
-          case 'start':
-            document.getElementById('state').innerText = 'Started';
-            resolve();
-            break;
-          default:
-            console.log('Received unknown message: ' + JSON.stringify(data));
-        }
-      })
-    });
+    return task.start();
   });
   describe('Basic connection tests', () => {
-    it('Each endpoint sends a message should success.', () => {
-      socket.emit('test');
+    beforeEach(() => {
+      return task.startCase();
+    });
+    afterEach(() => {
+      return task.stopCase();
+    });
+    it('Each endpoint sends a message should success.', (done) => {
+      task.addEventListener('test1', (event) => {
+        if (event.sender != role) {
+          done();
+        }
+      })
+      task.send('test1', 'Something useful.');
+    });
+    it('Each endpoint sends a message again should success.', (done) => {
+      task.addEventListener('test2', () => {
+        if (event.sender != role) {
+          done();
+        }
+      })
+      task.send('test2', 'Something more useful.');
     });
   });
 
-  after(()=>{
-    document.getElementById('state').innerText = 'Finished';
+  after(() => {
+    document.getElementById('iatf-state').innerText = 'Finished';
   });
-});
+}).timeout(50000);
 
 mocha.checkLeaks();
 mocha.run();
