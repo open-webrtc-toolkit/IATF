@@ -24,7 +24,7 @@ describe('Interactivity tests', () => {
     });
     it('Each endpoint sends a message should success.', (done) => {
       task.addEventListener('test1', (event) => {
-        if (event.sender != role) {
+        if (event.sender != task.role) {
           done();
         }
       })
@@ -32,7 +32,7 @@ describe('Interactivity tests', () => {
     });
     it('Each endpoint sends a message again should success.', (done) => {
       task.addEventListener('test2', () => {
-        if (event.sender != role) {
+        if (event.sender != task.role) {
           done();
         }
       })

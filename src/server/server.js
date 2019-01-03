@@ -37,8 +37,8 @@ httpServer.listen(8080);
 
 const io = require('socket.io').listen(httpServer);
 
-// Initialize a test.
-const addTask = function(roles) {
+// Initialize a task.
+const addTask = function(rolesInfo) {
   let id = uuid();
   while (tasks.has(id)) {
     id = uuid();
@@ -46,7 +46,8 @@ const addTask = function(roles) {
   const task = {
     roles: new Map()
   };
-  for (const role of roles) {
+  task.roles = new Map();
+  for (const role of rolesInfo) {
     task.roles.set(role.name, {
       name: role.name,
       type: role.type,
@@ -95,8 +96,9 @@ const isTaskReady = function(task) {
 // Are all roles ready for a specific case.
 const isCaseReady = function(roleInfoList) {
   let caseNumber;
-  for (const role of roleInfoList) {
+  for (const role of roleInfoList.values()) {
     caseNumber = caseNumber || role.currentCase;
+    console.log('Case number: ' + caseNumber);
     if (role.state !== RoleState.ready || caseNumber !== role.currentCase) {
       return false;
     }
@@ -112,7 +114,7 @@ io.on('connection', socket => {
   // Client type. e.g. JavaScript, iOS, Android.
   const type = socket.handshake.query.type;
 
-  if (!tasks.get(taskId)) {
+  if (!tasks.has(taskId)) {
     console.warn('Invalid task ID.');
     socket.disconnect(true);
     return;
@@ -126,6 +128,7 @@ io.on('connection', socket => {
   const roleInfo = task.roles.get(role);
   roleInfo.socket = socket;
   roleInfo.type = type;
+  roleInfo.currentCase = 0;
 
   console.log('A new client connected. Task ID: ' + taskId + ', role: ' +
     role + ', type: ' + type);
@@ -141,7 +144,8 @@ io.on('connection', socket => {
       case 'case-ready':
         roleInfo.currentCase++;
         roleInfo.state = RoleState.ready;
-        if (isCaseReady) {
+        console.log(task);
+        if (isCaseReady(task.roles)) {
           sendSystemMessage(task, {
             type: 'case-start',
             data: {
