@@ -13,15 +13,25 @@ import json
 import asyncio
 import concurrent.futures
 
+
+class Context(object):
+    def __init__(self, task_id, role, config):
+        self.task_id = task_id
+        self.role = role
+        self.config = config
+
+
 def _request_task_info(server, task_id, verify):
     '''Request configuration from IATF server.'''
     response = requests.get(server+'/rest/tasks/'+task_id, verify=verify)
     return response.json()
 
+
 async def _start_runners(runners):
     loop = asyncio.get_running_loop()
     futures = [loop.run_in_executor(None, runner.run) for runner in runners]
     await asyncio.gather(*futures)
+
 
 def main():
     parser = argparse.ArgumentParser(description='IATF controller.')
@@ -32,8 +42,9 @@ def main():
         '--server', help='IATF server address.', required=True)
     required_arguments.add_argument('--task', help='Task ID.', required=True)
     opts = parser.parse_args()
-    task_info=_request_task_info(opts.server, opts.task, opts.verify)
-    runners=(runner.create_runner(task['type'], task['config']) for task in task_info['roles'])
+    task_info = _request_task_info(opts.server, opts.task, opts.verify)
+    runners = (runner.create_runner(role['type'], Context(
+        opts.task, role['name'], role['config'])) for role in task_info['roles'])
     asyncio.run(_start_runners(runners))
 
 

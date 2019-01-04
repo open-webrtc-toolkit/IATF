@@ -39,6 +39,7 @@ const io = require('socket.io').listen(httpServer);
 
 // Initialize a task.
 const addTask = function(rolesInfo) {
+  console.log(rolesInfo);
   let id = uuid();
   while (tasks.has(id)) {
     id = uuid();
@@ -51,7 +52,7 @@ const addTask = function(rolesInfo) {
     task.roles.set(role.name, {
       name: role.name,
       type: role.type,
-      config: role.config,
+      config: role.config || {},
       currentCase: 0
     });
   }
@@ -188,9 +189,7 @@ const rolesMapToResponse = function(roles) {
     response.roles.push({
       name: roleId,
       type: roleInfo.type,
-      config: roleInfo.config,
-      state: RoleState.unknown,
-      currentCase: 0
+      config: roleInfo.config
     });
   }
   return response;
