@@ -17,7 +17,7 @@ export class Task extends EventDispatcher {
     this._started = false;
     this._caseSequenceNumber = 0;
     this._resolveStartCase;
-    this._caseState=CaseState.unknown;
+    this._caseState = CaseState.unknown;
     Object.defineProperty(this, 'configuration', {
       configurable: false,
       writable: false,
@@ -31,7 +31,7 @@ export class Task extends EventDispatcher {
       this._socket = io(this.configuration.socketIoUrl, {
         query: 'taskId=' + this.configuration.taskId + '&role=' + this.configuration.role + '&type=JavaScript'
       });
-      this._socket.on('iatf-control', (message)=> {
+      this._socket.on('iatf-control', (message) => {
         console.log('Received control message: ' + JSON.stringify(message));
         switch (message.type) {
           case 'task-start':
@@ -53,7 +53,7 @@ export class Task extends EventDispatcher {
             break;
           case 'case-start':
             if (this._resolveStartCase) {
-              this._caseState=CaseState.testing;
+              this._caseState = CaseState.testing;
               this._resolveStartCase();
             } else {
               console.warn('Receive case-start event in invalid state.')
@@ -82,7 +82,7 @@ export class Task extends EventDispatcher {
 
   startCase() {
     this._caseSequenceNumber++;
-    this._caseState=CaseState.ready;
+    this._caseState = CaseState.ready;
     this._socket.emit('iatf-control', {
       type: 'case-ready',
       message: {
@@ -96,7 +96,7 @@ export class Task extends EventDispatcher {
   }
 
   stopCase() {
-    this._caseState=CaseState.ended;
+    this._caseState = CaseState.ended;
     this._socket.emit('iatf-control', {
       type: 'case-end',
       message: {

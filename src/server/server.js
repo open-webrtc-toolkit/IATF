@@ -6,6 +6,7 @@ const spdy = require('spdy');
 const path = require('path');
 const commander = require('commander');
 const uuid = require('uuid/v4');
+const Task = require('./task.js').Task;
 
 const webapp = express();
 webapp.use(express.json()); // to support JSON-encoded bodies
@@ -44,67 +45,8 @@ const addTask = function(rolesInfo) {
   while (tasks.has(id)) {
     id = uuid();
   }
-  const task = {
-    roles: new Map()
-  };
-  task.roles = new Map();
-  for (const role of rolesInfo) {
-    task.roles.set(role.name, {
-      name: role.name,
-      type: role.type,
-      config: role.config || {},
-      currentCase: 0
-    });
-  }
-  tasks.set(id, task);
+  tasks.set(id, new Task(id, rolesInfo));
   return id;
-}
-
-// Emit a message to all other clients in current test. Message type is 'iatf-workflow'.
-const sendUserMessage = function(currentRoleName, roleInfoList, message) {
-  console.log('Send user message: ' + JSON.stringify(message));
-  for (const role of roleInfoList) {
-    if (role.name !== currentRoleName) {
-      if (!role.socket) {
-        return;
-      }
-      role.socket.emit('iatf-workflow', message);
-    }
-  }
-}
-
-// Emit a message to all clients in current test. Message type is 'iatf-control'.
-const sendSystemMessage = function(task, message) {
-  console.log('Send system message: ' + JSON.stringify(message));
-  for (const role of task.roles.values()) {
-    if (!role.socket) {
-      return;
-    }
-    role.socket.emit('iatf-control', message);
-  }
-}
-
-// Are all roles ready for start a task.
-const isTaskReady = function(task) {
-  for (const role of task.roles.values()) {
-    if (!role.socket) {
-      return false;
-    }
-  }
-  return true;
-}
-
-// Are all roles ready for a specific case.
-const isCaseReady = function(roleInfoList) {
-  let caseNumber;
-  for (const role of roleInfoList.values()) {
-    caseNumber = caseNumber || role.currentCase;
-    console.log('Case number: ' + caseNumber);
-    if (role.state !== RoleState.ready || caseNumber !== role.currentCase) {
-      return false;
-    }
-  }
-  return true;
 }
 
 io.on('connection', socket => {
@@ -120,76 +62,53 @@ io.on('connection', socket => {
     socket.disconnect(true);
     return;
   }
-  if (!tasks.get(taskId).roles.has(role)) {
+  const task = tasks.get(taskId);
+  console.log(task.roles);
+  if (!tasks.get(taskId).roles.find(r => {
+      return r.name === role;
+    })) {
     console.warn('Invalid role.');
     socket.disconnect(true);
     return;
   }
-  const task = tasks.get(taskId);
-  const roleInfo = task.roles.get(role);
-  roleInfo.socket = socket;
-  roleInfo.type = type;
-  roleInfo.currentCase = 0;
+  // The `connection` for task and role has a `send` message and a `onData` event handle.
+  const connection = Object.create({});
+  connection.send = (type, message) => {
+    console.log('Sending '+type+': '+message);
+    socket.emit(type, message);
+  };
+  for (const type of ['iatf-control', 'iatf-workflow']) {
+    socket.on(type, (data)=>{
+      if (connection.onData) {
+        connection.onData(type, data);
+      }
+    })
+  }
+  task.setConnection(role, connection);
 
   console.log('A new client connected. Task ID: ' + taskId + ', role: ' +
     role + ', type: ' + type);
-
-  socket.on('iatf-workflow', (message) => {
-    // Add sender info and forward this message to all other participants.
-    message.sender = role;
-    sendUserMessage(role, task.roles.values(), message);
-  });
-
-  socket.on('iatf-control', (message) => {
-    switch (message.type) {
-      case 'case-ready':
-        roleInfo.currentCase++;
-        roleInfo.state = RoleState.ready;
-        console.log(task);
-        if (isCaseReady(task.roles)) {
-          sendSystemMessage(task, {
-            type: 'case-start',
-            data: {
-              caseNumber: roleInfo.currentCase
-            }
-          });
-        }
-        break;
-      case 'case-end':
-        break;
-      default:
-        console.warn('Unrecognized control message from ' + role + '.');
-    }
-  });
-
-  if (isTaskReady(task)) {
-    sendSystemMessage(task, {
-      type: 'task-start'
-    });
-    console.log('Task is started.');
-  }
 });
 
 // Create a new test.
 // Example: {"roles":[{"name": "r1","type":"javascript"},{"name": "r2","type":"javascript"}]}
 webapp.put('/rest/tasks', (req, res) => {
   // req.body is expected to be [{name: string for role name, type: string for device type}].
-  console.log(req);
   const taskId = addTask(req.body.roles);
   if (taskId) {
     return res.status(200).send(taskId);
   }
 });
 
-const rolesMapToResponse = function(roles) {
+const rolesMapToResponse = function(task) {
   const response = {
     roles: []
   };
-  for (const [roleId, roleInfo] of roles.roles) {
+  for (const role of task.roles) {
     response.roles.push({
-      name: roleId,
-      type: roleInfo.type,
-      config: roleInfo.config
+      name: role.name,
+      type: role.type,
+      config: role.config
     });
   }
   return response;
@@ -197,10 +116,10 @@ const rolesMapToResponse = function(roles) {
 
 const tasksMapToResponse = function() {
   const response = [];
-  for (const [id, roles] of tasks) {
+  for (const task of tasks) {
     response.push({
-      id: id,
-      roles: rolesMapToResponse(roles)
+      id: task.id,
+      roles: rolesMapToResponse(task)
     });
   }
   return response;
