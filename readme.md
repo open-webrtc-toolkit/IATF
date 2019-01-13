@@ -68,7 +68,7 @@ node src/server/server.js --certificate_file <cert> --key_file <key>
 
 As current sample is a html page, you'll need a web server to host it and its resources. If you don't have such a web server, http-server might be a choice for development or evaluation. Simplely install it by `npm install -g http-server`. Then `http-server src\client`. It will listen HTTP request on 8081 port because the default 8080 is occupied by IATF server.
 
-3. Add a task to IATF server with a post request. An example could be
+3. Add a task to IATF server by a REST request (PUT) to `https://<server>/rest/v1/tasks`. An example could be
 ```
 {
     "roles": [{
