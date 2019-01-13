@@ -92,7 +92,7 @@ io.on('connection', socket => {
 
 // Create a new test.
 // Example: {"roles":[{"name": "r1","type":"javascript"},{"name": "r2","type":"javascript"}]}
-webapp.put('/rest/tasks', (req, res) => {
+webapp.put('/rest/v1/tasks', (req, res) => {
   // req.body is expected to be [{name: string for role name, type: string for device type}].
   const taskId = addTask(req.body.roles);
   if (taskId) {
@@ -125,11 +125,11 @@ const tasksMapToResponse = function() {
   return response;
 }
 
-webapp.get('/rest/tasks', (req, res) => {
+webapp.get('/rest/v1/tasks', (req, res) => {
   return res.send(tasksMapToResponse())
 });
 
-webapp.get('/rest/tasks/:task', (req, res) => {
+webapp.get('/rest/v1/tasks/:task', (req, res) => {
   const id = req.params.task;
   if (!tasks.has(id)) {
     res.status(404);

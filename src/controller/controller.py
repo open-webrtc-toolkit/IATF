@@ -23,7 +23,7 @@ class Context(object):
 
 def _request_task_info(server, task_id, verify):
     '''Request configuration from IATF server.'''
-    response = requests.get(server+'/rest/tasks/'+task_id, verify=verify)
+    response = requests.get(server+'/rest/v1/tasks/'+task_id, verify=verify)
     return response.json()
 
 
