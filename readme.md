@@ -57,24 +57,32 @@ The following figure shows the architecture of this framework.
 
 ## Sample
 
+A sample is included to demostrate how to add and run a task for two web endpoints. Task info will be uploaded by a REST request, and both test devices will be launched by controller and WebDriver.
+
 1. Start IATF server.
 ```
 node src/server/server.js --certificate_file <cert> --key_file <key>
 ```
 
-2. Add a task to IATF server with a post request. An example could be
+2. Host test pages.
+
+As current sample is a html page, you'll need a web server to host it and its resources. If you don't have such a web server, http-server might be a choice for development or evaluation. Simplely install it by `npm install -g http-server`. Then `http-server src\client`. It will listen HTTP request on 8081 port because the default 8080 is occupied by IATF server.
+
+3. Add a task to IATF server by a REST request (PUT) to `https://<server>/rest/v1/tasks`. An example could be
 ```
 {
     "roles": [{
         "name": "role1",
-        "type": "iOS"
+        "type": "JavaScript",
+        "config":{"url":"http://localhost:8081/javascript/test.html"}
     },{
         "name": "role2",
-        "type": "JavaScript"
+        "type": "JavaScript",
+        "config":{"url":"http://localhost:8081/javascript/test.html"}
     }]
 }
 ```
- 3. Start client controller.
- ```
- python src/controller/controller.py --server https://localhost:8080 --no_ssl_verification --task <taskId>
- ```
+4. Start client controller.
+```
+python src/controller/controller.py --server https://localhost:8080 --no_ssl_verification --task <taskId>
+```
