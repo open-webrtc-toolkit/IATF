@@ -52,8 +52,6 @@ In this section, we present our design to address the aforementioned problems vi
     + Intermediate communication component between test server and test devices
 3. **Test Client**: The test clients are the SUT (system under testing) on which the test cases with corresponding third-party API test framework are executed. They are deployed on top of different platforms for different types of API testing.
 
-## Sample with JavaScript client
-
 A sample is included to demostrate how to add and run a task for two web endpoints. Task info will be uploaded by a REST request, and both test devices will be launched by controller and WebDriver.
 
 1. Install dependence and start IATF server.
@@ -67,7 +65,7 @@ A sample is included to demostrate how to add and run a task for two web endpoin
    ```
    node src/server/server.js --certificate_file <cert> --key_file <key>
    ```
-
+## Sample with JavaScript client
 2. Host test pages.
 
 As current sample is a html page, you'll need a web server to host it and its resources. If you don't have such a web server, http-server might be a choice for development or evaluation. Simplely install it by `npm install -g http-server`. Then `http-server src\client`. It will listen HTTP request on 8081 port because the default 8080 is occupied by IATF server.
@@ -91,7 +89,36 @@ As current sample is a html page, you'll need a web server to host it and its re
    + Install webdriver,download the corresponding webdrivers for your tested browser.
    + Modify webdriver installation path in src/controller/runners/javascriptrunner.py.
 
+## Sample with Android client
+2. Install your test apk to android device
+3. Add a task to IATF server by a REST request (PUT) to `https://<server>/rest/v1/tasks`. An example could be
+```
+{
+    "roles": [{
+      "name": "role1",
+      "type": "Android",
+      "config": {
+        "sourcePath": "your_source_path",
+        "package": "package_name",
+        "testClass": "test_class",
+        "testRunner": "android.support.test.runner.AndroidJUnitRunner",
+        "device": "android_device"
+      }
+    },{
+      "name": "role2",
+      "type": "Android",
+      "config": {
+        "sourcePath": "your_source_path",
+        "package": "package_name",
+        "testClass": "test_class",
+        "testRunner": "android.support.test.runner.AndroidJUnitRunner",
+        "device": "android_device"
+      }
+    }]
+}
+```
 5. Start client controller.
 ```
 python src/controller/controller.py --server https://localhost:8080 --no_ssl_verification --task <taskId>
 ```
+
