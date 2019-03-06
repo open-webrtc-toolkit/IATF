@@ -18,6 +18,7 @@ export class Task extends EventDispatcher {
     this._caseSequenceNumber = 0;
     this._resolveStartCase;
     this._caseState = CaseState.unknown;
+    this._eventMsg = new Map();
     Object.defineProperty(this, 'configuration', {
       configurable: false,
       writable: false,
@@ -67,18 +68,11 @@ export class Task extends EventDispatcher {
         console.log('Recieved workflow message: ' + message);
         this.dispatchEvent(new WorkflowEvent(message.type, {
           sender: message.sender,
-          data: message.data
+          message: message.data
         }));
       });
     });
   };
-
-  send(type, data) {
-    this._socket.emit('iatf-workflow', {
-      type: type,
-      data: data
-    });
-  }
 
   startCase() {
     this._caseSequenceNumber++;
@@ -104,6 +98,47 @@ export class Task extends EventDispatcher {
       }
     });
     // Return immediately, so app has more time to prepare for the next case. But we can wait for server's confirmation without changing API.
+    return Promise.resolve();
+  }
+
+  bindListener(eventType) {
+    this.addEventListener(eventType, (event) => {
+      console.log(eventType)
+      console.log(event)
+      if (!this._eventMsg.has(eventType)) {
+        this._eventMsg.set(eventType, event);
+      }else{
+        this._eventMsg.get(eventType).sender = event.sender;
+        this._eventMsg.get(eventType).message = event.data;
+      }
+    })
+  }
+
+  waitWorkflowLock(eventType, eventData) {
+    return new Promise((resolve, reject) => {
+      let interval = setInterval(() => {
+        if (this._eventMsg.has(eventType) && this._eventMsg.get(eventType).message == eventData){
+          clearInterval(interval)
+          clearTimeout(timeout)
+          resolve()
+        }
+      }, 500)
+      let timeout = setTimeout(() => {
+         clearInterval(interval)
+         reject("can not get message:" + eventData)
+      }, 10000)
+    })
+  }
+
+  notifyWorkflowLock(type, data) {
+    this._socket.emit('iatf-workflow', {
+      type: type,
+      data: data
+    });
+  }
+
+  run(func){
+    func()
     return Promise.resolve();
   }
 }

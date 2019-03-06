@@ -20,28 +20,24 @@ describe('Interactivity tests', function() {
   describe('Basic connection tests', () => {
     beforeEach(() => {
       // Start a new test case.
+      task.bindListener('user2')
       return task.startCase();
     });
     afterEach(() => {
       // Stop a test case.
       return task.stopCase();
     });
-    it('Each endpoint sends a message should success.', (done) => {
-      task.addEventListener('test1', (event) => {
-        if (event.sender != task.role) {
-          // Execute done when received message from another endpoint.
-          done();
-        }
+    it('testConnect should success.', (done) => {
+      task.run(() => {
+        task.notifyWorkflowLock('user1', 'connect');
+      }).then(() => {
+        return task.waitWorkflowLock('user2', 'connect')
+      }).then(() => {
+        console.log("test success")
+        done()
+      }).catch(err => {
+        done(err)
       })
-      task.send('test1', 'Something useful.');
-    });
-    it('Each endpoint sends a message again should success.', (done) => {
-      task.addEventListener('test2', (event) => {
-        if (event.sender != task.role) {
-          done();
-        }
-      })
-      task.send('test2', 'Something more useful.');
     });
   });
 
