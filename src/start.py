@@ -44,7 +44,6 @@ if __name__ == '__main__':
         '--server', help='IATF server address.', required=True)
     required_arguments.add_argument('--task', help='Task ID.', default=None)
     opts = parser.parse_args()
-
     task_id = opts.task
 
     if task_id is None:
