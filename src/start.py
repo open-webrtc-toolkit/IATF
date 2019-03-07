@@ -51,7 +51,7 @@ if __name__ == '__main__':
         headers = {
             "Content-Type": "application/json"
         }
-        task_id = do_request('https://10.239.44.83:8080/rest/v1/tasks', method="PUT", data=json.dumps(TASK),
+        task_id = do_request(opts.server + '/rest/v1/tasks', method="PUT", data=json.dumps(TASK),
                              headers=headers)
     print(task_id)
     if task_id is not None:
