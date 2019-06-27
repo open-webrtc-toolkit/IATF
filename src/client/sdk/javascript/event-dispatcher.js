@@ -1,3 +1,8 @@
+// Copyright (C) <2019> Intel Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+'use strict';
+
 /**
  * @class EventDispatcher
  * @classDesc A shim for EventTarget. Might be changed to EventTarget later.

@@ -1,3 +1,8 @@
+// Copyright (C) <2019> Intel Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+'use strict';
+
 const uuid = require('uuid/v4');
 const Role = require('./role.js').Role;
 const RoleState = require('./role.js').State;
@@ -12,8 +17,9 @@ module.exports.Task = class Task {
       value: id || uuid()
     });
     // this._roles is a map for internal use, this.role is an array.
-    this._roles = new Map(roleInits.map(roleInit => [roleInit.name, new Role(
-      roleInit)]));
+    this._roles = new Map(roleInits.map(roleInit => [roleInit.name,
+      new Role(roleInit)
+    ]));
     for (const role of this._roles.values()) {
       role.onCaseStart = () => {
         console.log(role.name + ' reports case started.');
@@ -63,7 +69,8 @@ module.exports.Task = class Task {
     let caseNumber;
     for (const role of this._roles.values()) {
       caseNumber = caseNumber || role.currentCase;
-      if (role.state !== RoleState.ready || caseNumber !== role.currentCase) {
+      if (role.state !== RoleState.ready || caseNumber !== role
+        .currentCase) {
         return false;
       }
     }

@@ -1,3 +1,7 @@
+# Copyright (C) <2019> Intel Corporation
+#
+# SPDX-License-Identifier: Apache-2.0
+
 '''IATF Test Runner base class
 
 It's the base class for all test runners on different platforms.
