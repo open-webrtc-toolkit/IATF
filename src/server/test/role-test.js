@@ -1,3 +1,8 @@
+// Copyright (C) <2019> Intel Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+'use strict';
+
 const chai = require('chai');
 const sinon = require('sinon');
 const Role = require('../role.js').Role;

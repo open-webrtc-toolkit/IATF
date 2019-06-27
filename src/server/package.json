@@ -8,12 +8,11 @@
     "chai-as-promised": "^7.1.1",
     "commander": "^2.19.0",
     "express": "^4.16.4",
-    "fs": "^0.0.1-security",
     "https": "^1.0.0",
+    "morgan": "^1.9.1",
+    "sinon": "^7.2.2",
     "socket.io": "^2.1.1",
-    "spdy": "^4.0.0",
-    "uuid": "^3.3.2",
-    "sinon": "^7.2.2"
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "mocha": "^5.2.0"
@@ -29,7 +28,7 @@
   "author": "",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/open-media-streamer/iatf/issues"
+    "url": "https://github.com/open-webrtc-toolkit/iatf/issues"
   },
-  "homepage": "https://github.com/open-media-streamer/iatf#readme"
+  "homepage": "https://github.com/open-webrtc-toolkit/iatf#readme"
 }

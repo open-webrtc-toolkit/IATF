@@ -1,14 +1,22 @@
+// Copyright (C) <2019> Intel Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Starts a HTTP server for dashboard and a Socket.IO server for testing.
+'use strict';
 
 const express = require('express');
 const fs = require('fs');
-const spdy = require('spdy');
+var https = require('https')
 const path = require('path');
+const morgan = require('morgan')
 const commander = require('commander');
 const uuid = require('uuid/v4');
 const Task = require('./task.js').Task;
+const crypto = require('crypto');
 
 const webapp = express();
+
 webapp.use(express.json()); // to support JSON-encoded bodies
 webapp.use(express.urlencoded()); // to support URL-encoded bodies
 
@@ -33,7 +41,7 @@ const httpsOptions = {
   cert: fs.readFileSync(commander.certificate_file).toString()
 };
 
-const httpServer = spdy.createServer(httpsOptions, webapp);
+const httpServer = https.createServer(httpsOptions, webapp);
 httpServer.listen(8080);
 
 const io = require('socket.io').listen(httpServer);
@@ -65,8 +73,8 @@ io.on('connection', socket => {
   const task = tasks.get(taskId);
   console.log(task.roles);
   if (!tasks.get(taskId).roles.find(r => {
-      return r.name === role;
-    })) {
+    return r.name === role;
+  })) {
     console.warn('Invalid role.');
     socket.disconnect(true);
     return;
@@ -74,11 +82,11 @@ io.on('connection', socket => {
   // The `connection` for task and role has a `send` message and a `onData` event handle.
   const connection = Object.create({});
   connection.send = (type, message) => {
-    console.log('Sending '+type+': '+message);
+    console.log('Sending ' + type + ': ' + message);
     socket.emit(type, message);
   };
   for (const type of ['iatf-control', 'iatf-workflow']) {
-    socket.on(type, (data)=>{
+    socket.on(type, (data) => {
       if (connection.onData) {
         connection.onData(type, data);
       }
@@ -90,9 +98,21 @@ io.on('connection', socket => {
     role + ', type: ' + type);
 });
 
+morgan.token('errormsg', function getErrorMsg (req) {
+  return req.errormsg
+})
+
+var logDirectory = path.join(__dirname, 'logs')
+fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory)
+var accessLogStream = fs.createWriteStream(path.join(logDirectory, 'error.log'), { flags: 'a' })
+
+// setup the logger
+webapp.use(morgan('combined', { stream: accessLogStream, skip: function (req, res) { return res.statusCode < 400 }}))
+webapp.use(morgan(':errormsg', { stream: accessLogStream, skip: function (req, res) { return res.statusCode < 400 }}))
+
 // Create a new test.
 // Example: {"roles":[{"name": "r1","type":"javascript"},{"name": "r2","type":"javascript"}]}
-webapp.put('/rest/v1/tasks', (req, res) => {
+webapp.put('/rest/v1/tasks', (req, res, next) => {
   // req.body is expected to be [{name: string for role name, type: string for device type}].
   const taskId = addTask(req.body.roles);
   if (taskId) {
@@ -125,11 +145,11 @@ const tasksMapToResponse = function() {
   return response;
 }
 
-webapp.get('/rest/v1/tasks', (req, res) => {
+webapp.get('/rest/v1/tasks', (req, res, next) => {
   return res.send(tasksMapToResponse())
 });
 
-webapp.get('/rest/v1/tasks/:task', (req, res) => {
+webapp.get('/rest/v1/tasks/:task', (req, res, next) => {
   const id = req.params.task;
   if (!tasks.has(id)) {
     res.status(404);
@@ -137,8 +157,13 @@ webapp.get('/rest/v1/tasks/:task', (req, res) => {
   return res.send(rolesMapToResponse(tasks.get(id)));
 })
 
-webapp.use('/web', express.static('LockServerHtmlClient'));
-
 webapp.get('*', (req, res) => {
   res.send(404, 'Not found');
+});
+
+webapp.use(function(err, req, res, next) {
+  console.error(err); // Log error message in our server's console
+  if (!err.statusCode) err.statusCode = 500; // If err has no specified error code, set error code to 'Internal Server Error (500)'
+  req.errormsg = err.stack
+  res.status(err.statusCode).send(err.message); // All HTTP requests must have a response, so let's send back an error with its status code and message
 });

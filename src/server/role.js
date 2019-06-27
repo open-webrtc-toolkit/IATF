@@ -1,3 +1,8 @@
+// Copyright (C) <2019> Intel Corporation
+//
+// SPDX-License-Identifier: Apache-2.0
+'use strict';
+
 const State = Object.freeze({
   unknown: 0,
   ready: 1, // Waiting for next case.
@@ -5,7 +10,7 @@ const State = Object.freeze({
   ended: 3 // All case are finished.
 });
 
-module.exports.State=State;
+module.exports.State = State;
 
 // A role is a participant in a specific testing task. It will be associated with a device when running cases.
 module.exports.Role = class Role {
@@ -42,12 +47,12 @@ module.exports.Role = class Role {
     this.onCaseEnd = undefined;
     this.onConnect = undefined;
     this.onDisconnect = undefined;
-    this.onWorkflowData = undefined;  // Receive workflow message from client side.
+    this.onWorkflowData = undefined; // Receive workflow message from client side.
   }
 
   sendControlData(message) {
     if (this._connection) {
-      console.log('Role sending control message: '+message);
+      console.log('Role sending control message: ' + message);
       this._connection.send('iatf-control', message);
     }
   }
@@ -96,7 +101,7 @@ module.exports.Role = class Role {
   }
 
   _onWorkflowData(data) {
-    if(this.onWorkflowData){
+    if (this.onWorkflowData) {
       this.onWorkflowData(data);
     }
   }

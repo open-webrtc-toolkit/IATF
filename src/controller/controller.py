@@ -1,3 +1,7 @@
+# Copyright (C) <2019> Intel Corporation
+#
+# SPDX-License-Identifier: Apache-2.0
+
 '''IATF controller
 
 It fetches IATF task from server and start specified test clients.

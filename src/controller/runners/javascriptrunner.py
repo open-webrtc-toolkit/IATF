@@ -1,3 +1,7 @@
+# Copyright (C) <2019> Intel Corporation
+#
+# SPDX-License-Identifier: Apache-2.0
+
 from threading import Timer
 import asyncio
 from selenium.webdriver.support import expected_conditions as EC
@@ -13,7 +17,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 class JavaScriptRunner(Runner):
     def __init__(self, context):
         self.driver = webdriver.Chrome(
-            executable_path='D:\Program Files\WebDrivers\chromedriver.exe')
+            executable_path='')
         self.url = context.config['url']+'?taskId=' + \
             context.task_id+'&role='+context.role
 
