@@ -1,0 +1,18 @@
+{
+  "roles": [
+    {
+      "name": "role1",
+      "type": "JavaScript",
+      "config": {
+        "url": "http://localhost:8081/javascript/user1.html"
+      }
+    },
+    {
+      "name": "role2",
+      "type": "JavaScript",
+      "config": {
+        "url": "http://localhost:8081/javascript/user2.html"
+      }
+    }
+  ]
+}
